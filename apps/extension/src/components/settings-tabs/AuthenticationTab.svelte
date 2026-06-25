@@ -2,7 +2,7 @@
   import { settingsStore, settings } from '@/settings/index.svelte'
   import AuthButton from '@/components/AuthButton.svelte'
   import { log } from '@/logger'
-  import { AuthClient } from '@/oauth2/auth'
+  import { AuthClient } from '@melledijkstra/extension'
   import {
     GoogleAuthProvider,
     SpotifyAuthProvider,

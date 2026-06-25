@@ -1,9 +1,11 @@
 import manifest from '../../manifest.json' with { type: 'json' }
 import { settingsStore } from '@/settings/index.svelte'
 import { GoogleAuthConfig, SpotifyAuthConfig, FitbitAuthConfig } from '@melledijkstra/auth'
-export type { OauthProvider } from '@melledijkstra/auth'
+
+export type OauthProvider = 'google' | 'spotify' | 'fitbit'
 
 export class GoogleAuthProvider extends GoogleAuthConfig {
+  // @ts-expect-error Overriding property with accessor
   get clientId() {
     return settingsStore.apiKeys.google || ''
   }
@@ -11,6 +13,7 @@ export class GoogleAuthProvider extends GoogleAuthConfig {
 }
 
 export class SpotifyAuthProvider extends SpotifyAuthConfig {
+  // @ts-expect-error Overriding property with accessor
   get clientId() {
     return settingsStore.apiKeys.spotify || ''
   }
@@ -24,6 +27,7 @@ export class SpotifyAuthProvider extends SpotifyAuthConfig {
 }
 
 export class FitbitAuthProvider extends FitbitAuthConfig {
+  // @ts-expect-error Overriding property with accessor
   get clientId() {
     return settingsStore.apiKeys.fitbit || ''
   }

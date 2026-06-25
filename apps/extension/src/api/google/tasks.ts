@@ -1,6 +1,6 @@
 import type { TaskList, Task } from '@/api/definitions/google'
 import { TokenBaseClient } from '../tokenbaseclient'
-import type { AuthClient } from '@/oauth2/auth'
+import type { AuthClient } from '@melledijkstra/extension'
 
 const BASE_URL = 'https://tasks.googleapis.com/tasks/v1'
 

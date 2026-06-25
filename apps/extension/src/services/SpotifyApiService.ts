@@ -1,6 +1,6 @@
 import { SpotifyApiClient } from "@/api/spotify";
 import { MemoryCache, MIN_5 } from "@/cache/memory";
-import type { AuthClient } from "@/oauth2/auth";
+import type { AuthClient } from "@melledijkstra/extension";
 import type { Playlist, Track } from "MusicPlayer";
 import { convertSpotifyPlaylist, convertSpotifyTrackToMPTrack, convertApiPlaybackState } from "@/transforms/spotify";
 import { Logger } from "@/logger";
