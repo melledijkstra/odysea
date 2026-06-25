@@ -12,6 +12,8 @@ services:
       - N8N_BADGE_LINK=false
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
       - RECIPIENT_EMAIL=${RECIPIENT_EMAIL}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
     volumes:
       - ./data:/home/node/.n8n
       - ./workflows:/backup

@@ -1,17 +1,19 @@
 {
-  "updatedAt": "2026-06-25T07:02:20.598Z",
+  "updatedAt": "2026-06-25T08:14:37.572Z",
   "createdAt": "2026-06-21T20:21:30.284Z",
   "id": "FoQlcw8JLo8Vj0I8",
   "name": "Timebased Aggregation",
   "description": null,
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {
       "parameters": {
         "rule": {
           "interval": [
-            {}
+            {
+              "triggerAtHour": 18
+            }
           ]
         }
       },
@@ -94,23 +96,30 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner"
   },
-  "staticData": null,
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
   "meta": {
     "templateCredsSetupCompleted": true
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "fba508ff-ca67-43f3-a837-97af60b59e98",
-  "activeVersionId": null,
-  "versionCounter": 24,
-  "triggerCount": 0,
+  "versionId": "2f565638-7bb6-4e97-8501-1fb0751ef3e2",
+  "activeVersionId": "2f565638-7bb6-4e97-8501-1fb0751ef3e2",
+  "versionCounter": 52,
+  "triggerCount": 2,
   "sourceWorkflowId": null,
   "tags": [],
   "shared": [],
   "versionMetadata": {
-    "name": null,
-    "description": null
+    "name": "Version 2f565638",
+    "description": ""
   }
 }

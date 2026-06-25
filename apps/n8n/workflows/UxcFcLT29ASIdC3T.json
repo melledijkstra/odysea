@@ -1,0 +1,185 @@
+{
+  "updatedAt": "2026-06-25T11:28:31.772Z",
+  "createdAt": "2026-06-25T10:26:08.229Z",
+  "id": "UxcFcLT29ASIdC3T",
+  "name": "Work Events to Google Calendar",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "has:attachment",
+          "sender": "={{ $env.WORK_EMAIL }}"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "147d2c61-4511-46cc-9f3f-54bf0580e30e",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UnrWXRzkflCFynN3",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "fromIcs",
+        "binaryPropertyName": "attachment_0",
+        "destinationKey": "eventData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a0848a1f-c52d-4773-8851-fa8b22905d9a",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "3eca3d1aba4155299ca3076d5a21860aeb954cfb99633c596f1ece5dca96c782@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Work"
+        },
+        "start": "={{ $json.eventData.events[0].start.date }}",
+        "end": "={{ $json.eventData.events[0].end.date }}",
+        "useDefaultReminders": false,
+        "additionalFields": {
+          "description": "={{ $json.eventData.events[0].description.replaceAll(\"\\\\n\", \"\\n\") }}",
+          "location": "={{ $json.eventData.events[0].location }}",
+          "summary": "={{ $json.eventData.events[0].summary.replace('Fw: ', '') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        0
+      ],
+      "id": "f6a7114b-dad0-4c1a-8699-a1f785cf52ff",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "x8iS6oAvnfsmRXuR",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        640,
+        0
+      ],
+      "id": "10335c36-7423-423e-9bdc-d4e6277fd4f8",
+      "name": "Delete a message",
+      "webhookId": "9d8ee423-7ac4-434a-8544-230945416a0d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UnrWXRzkflCFynN3",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "Delete a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "732fd5e0-983a-4a8d-8a56-6fadf6e8454d",
+  "activeVersionId": null,
+  "versionCounter": 120,
+  "triggerCount": 0,
+  "sourceWorkflowId": null,
+  "tags": [
+    {
+      "updatedAt": "2026-06-25T11:27:42.457Z",
+      "createdAt": "2026-06-25T11:27:42.457Z",
+      "id": "1Wrt2d3F5DA50q6k",
+      "name": "work"
+    },
+    {
+      "updatedAt": "2026-06-25T11:27:46.757Z",
+      "createdAt": "2026-06-25T11:27:46.757Z",
+      "id": "q3nizic1MvncDiij",
+      "name": "calendar"
+    }
+  ],
+  "shared": [],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

@@ -15,8 +15,8 @@ fi
 echo "Exporting all workflows to workflows/ directory..."
 docker compose exec -T n8n n8n export:workflow --backup --output=/backup/
 
-echo "Sanitizing exported workflows..."
-node scripts/sanitize.js
+# echo "Sanitizing exported workflows..."
+# node scripts/sanitize.js
 
 echo "Backup completed successfully!"
 
