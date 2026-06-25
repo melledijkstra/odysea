@@ -52,7 +52,7 @@ export class AuthClient {
     try {
       const token = await this.getAuthToken()
   
-      this.logger.log({ token })
+      this.logger.debug('isAuthenticated?', { token })
   
       return !!token
     } catch {
@@ -163,7 +163,7 @@ export class AuthClient {
     let { access_token } = storeToken ?? {};
     const { refresh_token, expires_at } = storeToken ?? {}
 
-    this.logger.log('token in storage?', { storeToken })
+    this.logger.debug('token in storage?', { storeToken })
 
     // Subtract some buffer (60 seconds) to ensure we refresh before actual expiry
     const isTokenExpired = !expires_at || Date.now() > expires_at - 60_000
@@ -222,7 +222,7 @@ export class AuthClient {
       // if we are on chrome browser then use the preferred auth token
       // method that is already build in
       try {
-        this.logger.log(
+        this.logger.debug(
           'trying to retrieve oauth token using build in functionality'
         )
         const token = await this.getAuthTokenChrome(interactive)
@@ -242,12 +242,12 @@ export class AuthClient {
     const storedToken = await this.getTokenFromStoreOrRefreshToken()
 
     if (storedToken) {
-      this.logger.log('we have a refreshed or stored token, lets use it', {
+      this.logger.debug('we have a refreshed or stored token, lets use it', {
         storedToken
       })
       return storedToken
     } else if (!interactive) {
-      this.logger.log(
+      this.logger.debug(
         'no token retrieved, but not interactive, so returning nothing'
       )
       return

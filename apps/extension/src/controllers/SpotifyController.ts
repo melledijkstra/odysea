@@ -1,65 +1,52 @@
-import { SpotifyApiClient } from "@/api/spotify";
 import { Logger } from "@/logger";
-import { initializeSpotifyPlayer } from "@/modules/spotify/spotify-sdk";
 import { spotifyState } from "@/modules/spotify/spotify.state.svelte";
 import { AuthClient } from "@/oauth2/auth";
 import { SpotifyAuthProvider } from "@/oauth2/providers";
 import type { Album, PlaybackState, Playlist, Track } from "MusicPlayer";
 import type { ILogger } from "@/interfaces/logger.interface";
-import { MemoryCache, MIN_5 } from "@/cache/memory";
-import { convertApiPlaybackState, convertPlayerState, convertSpotifyPlaylist, convertSpotifyTrackToMPTrack } from "@/transforms/spotify";
+import { convertPlayerState } from "@/transforms/spotify";
 import { BaseMusicController } from "./BaseMusicController";
 import browser from 'webextension-polyfill';
+import { SpotifyPlayerService } from "@/services/SpotifyPlayerService";
+import { SpotifyApiService } from "@/services/SpotifyApiService";
 
 export class SpotifyController extends BaseMusicController implements ILogger {
   logger: Logger = new Logger('SpotifyController');
 
   protected authClient: AuthClient = new AuthClient(new SpotifyAuthProvider());
-  protected api: SpotifyApiClient = new SpotifyApiClient(this.authClient);
-  protected player?: Spotify.Player;
-  private readonly cache = new MemoryCache();
+  protected playerService: SpotifyPlayerService;
+  protected apiService: SpotifyApiService;
 
   private initialized: boolean = false;
   public isPlayerActive: boolean = false;
 
+  constructor(state: { playback: PlaybackState }) {
+    super(state);
+    this.apiService = new SpotifyApiService(this.authClient);
+    this.playerService = new SpotifyPlayerService(this.authClient, this.state.playback.volume);
+
+    this.playerService.setCallbacks({
+      onStateChanged: (state) => this.playerStateChanged(state),
+      onReady: (deviceId) => this.handlePlayerReady(deviceId),
+      onNotReady: () => this.handlePlayerNotReady()
+    });
+  }
+
   get auth(): AuthClient {
-    return this.authClient
+    return this.authClient;
   }
 
   async getPlaylistItems(playlist: Playlist): Promise<Track[]> {
-    const tracks = await this.api.getPlaylistItems(playlist.id)
-    return tracks.map(convertSpotifyTrackToMPTrack)
+    return this.apiService.getPlaylistItems(playlist.id);
   }
 
   async getPlaylists(): Promise<Playlist[]> {
-    const cached = this.cache.get<Playlist[]>('playlists')
-    if (cached) {
-      return cached
-    }
-    try {
-      const playlists = await this.api.userPlaylists()
-      const converted = playlists.map(convertSpotifyPlaylist)
-      this.cache.set('playlists', converted, MIN_5) // Cache for 5 minutes
-      return converted
-    } catch(error) {
-      this.logger.error('Failed to retrieve playlists', error);
-    }
-
-    return [];
+    return this.apiService.getPlaylists();
   }
 
   async switchRepeatMode(repeatMode: string | number): Promise<void> {
-    if (!this.api) {
-      throw new Error('Spotify API client is not initialized');
-    }
-    await this.api?.toggleRepeatMode(repeatMode);
+    await this.apiService.toggleRepeatMode(repeatMode);
     await this.syncState();
-  }
-
-  async togglePlayPause(): Promise<void> {
-    if (spotifyState.deviceId && this.player) {
-      return this.player.togglePlay()
-    }
   }
 
   async initialize() {
@@ -68,212 +55,181 @@ export class SpotifyController extends BaseMusicController implements ILogger {
       return;
     }
 
-    spotifyState.isAuthenticated = await this.authClient.isAuthenticated()
-    browser.storage.local.onChanged.addListener(this.handleStorageChange)
+    spotifyState.isAuthenticated = await this.authClient.isAuthenticated();
+    browser.storage.local.onChanged.addListener(this.handleStorageChange);
 
     if (spotifyState.isAuthenticated) {
-      await this.initializeSpotifyPlayer(this.authClient)
+      await this.playerService.initialize();
     }
 
     this.initialized = true;
   }
 
   destroy() {
-    super.destroy()
-
-    browser.storage.local.onChanged.removeListener(this.handleStorageChange)
-
-    if (this.player) {
-      this.player.disconnect()
-      delete this.player
-    }
+    super.destroy();
+    browser.storage.local.onChanged.removeListener(this.handleStorageChange);
+    this.playerService.disconnect();
   }
 
   private readonly handleStorageChange = async (changes: Record<string, browser.Storage.StorageChange>) => {
-    const key = this.authClient.storageKey
+    const key = this.authClient.storageKey;
     if (changes[key]) {
-      const isAuthenticated = changes[key].newValue
-      spotifyState.isAuthenticated = !!isAuthenticated
-      this.logger.log('Spotify auth state changed reactively:', spotifyState.isAuthenticated)
+      const isAuthenticated = changes[key].newValue;
+      spotifyState.isAuthenticated = !!isAuthenticated;
+      this.logger.log('Spotify auth state changed reactively:', spotifyState.isAuthenticated);
       if (isAuthenticated) {
-        if (!this.player) {
+        if (!this.playerService.hasPlayer()) {
           try {
-            await this.initializeSpotifyPlayer(this.authClient)
+            await this.playerService.initialize();
           } catch (err) {
-            this.logger.error('Failed to initialize Spotify player after re-auth:', err)
+            this.logger.error('Failed to initialize Spotify player after re-auth:', err);
           }
         }
       } else {
-        this.isPlayerActive = false
-        if (this.player) {
-          this.player.disconnect()
-          delete this.player
-        }
-        delete spotifyState.deviceId
-        spotifyState.devices = []
+        this.isPlayerActive = false;
+        this.playerService.disconnect();
+        delete spotifyState.deviceId;
+        spotifyState.devices = [];
       }
     }
-  }
+  };
 
   private async retrieveDevices(): Promise<void> {
-    const availableDevices = await this.api?.availableDevices()
+    const availableDevices = await this.apiService.availableDevices();
     if (availableDevices?.length) {
-      spotifyState.devices = availableDevices
+      spotifyState.devices = availableDevices;
     }
   }
 
-private async initializeSpotifyPlayer(authClient: AuthClient) {
-    const initVolume = this.state.playback.volume / 100; // Spotify SDK expects a value between 0 and 1
-    this.player = await initializeSpotifyPlayer(authClient, initVolume)
-
-    this.player.addListener('ready', async ({ device_id }) => {
-      this.logger.log(`Ready with Device ID: %c${device_id}`, 'font-style: italic; color: lightgreen;')
-      spotifyState.deviceId = device_id
-
-      this.retrieveDevices()
-    })
-
-    this.player.addListener('not_ready', ({ device_id }) => {
-      this.logger.log('device ID has gone offline', device_id)
-      delete spotifyState.deviceId
-      this.isPlayerActive = false
-    })
-
-    this.player.addListener('player_state_changed', (state) => this.playerStateChanged(state))
-
-    this.player.addListener('playback_error', ({ message }) => {
-      this.logger.error('Playback error', message)
-    })
-
-    this.player.connect().then((success) => {
-      if (success) {
-        this.logger.log('Connected to Spotify Web Playback SDK')
-      } else {
-        throw new Error('Failed to connect')
-      }
-    })
+  private handlePlayerReady(deviceId: string) {
+    spotifyState.deviceId = deviceId;
+    this.retrieveDevices();
   }
 
-  async playerStateChanged(state: Spotify.PlaybackState) {
+  private handlePlayerNotReady() {
+    delete spotifyState.deviceId;
+    this.isPlayerActive = false;
+  }
+
+  async playerStateChanged(state: Spotify.PlaybackState | null) {
     if (!state) {
-      this.isPlayerActive = false
-      return
+      this.isPlayerActive = false;
+      return;
     }
 
     this.logger.log('playerStateChanged: Playback state changed', state);
-
     this.state.playback = convertPlayerState(state, this.state.playback);
 
     if (state.paused) {
-      this.cancelPlaybackLoop?.()
+      this.cancelPlaybackLoop?.();
     } else {
       this.setupPlaybackLoop(state.position);
     }
   }
 
   async activateDevice(deviceIdToActivate: string) {
-    const result = await this.api?.transferPlaybackDevice(deviceIdToActivate)
+    const result = await this.apiService.transferPlaybackDevice(deviceIdToActivate);
     if (result) {
       this.logger.log(`Playback device transferred to ${deviceIdToActivate}`);
       if (spotifyState.deviceId === deviceIdToActivate) {
         this.isPlayerActive = true;
       } else {
         this.isPlayerActive = false;
-        await this.syncState()
+        await this.syncState();
       }
       spotifyState.devices = spotifyState.devices.map(device => ({
         ...device,
         is_active: device.id === deviceIdToActivate
-      }))
+      }));
     }
   }
 
   async playItem(mediaItem: Playlist | Album | Track) {
-    this.logger.log('Playing item:', mediaItem.title, mediaItem)
-    await this.api.play(mediaItem.uri)
+    this.logger.log('Playing item:', mediaItem.title, mediaItem);
+    await this.apiService.play(mediaItem.uri);
   }
 
   async play() {
     this.logger.log('Resuming playback', { isPlayerActive: this.isPlayerActive });
     if (this.isPlayerActive) {
-      await this.player?.resume()
+      await this.playerService.resume();
     } else {
-      await this.api.play()
+      await this.apiService.play();
     }
-    super.play()
+    super.play();
   }
 
   async pause() {
     this.logger.log('Pausing playback', { isPlayerActive: this.isPlayerActive });
     if (this.isPlayerActive) {
-      await this.player?.pause()
+      await this.playerService.pause();
     } else {
-      await this.api?.pause()
+      await this.apiService.pause();
     }
-    super.pause()
+    super.pause();
   }
 
   async next() {
     if (this.isPlayerActive) {
-      await this.player?.nextTrack()
+      await this.playerService.nextTrack();
     } else {
-      await this.api.nextTrack()
-      await this.syncState()
+      await this.apiService.nextTrack();
+      await this.syncState();
     }
   }
 
   async previous() {
     if (this.isPlayerActive) {
-      await this.player?.previousTrack()
+      await this.playerService.previousTrack();
     } else {
-      await this.api.previousTrack()
-      await this.syncState()
+      await this.apiService.previousTrack();
+      await this.syncState();
     }
   }
 
   async setVolume(volume: number) {
-    this.logger.log('Setting volume', volume)
+    this.logger.log('Setting volume', volume);
     if (this.isPlayerActive) {
-      await this.player?.setVolume(volume / 100)
+      await this.playerService.setVolume(volume);
     } else {
-      await this.api.setVolume(volume)
+      await this.apiService.setVolume(volume);
     }
-    super.setVolume(volume)
+    super.setVolume(volume);
   }
 
   async seek(position: number) {
-    this.logger.log('Seeking to position:', position, this.isPlayerActive)
+    this.logger.log('Seeking to position:', position, this.isPlayerActive);
     if (this.isPlayerActive) {
-      await this.player?.seek(position)
+      await this.playerService.seek(position);
     } else {
-      await this.api.seek(position)
+      await this.apiService.seek(position);
       // manually update state since we won't get a state change event
-      this.state.playback.position_ms = position
-      this.setupPlaybackLoop()
+      this.state.playback.position_ms = position;
+      this.setupPlaybackLoop();
     }
-    super.seek(position)
+    super.seek(position);
   }
 
   trackEnded(): void {
-    this.getPlaybackState()
+    this.getPlaybackState();
   }
 
   async getPlaybackState(): Promise<PlaybackState> {
     this.logger.log('Retrieving Spotify playback state', {
       isPlayerActive: this.isPlayerActive,
     });
-    if (this.isPlayerActive && this.player) {
-      const playbackState = await this.player.getCurrentState()
+    if (this.isPlayerActive && this.playerService.hasPlayer()) {
+      const playbackState = await this.playerService.getCurrentState();
       if (playbackState) {
-        return convertPlayerState(playbackState, this.state.playback)
+        return convertPlayerState(playbackState, this.state.playback);
       }
     }
 
     this.logger.log('User is not playing music through the Web SDK, trying to retrieve from Web API');
-    const playbackState = await this.api?.getPlaybackState()
+    const playbackState = await this.apiService.getPlaybackState();
     if (playbackState) {
       this.logger.log('Playback state retrieved from Web API', playbackState);
-      return convertApiPlaybackState(playbackState)
+      return playbackState;
     } else {
       throw new Error('No playback state available from Web API');
     }
@@ -299,7 +255,7 @@ private async initializeSpotifyPlayer(authClient: AuthClient) {
     ? forceState
     : !this.state.playback.shuffle;
     this.logger.log('Toggling shuffle mode', { newState });
-    await this.api?.toggleShuffle(newState);
+    await this.apiService.toggleShuffle(newState);
     await this.syncState();
   }
 }

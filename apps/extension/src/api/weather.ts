@@ -20,18 +20,11 @@ const logger = new Logger('weather')
 
 const BASE_URL = 'https://api.openweathermap.org/data/2.5'
 
-import { settingsStore } from '@/settings/index.svelte'
-
 export class WeatherClient extends ApiKeyBaseClient {
   protected urlQueryKeyName: string = 'appid'
   
-  constructor() {
-    // Pass empty string initially, api key will be dynamically fetched if empty
-    super(BASE_URL, settingsStore.apiKeys.weather || '')
-  }
-
-  getApiKey() {
-    return settingsStore.apiKeys.weather || ''
+  constructor(apiKey: string | (() => string)) {
+    super(BASE_URL, apiKey)
   }
 
   async getWeather(position?: GeoPosition): Promise<WeatherInfo | undefined> {

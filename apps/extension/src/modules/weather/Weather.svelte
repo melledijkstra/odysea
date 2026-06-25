@@ -5,9 +5,10 @@
   import IconButton from '@/components/atoms/IconButton.svelte'
   import { createWeatherState } from './state.svelte'
   import WeatherInfo from './WeatherInfo.svelte'
+  import { settingsStore } from '@/settings/index.svelte'
 
   let { currentWeather, setCurrentWeather } = createWeatherState()
-  let client = $state<WeatherClient>(new WeatherClient())
+  let client = $state<WeatherClient>(new WeatherClient(() => settingsStore.apiKeys.weather || ''))
 
   async function retrieveWeather() {
     const weather = await client.getWeather()
