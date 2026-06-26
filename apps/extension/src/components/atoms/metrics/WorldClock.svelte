@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { WorldClock } from "@/modules/trackers/state.svelte"
-  import { renderTimezone, repeatEvery } from "@/time/utils"
+  import { renderTimezone, repeatEvery } from "@melledijkstra/toolbox"
   import { onDestroy, onMount } from "svelte"
   import { fade } from "svelte/transition"
 

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { settingsStore, settings } from '@/settings/index.svelte'
   import AuthButton from '@/components/AuthButton.svelte'
-  import { log } from '@/logger'
   import { AuthClient } from '@melledijkstra/extension'
   import {
     GoogleAuthProvider,
@@ -12,6 +11,9 @@
   import Input from '@/components/atoms/Input.svelte'
   import { onMount, onDestroy } from 'svelte'
   import browser from 'webextension-polyfill'
+  import { Logger } from '@/logger'
+
+  const logger = new Logger('AuthenticationTab')
 
   const clients = {
     google: new AuthClient(new GoogleAuthProvider()),
@@ -44,18 +46,20 @@
   })
 
   async function retrieveAuthState() {
-    log('Retrieving authentication state from all providers...')
+    logger.log('Retrieving authentication state from all providers...')
     authState.google = await clients.google.isAuthenticated()
     authState.spotify = await clients.spotify.isAuthenticated()
     authState.fitbit = await clients.fitbit.isAuthenticated()
   }
 
   async function authenticate(provider: OauthProvider) {
+    logger.log('Authenticating with', provider)
     const token = await clients[provider].getAuthToken(true)
     authState[provider] = !!token
   }
 
   async function deauthenticate(provider: OauthProvider) {
+    logger.log('Deauthenticating from', provider)
     await clients[provider].deauthenticate()
     authState[provider] = false
   }
