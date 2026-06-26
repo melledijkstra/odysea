@@ -20,7 +20,9 @@
     "storybook": "turbo run storybook",
     "storybook:build": "turbo run storybook:build",
     "local:ci": "pnpm build && pnpm lint && CI=true pnpm test && pnpm test:e2e",
-    "clean": "rm -rf .turbo node_modules && rm -fr apps/*/node_modules && pnpm cache delete"
+    "clean": "rm -rf .turbo node_modules && rm -fr apps/*/node_modules && pnpm cache delete",
+    "yalc:on": "yalc add @melledijkstra/auth @melledijkstra/extension @melledijkstra/storage @melledijkstra/toolbox && pnpm install",
+    "yalc:off": "yalc remove --all && pnpm install"
   },
   "engines": {
     "node": ">=20"
@@ -55,5 +57,11 @@
     "url": "https://github.com/melledijkstra/odysea/issues"
   },
   "homepage": "https://github.com/melledijkstra/odysea#readme",
-  "packageManager": "pnpm@10.26.2"
+  "packageManager": "pnpm@10.26.2",
+  "dependencies": {
+    "@melledijkstra/auth": "file:.yalc/@melledijkstra/auth",
+    "@melledijkstra/extension": "file:.yalc/@melledijkstra/extension",
+    "@melledijkstra/storage": "file:.yalc/@melledijkstra/storage",
+    "@melledijkstra/toolbox": "file:.yalc/@melledijkstra/toolbox"
+  }
 }

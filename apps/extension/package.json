@@ -14,9 +14,7 @@
     "typecheck": "svelte-check",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
-    "storybook:start": "storybook start",
-    "yalc:on": "yalc add @melledijkstra/auth @melledijkstra/extension @melledijkstra/storage @melledijkstra/toolbox && pnpm install",
-    "yalc:off": "yalc remove --all && pnpm install"
+    "storybook:start": "storybook start"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
