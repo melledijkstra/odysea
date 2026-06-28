@@ -1,6 +1,6 @@
 <script lang="ts">
   import IconFitbit from "@/icons/IconFitbit.svelte"
-import type { HTMLAttributes } from "svelte/elements"
+  import type { HTMLAttributes } from "svelte/elements"
   import { fade } from "svelte/transition"
 
   const { minutes, ...props }: { minutes: number } & HTMLAttributes<HTMLDivElement> = $props()
