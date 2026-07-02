@@ -24,7 +24,7 @@
     "@storybook/svelte": "^10.4.6",
     "@storybook/svelte-vite": "^10.4.6",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
-    "@tailwindcss/vite": "^4.3.1",
+    "@tailwindcss/vite": "^4.3.2",
     "@tsconfig/svelte": "^5.0.8",
     "@types/chrome": "^0.1.42",
     "@types/node": "^25.9.1",
@@ -35,7 +35,7 @@
     "storybook": "^10.4.6",
     "svelte": "^5.55.10",
     "svelte-check": "^4.7.1",
-    "tailwindcss": "^4.3.1",
+    "tailwindcss": "^4.3.2",
     "vite": "^8.0.16",
     "vite-plugin-static-copy": "^4.1.1",
     "webextension-polyfill": "^0.12.0"
