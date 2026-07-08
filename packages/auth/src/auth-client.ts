@@ -260,19 +260,31 @@ export class AuthClient {
       codeVerifier: this._codeVerifier,
     })
 
+    let url: URL
     if (this._authclient instanceof OAuth2Client) {
-      return this._authclient.createAuthorizationURLWithPKCE(
+      url = this._authclient.createAuthorizationURLWithPKCE(
         this.provider.authEndpoint ?? '', this._state, CodeChallengeMethod.S256,
         this._codeVerifier, scopes,
       )
     }
     else if (this._authclient instanceof Google
       || this._authclient instanceof Spotify) {
-      return this._authclient.createAuthorizationURL(this._state, this._codeVerifier, scopes)
+      url = this._authclient.createAuthorizationURL(this._state, this._codeVerifier, scopes)
     }
     else if (this._authclient instanceof GitHub) {
-      return this._authclient.createAuthorizationURL(this._state, scopes)
+      url = this._authclient.createAuthorizationURL(this._state, scopes)
     }
+    else {
+      return undefined
+    }
+
+    if (this.provider.extraParams) {
+      for (const [key, value] of Object.entries(this.provider.extraParams)) {
+        url.searchParams.set(key, value)
+      }
+    }
+
+    return url
   }
 
   async validate(code: string, state: string): Promise<OAuth2Tokens> {

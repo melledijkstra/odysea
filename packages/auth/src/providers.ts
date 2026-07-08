@@ -10,6 +10,7 @@ export abstract class AuthConfig {
   scopes: string[]
   authEndpoint?: string
   tokenEndpoint?: string
+  extraParams?: Record<string, string>
 
   constructor(name: OauthProvider, scopes: string[]) {
     this.name = name
@@ -23,6 +24,10 @@ export abstract class AuthConfig {
 export class GoogleAuthConfig extends AuthConfig {
   constructor() {
     super('google', ['openid', 'profile'])
+    this.extraParams = {
+      access_type: 'offline',
+      prompt: 'consent',
+    }
   }
 
   get clientId(): string {
