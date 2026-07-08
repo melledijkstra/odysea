@@ -65,9 +65,6 @@ export class AuthClient {
   async isAuthenticated(): Promise<boolean> {
     try {
       const token = await this.getAuthToken()
-
-      this._logger.log({ token })
-
       return !!token
     }
     catch {
