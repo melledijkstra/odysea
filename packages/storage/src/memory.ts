@@ -79,7 +79,7 @@ export class MemoryCache implements IStorage {
   logger = new Logger('MemoryCache')
   private _cache: Record<string, CacheItem<unknown> | undefined> = {}
 
-  get<T>(key: string): T | undefined {
+  async get<T>(key: string): Promise<T | undefined> {
     const cachedItem = this._cache[key]
     if (!cachedItem) {
       return

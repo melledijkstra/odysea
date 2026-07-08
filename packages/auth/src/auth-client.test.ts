@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { AuthClient, AuthFlowHandler } from './auth-client'
 import { GoogleAuthConfig } from './providers'
 import { MemoryCache } from '@melledijkstra/storage'
-import { OAuth2Tokens } from 'arctic'
+import { OAuth2Tokens, OAuth2RequestError, UnexpectedErrorResponseBodyError, Google } from 'arctic'
 
 vi.mock('@melledijkstra/storage', () => {
   return {
@@ -12,6 +12,18 @@ vi.mock('@melledijkstra/storage', () => {
       set = vi.fn((key: string, value: unknown) => { this.store[key] = value })
       delete = vi.fn((key: string) => { delete this.store[key] })
       clear = vi.fn(() => { this.store = {} })
+    },
+  }
+})
+
+vi.mock('arctic', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('arctic')>()
+  return {
+    ...actual,
+    Google: class extends actual.Google {
+      async refreshAccessToken(refreshToken: string): Promise<OAuth2Tokens> {
+        return super.refreshAccessToken(refreshToken)
+      }
     },
   }
 })
@@ -93,17 +105,18 @@ describe('AuthClient', () => {
       vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce(mockStore)
 
       // To throw the internal AuthError, we need to make the internal _authclient throw OAuth2RequestError
-      const { OAuth2RequestError } = await import('arctic')
-      const reqError = new OAuth2RequestError(new Request('http://localhost'), new Response())
-      reqError.code = 'invalid_grant'
+      const reqError = new OAuth2RequestError(
+        'invalid_grant',
+        'Refresh token invalid: mock-reason',
+        'https://mock-endpoint.com',
+        'mock-state',
+      )
 
-      vi.spyOn((client as unknown as { _authclient: { refreshAccessToken: (...args: unknown[]) => Promise<unknown> }, _storage: { delete: (key: string) => void } })._authclient, 'refreshAccessToken').mockRejectedValueOnce(reqError)
-
-      vi.spyOn((client as unknown as { _authclient: { refreshAccessToken: (...args: unknown[]) => Promise<unknown> }, _storage: { delete: (key: string) => void } })._storage, 'delete')
+      vi.spyOn(Google.prototype, 'refreshAccessToken').mockRejectedValueOnce(reqError)
 
       const token = await client.getTokenFromStoreOrRefreshToken()
 
-      expect((client as unknown as { _authclient: { refreshAccessToken: (...args: unknown[]) => Promise<unknown> }, _storage: { delete: (key: string) => void } })._storage.delete).toHaveBeenCalledWith(client.storageKey)
+      expect(storage.delete).toHaveBeenCalledWith(client.storageKey)
       expect(token).toBeUndefined()
     })
 
@@ -115,19 +128,22 @@ describe('AuthClient', () => {
       }
       vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce(mockStore)
 
-      const { UnexpectedErrorResponseBodyError } = await import('arctic')
       const reqError = new UnexpectedErrorResponseBodyError(400, {
         errorType: 'invalid_grant',
         message: 'Refresh token invalid: mock-reason',
+        errors: [
+          {
+            errorType: 'invalid_grant',
+            message: 'Refresh token invalid: mock-reason',
+          },
+        ],
       })
 
-      vi.spyOn((client as unknown as { _authclient: { refreshAccessToken: (...args: unknown[]) => Promise<unknown> }, _storage: { delete: (key: string) => void } })._authclient, 'refreshAccessToken').mockRejectedValueOnce(reqError)
-
-      vi.spyOn((client as unknown as { _authclient: { refreshAccessToken: (...args: unknown[]) => Promise<unknown> }, _storage: { delete: (key: string) => void } })._storage, 'delete')
+      vi.spyOn(Google.prototype, 'refreshAccessToken').mockRejectedValueOnce(reqError)
 
       const token = await client.getTokenFromStoreOrRefreshToken()
 
-      expect((client as unknown as { _authclient: { refreshAccessToken: (...args: unknown[]) => Promise<unknown> }, _storage: { delete: (key: string) => void } })._storage.delete).toHaveBeenCalledWith(client.storageKey)
+      expect(storage.delete).toHaveBeenCalledWith(client.storageKey)
       expect(token).toBeUndefined()
     })
 
@@ -209,8 +225,12 @@ describe('AuthClient', () => {
     it('should store state and verifier when creating auth URL', async () => {
       const authUrl = await client.createAuthUrl()
 
-      expect(authUrl.search).toEqual(expect.stringContaining('state='))
-      expect(authUrl.origin).toEqual(expect.stringContaining('https://accounts.google.com'))
+      expect(authUrl).toBeDefined()
+
+      if (authUrl) {
+        expect(authUrl.search).toEqual(expect.stringContaining('state='))
+        expect(authUrl.origin).toEqual(expect.stringContaining('https://accounts.google.com'))
+      }
 
       const context = client.getContext()
       expect(context.state).toBeDefined()

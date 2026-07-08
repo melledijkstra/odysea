@@ -21,10 +21,10 @@ export interface AuthFlowHandler {
 }
 
 export class AuthClient {
+  protected _arcticClient: ArcticClient
+  protected _storage: IStorage
   protected _state: string | undefined
   protected _codeVerifier: string | undefined
-  protected _authclient: ArcticClient
-  protected _storage: IStorage
   protected _logger: Logger
   protected _handler: AuthFlowHandler | undefined
   protected _tokenPromise: Promise<string | undefined> | null = null
@@ -43,17 +43,17 @@ export class AuthClient {
     this._handler = handler
     switch (provider.name) {
       case 'google':
-        this._authclient = new Google(provider.clientId, provider.clientSecret ?? '', redirectUrl)
+        this._arcticClient = new Google(provider.clientId, provider.clientSecret ?? '', redirectUrl)
         break
       case 'spotify':
-        this._authclient = new Spotify(provider.clientId, provider.clientSecret ?? null, redirectUrl)
+        this._arcticClient = new Spotify(provider.clientId, provider.clientSecret ?? null, redirectUrl)
         break
       case 'github':
-        this._authclient = new GitHub(provider.clientId, provider.clientSecret ?? '', redirectUrl)
+        this._arcticClient = new GitHub(provider.clientId, provider.clientSecret ?? '', redirectUrl)
         break
       case 'fitbit':
       default:
-        this._authclient = new OAuth2Client(provider.clientId, provider.clientSecret ?? null, redirectUrl)
+        this._arcticClient = new OAuth2Client(provider.clientId, provider.clientSecret ?? null, redirectUrl)
         break
     }
   }
@@ -98,8 +98,8 @@ export class AuthClient {
 
   async revokeAuthToken(token: string) {
     try {
-      if (this._authclient instanceof Google) {
-        await this._authclient.revokeToken(token)
+      if (this._arcticClient instanceof Google) {
+        await this._arcticClient.revokeToken(token)
       }
       else {
         this._logger.warn(`Token revocation not implemented or supported for provider: ${this.provider.name}`)
@@ -137,17 +137,16 @@ export class AuthClient {
   async refreshAccessToken(
     refreshToken: string,
   ): Promise<OAuth2Tokens | null> {
-    if (this._authclient instanceof Google
-      || this._authclient instanceof GitHub
-      || this._authclient instanceof Spotify
+    if (this._arcticClient instanceof Google
+      || this._arcticClient instanceof GitHub
+      || this._arcticClient instanceof Spotify
     ) {
-      return this._authclient.refreshAccessToken(refreshToken)
+      return this._arcticClient.refreshAccessToken(refreshToken)
     }
-    return this._authclient.refreshAccessToken(this.provider.tokenEndpoint ?? '', refreshToken, this.provider.scopes)
+    return this._arcticClient.refreshAccessToken(this.provider.tokenEndpoint ?? '', refreshToken, this.provider.scopes)
   }
 
   protected isInvalidTokenError(error: unknown): boolean {
-    console.log(typeof error, error)
     if (error instanceof OAuth2RequestError && error.code === 'invalid_grant') {
       return true
     }
@@ -258,18 +257,18 @@ export class AuthClient {
     })
 
     let url: URL
-    if (this._authclient instanceof OAuth2Client) {
-      url = this._authclient.createAuthorizationURLWithPKCE(
+    if (this._arcticClient instanceof OAuth2Client) {
+      url = this._arcticClient.createAuthorizationURLWithPKCE(
         this.provider.authEndpoint ?? '', this._state, CodeChallengeMethod.S256,
         this._codeVerifier, scopes,
       )
     }
-    else if (this._authclient instanceof Google
-      || this._authclient instanceof Spotify) {
-      url = this._authclient.createAuthorizationURL(this._state, this._codeVerifier, scopes)
+    else if (this._arcticClient instanceof Google
+      || this._arcticClient instanceof Spotify) {
+      url = this._arcticClient.createAuthorizationURL(this._state, this._codeVerifier, scopes)
     }
-    else if (this._authclient instanceof GitHub) {
-      url = this._authclient.createAuthorizationURL(this._state, scopes)
+    else if (this._arcticClient instanceof GitHub) {
+      url = this._arcticClient.createAuthorizationURL(this._state, scopes)
     }
     else {
       return undefined
@@ -298,11 +297,11 @@ export class AuthClient {
     })
 
     let tokens: OAuth2Tokens
-    if (this._authclient instanceof OAuth2Client) {
-      tokens = await this._authclient.validateAuthorizationCode(this.provider.tokenEndpoint ?? '', code, savedCodeVerifier)
+    if (this._arcticClient instanceof OAuth2Client) {
+      tokens = await this._arcticClient.validateAuthorizationCode(this.provider.tokenEndpoint ?? '', code, savedCodeVerifier)
     }
     else {
-      tokens = await this._authclient.validateAuthorizationCode(code, savedCodeVerifier)
+      tokens = await this._arcticClient.validateAuthorizationCode(code, savedCodeVerifier)
     }
 
     // Clean up auth state
