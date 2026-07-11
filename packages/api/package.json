@@ -1,6 +1,6 @@
 {
   "name": "@melledijkstra/api",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Melle Dijkstra",
   "type": "module",
   "main": "./dist/index.cjs",

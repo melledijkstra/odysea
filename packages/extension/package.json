@@ -1,6 +1,6 @@
 {
   "name": "@melledijkstra/extension",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Reusable browser extension code",
   "type": "module",
   "main": "./dist/index.cjs",
