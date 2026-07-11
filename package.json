@@ -19,6 +19,7 @@
     "yalc:push": "pnpm build && pnpm -r --filter './packages/*' exec yalc push"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "@eslint/css": "^1.1.0",
     "@eslint/json": "^0.14.0",
     "@stylistic/eslint-plugin": "^5.7.0",

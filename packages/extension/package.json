@@ -1,12 +1,14 @@
 {
   "name": "@melledijkstra/extension",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Reusable browser extension code",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",

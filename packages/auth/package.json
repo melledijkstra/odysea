@@ -1,6 +1,6 @@
 {
   "name": "@melledijkstra/auth",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Melle Dijkstra",
   "type": "module",
   "main": "./dist/index.cjs",
