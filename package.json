@@ -39,5 +39,5 @@
     "utilities"
   ],
   "license": "MIT",
-  "packageManager": "pnpm@10.26.2"
+  "packageManager": "pnpm@11.10.0"
 }

@@ -82,6 +82,7 @@ describe('AuthClient', () => {
 
       const mockTokens = {
         accessToken: () => 'new-access-token',
+        hasRefreshToken: () => true,
         refreshToken: () => 'new-refresh-token',
         accessTokenExpiresInSeconds: () => 3600,
       } as unknown as OAuth2Tokens
@@ -93,6 +94,31 @@ describe('AuthClient', () => {
 
       expect(client.refreshAccessToken).toHaveBeenCalledWith('refresh-token')
       expect(client.cacheAuthToken).toHaveBeenCalledWith('new-access-token', 'new-refresh-token', 3600)
+      expect(token).toBe('new-access-token')
+    })
+
+    it('getTokenFromStoreOrRefreshToken should reuse old refresh token when provider omits one from response', async () => {
+      const mockStore = {
+        access_token: 'expired-token',
+        expires_at: Date.now() - 10000,
+        refresh_token: 'old-refresh-token',
+      }
+      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce(mockStore)
+
+      // Simulate a provider that returns no refresh_token in the response
+      const mockTokens = new OAuth2Tokens({
+        access_token: 'new-access-token',
+        expires_in: 3600,
+        // no refresh_token field
+      })
+
+      vi.spyOn(client, 'refreshAccessToken').mockResolvedValueOnce(mockTokens)
+      vi.spyOn(client, 'cacheAuthToken').mockResolvedValueOnce(undefined)
+
+      const token = await client.getTokenFromStoreOrRefreshToken()
+
+      // Should reuse the old refresh token instead of throwing
+      expect(client.cacheAuthToken).toHaveBeenCalledWith('new-access-token', 'old-refresh-token', 3600)
       expect(token).toBe('new-access-token')
     })
 
@@ -157,6 +183,7 @@ describe('AuthClient', () => {
 
       const mockTokens = {
         accessToken: () => 'new-access-token',
+        hasRefreshToken: () => true,
         refreshToken: () => 'new-refresh-token',
         accessTokenExpiresInSeconds: () => 3600,
       } as unknown as OAuth2Tokens
@@ -200,6 +227,7 @@ describe('AuthClient', () => {
 
       const mockTokens = {
         accessToken: () => 'new-access-token',
+        hasRefreshToken: () => true,
         refreshToken: () => 'new-refresh-token',
         accessTokenExpiresInSeconds: () => 3600,
       } as unknown as OAuth2Tokens
@@ -214,6 +242,26 @@ describe('AuthClient', () => {
       expect(handler.open).toHaveBeenCalled()
       expect(client.validate).toHaveBeenCalledWith('mockcode', 'mockstate')
       expect(token).toBe('new-access-token')
+    })
+
+    it('should throw when provider does not return a refresh token during initial auth flow', async () => {
+      vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue(undefined)
+
+      // Provider returns no refresh_token (e.g. missing access_type=offline)
+      const mockTokens = new OAuth2Tokens({
+        access_token: 'new-access-token',
+        expires_in: 3600,
+        // no refresh_token field
+      })
+
+      vi.spyOn(client, 'validate').mockResolvedValue(mockTokens)
+
+      const mockUrl = new URL('http://localhost:3000/callback?code=mockcode&state=mockstate')
+      vi.mocked(handler.open).mockResolvedValue(mockUrl)
+
+      // The error is caught internally and logged; getAuthToken returns undefined
+      const token = await client.getAuthToken(true)
+      expect(token).toBeUndefined()
     })
   })
 

@@ -9,7 +9,7 @@ const OAUTH2_STORAGE_KEY = 'oauth2'
 type TokenStore = {
   access_token: string
   expires_at: number
-  refresh_token: string
+  refresh_token?: string
 }
 
 export interface AuthFlowHandler {
@@ -199,8 +199,8 @@ export class AuthClient {
             this._logger.log('refreshed new access token, storing it and continue')
             await this.cacheAuthToken(
               newAccessToken,
-              // if provider doesn’t return a new refresh token, keep the old one
-              newTokens.refreshToken() ?? refresh_token,
+              // if provider doesn't return a new refresh token, keep the old one
+              newTokens.hasRefreshToken() ? newTokens.refreshToken() : refresh_token,
               newTokens.accessTokenExpiresInSeconds(),
             )
             access_token = newAccessToken
@@ -230,7 +230,7 @@ export class AuthClient {
 
   async cacheAuthToken(
     access_token: string,
-    refresh_token: string,
+    refresh_token: string | undefined,
     expires_in_seconds: number,
   ) {
     const tokenStore: TokenStore = {
@@ -352,10 +352,13 @@ export class AuthClient {
 
         if (code && state) {
           const tokens = await this.validate(code, state)
+          if (!tokens.hasRefreshToken()) {
+            throw new Error(`Provider '${this.provider.name}' did not return a refresh token.`)
+          }
           // Store the tokens
           await this.cacheAuthToken(
             tokens.accessToken(),
-            tokens.refreshToken() ?? '', // Handle potential missing refresh token
+            tokens.refreshToken(),
             tokens.accessTokenExpiresInSeconds(),
           )
           return tokens.accessToken()
