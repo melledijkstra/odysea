@@ -32,6 +32,9 @@ const defaultConfig = defineConfig(({ mode }) => ({
       ]
     })
   ],
+  optimizeDeps: {
+    exclude: ['@melledijkstra/*']
+  },
   build: {
     minify: mode === 'production',
     rollupOptions: {

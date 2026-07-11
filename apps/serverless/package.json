@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "Serverless functions for the Odysea project",
   "type": "module",
+  "private": true,
   "main": "main.ts",
   "scripts": {
     "dev": "deno run --allow-net --allow-env --watch --env-file main.ts",

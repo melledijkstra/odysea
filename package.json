@@ -21,47 +21,40 @@
     "storybook:build": "turbo run storybook:build",
     "local:ci": "pnpm build && pnpm lint && CI=true pnpm test && pnpm test:e2e",
     "clean": "rm -rf .turbo node_modules && rm -fr apps/*/node_modules && pnpm cache delete",
-    "yalc:on": "yalc add @melledijkstra/auth @melledijkstra/extension @melledijkstra/storage @melledijkstra/toolbox && pnpm install",
-    "yalc:off": "yalc remove --all && pnpm install"
+    "dev:activate": "./scripts/activate-local-dev.sh",
+    "dev:deactivate": "./scripts/deactivate-local-dev.sh"
   },
   "engines": {
     "node": ">=20"
   },
+  "dependencies": {
+    "@melledijkstra/auth": "^1.0.2",
+    "@melledijkstra/extension": "^1.0.1",
+    "@melledijkstra/storage": "^1.0.0",
+    "@melledijkstra/toolbox": "^1.1.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
-    "@types/node": "^25.9.1",
-    "@typescript-eslint/eslint-plugin": "^8.60.0",
-    "@typescript-eslint/parser": "^8.60.0",
-    "eslint": "^10.5.0",
-    "eslint-plugin-svelte": "^3.18.0",
-    "globals": "^17.6.0",
-    "prettier": "^3.8.3",
+    "@types/node": "^25.9.5",
+    "@typescript-eslint/eslint-plugin": "^8.63.0",
+    "@typescript-eslint/parser": "^8.63.0",
+    "eslint": "^10.6.0",
+    "eslint-plugin-svelte": "^3.20.0",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.5",
     "svelte-eslint-parser": "^1.8.0",
-    "turbo": "^2.9.18",
+    "turbo": "^2.10.4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.0",
-    "vitest": "^4.1.9",
-    "yalc": "^1.0.0-pre.53"
+    "typescript-eslint": "^8.63.0",
+    "vitest": "^4.1.10"
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/melledijkstra/odysea.git"
   },
-  "keywords": [
-    "chrome",
-    "extension",
-    "homepage",
-    "productivity"
-  ],
   "bugs": {
     "url": "https://github.com/melledijkstra/odysea/issues"
   },
   "homepage": "https://github.com/melledijkstra/odysea#readme",
-  "packageManager": "pnpm@10.26.2",
-  "dependencies": {
-    "@melledijkstra/auth": "file:.yalc/@melledijkstra/auth",
-    "@melledijkstra/extension": "file:.yalc/@melledijkstra/extension",
-    "@melledijkstra/storage": "file:.yalc/@melledijkstra/storage",
-    "@melledijkstra/toolbox": "file:.yalc/@melledijkstra/toolbox"
-  }
+  "packageManager": "pnpm@11.11.0"
 }
