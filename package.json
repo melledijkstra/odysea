@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "local:ci": "pnpm build && pnpm lint && pnpm test --run --coverage",
     "clean": "rm -rf .turbo packages/*/.turbo && rm -rf packages/*/dist",
+    "publish": "pnpm build && pnpm -r publish --access public",
     "link:all": "pnpm -r exec pnpm link --global",
     "unlink:all": "pnpm -r exec pnpm unlink --global",
     "yalc:publish": "pnpm build && pnpm -r --filter './packages/*' exec yalc publish --push",
