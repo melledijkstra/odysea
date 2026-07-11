@@ -4,99 +4,49 @@ This guide explains how to use packages from this monorepo in external projects 
 
 ## 🎯 Recommended Approaches
 
-### Option 1: Yalc (Recommended)
+### Option 1: pnpm link (Recommended)
 
-**Best for:** Most use cases, simulates publishing, no symlink issues
-
-#### Setup
-
-```bash
-# Install yalc globally (once)
-npm i -g yalc
-```
+**Best for:** Most use cases, fast iteration without extra tooling
 
 #### Usage
 
-**In this monorepo:**
+**In this monorepo — build the packages:**
 
 ```bash
-# Publish all packages to yalc store
-pnpm yalc:publish
-
-# Or publish individually
-cd packages/auth
-yalc publish
+pnpm build
 ```
 
-**In your external project:**
+**In your external project — link directly to the package path:**
 
 ```bash
-# Add packages from yalc
-yalc add @melledijkstra/auth @melledijkstra/storage
-pnpm install
+pnpm link /absolute/path/to/toolbox/packages/auth
+pnpm link /absolute/path/to/toolbox/packages/storage
 ```
+
+That's it. No setup needed in this repo beyond having it built.
 
 **When you make changes:**
 
 ```bash
-# In this monorepo - auto-updates all linked projects
-pnpm yalc:push
+# In this monorepo - rebuild after changes (symlink stays in place)
+pnpm build
 
-# Or for specific package
-cd packages/auth
-yalc push
+# Or watch for changes automatically (if configured)
+pnpm build --watch
 ```
 
 **Cleanup:**
 
 ```bash
 # In external project
-yalc remove --all
-pnpm install
+pnpm unlink @melledijkstra/auth @melledijkstra/storage
 ```
 
 ---
 
-### Option 2: pnpm link (Manual)
+### Option 2: File Protocol (Simplest)
 
-**Best for:** Quick one-off testing
-
-#### Usage
-
-**In this monorepo:**
-
-```bash
-# Link all packages globally
-pnpm link:all
-
-# Or link individually
-cd packages/auth
-pnpm link --global
-```
-
-**In your external project:**
-
-```bash
-pnpm link --global @melledijkstra/auth @melledijkstra/storage
-```
-
-**Cleanup:**
-
-```bash
-# In this monorepo
-pnpm unlink:all
-
-# In external project
-pnpm unlink @melledijkstra/auth
-```
-
----
-
-### Option 3: File Protocol (Simplest)
-
-**Best for:** Simple cases, stable paths
-
-#### Usage
+**Best for:** Simple cases, stable relative paths
 
 **In your external project's `package.json`:**
 
@@ -115,32 +65,29 @@ Then run `pnpm install`. Changes require rebuilding the packages (`pnpm build` i
 
 ## 🔄 Workflow Recommendations
 
-### Daily Development with Yalc
+### Daily Development with pnpm link
 
 ```bash
 # 1. Make changes in this monorepo
-# 2. Push updates to all linked projects
-pnpm yalc:push
+# 2. Rebuild to propagate updates (symlink is already in place)
+pnpm build
 
-# Your external projects auto-update!
+# Your external projects pick up changes automatically via symlinks!
 ```
 
 ### Before Committing
 
 ```bash
-# Run full CI check
 pnpm local:ci
 ```
 
 ### Publishing to npm (when ready)
 
 ```bash
-# Ensure everything is built and tested
 pnpm build && pnpm test --run
 
-# Publish individually with changesets or manually
 cd packages/auth
-pnpm publish
+pnpm run publish
 ```
 
 ---
@@ -150,17 +97,16 @@ pnpm publish
 ### "Cannot find module" with pnpm link
 
 - Ensure packages are built: `pnpm build`
-- Check the link exists: `pnpm list -g --depth=0`
+- Re-run `pnpm link <path>` in the consuming project
 
 ### Changes not reflecting
 
-- **With yalc:** Run `yalc push` in the changed package
-- **With file protocol:** Rebuild the package
-- **With pnpm link:** Rebuild and may need to restart dev server
+- **With pnpm link:** Rebuild the package (`pnpm build`) and restart your dev server if needed
+- **With file protocol:** Rebuild the package (`pnpm build`)
 
 ### TypeScript errors with linked packages
 
-- Ensure `tsconfig.json` preserves symlinks:
+- Ensure `tsconfig.json` preserves symlinks in the consuming project:
 
   ```json
   {
@@ -174,8 +120,7 @@ pnpm publish
 
 ## 💡 Tips
 
-1. **Yalc** is the sweet spot - combines ease of use with reliability
+1. **pnpm link** is the recommended approach — just point the consumer at the package path
 2. Keep this repo built when developing: `pnpm build --watch` (if configured)
-3. Use `pnpm yalc:push` script for bulk updates
-4. Remember to unlink/remove before publishing to npm
-5. For React/UI packages, you may need to dedupe dependencies in the consuming project
+3. Remember to `pnpm unlink` in the consumer before publishing to npm
+4. For React/UI packages, you may need to dedupe dependencies in the consuming project
