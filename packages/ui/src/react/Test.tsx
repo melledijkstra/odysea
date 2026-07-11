@@ -1,5 +1,9 @@
-export const TestComponent = ({ input }) => {
+export type TestComponentProps = {
+  input: string
+}
+
+export const TestComponent = ({ input }: TestComponentProps) => {
   return (
-    <div>{input}</div>
+    <strong>{input}</strong>
   )
 }
