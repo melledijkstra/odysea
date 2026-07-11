@@ -183,6 +183,9 @@ importers:
       deno:
         specifier: ^2.4.0
         version: 2.9.2
+      hono:
+        specifier: jsr:@hono/hono@^4.7.11
+        version: '@jsr/hono__hono@4.12.29'
 
 packages:
 
@@ -556,6 +559,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@jsr/hono__hono@4.12.29':
+    resolution: {integrity: sha512-eOu15ffZGID0Cn1KgrljbgIVtw3i7xI+DwUx+kIc2holkPykhuHwif48j8Wyz9/STq4EgYuIDtubxoI4cXVIgA==, tarball: https://npm.jsr.io/~/11/@jsr/hono__hono/4.12.29.tgz}
 
   '@mdi/js@7.4.47':
     resolution: {integrity: sha512-KPnNOtm5i2pMabqZxpUz7iQf+mfrYZyKCZ8QNz85czgEt7cuHcGorWfdzUMWYA0SD+a6Hn4FmJ+YhzzzjkTZrQ==}
@@ -3433,6 +3439,8 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@jsr/hono__hono@4.12.29': {}
 
   '@mdi/js@7.4.47': {}
 
