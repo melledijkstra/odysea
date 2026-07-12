@@ -13,7 +13,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@odysea/cli": "link:",
     "commander": "^12.1.0"
   },
   "devDependencies": {

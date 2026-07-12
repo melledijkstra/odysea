@@ -33,11 +33,11 @@ export async function startInteractive() {
       // Check if command is registered
       const command = commands.find(c => c.name === commandName);
       if (command) {
-        if (commandName === 'interactive') {
-          console.log('You are already in interactive mode.');
-          continue;
+        try {
+          await command.execute(args);
+        } catch (error) {
+          console.error(`Error executing command "${commandName}":`, error);
         }
-        await command.execute(args);
       } else {
         console.log(`Unknown command: "${cmd}". Type "help" for a list of commands.`);
       }
