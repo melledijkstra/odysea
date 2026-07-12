@@ -1,0 +1,22 @@
+{
+  "name": "@odysea/cli",
+  "version": "0.0.1",
+  "description": "CLI for the Odysea ecosystem",
+  "type": "module",
+  "main": "src/index.ts",
+  "bin": {
+    "odysea": "./src/index.ts"
+  },
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "tsx": "^4.22.4"
+  }
+}

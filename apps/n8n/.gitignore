@@ -1,5 +1,0 @@
-# Ignore n8n local data directory
-data/
-
-# Ignore local environment file
-.env

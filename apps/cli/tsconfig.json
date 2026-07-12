@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "noEmit": true,
+    "strict": true,
+    "moduleDetection": "force",
+    "module": "ESNext",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "moduleResolution": "bundler",
+    "types": ["node"]
+  }
+}
