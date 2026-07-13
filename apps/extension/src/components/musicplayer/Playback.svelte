@@ -14,7 +14,7 @@
     mdiVolumeOff
   } from '@mdi/js'
   import Icon from '../atoms/Icon.svelte'
-  import { millisecondsToTime } from '@/time/utils'
+  import { millisecondsToTime } from "@melledijkstra/toolbox"
   import type { PlaybackState } from 'MusicPlayer'
   import type { HTMLAttributes } from 'svelte/elements'
   import { Slider } from 'bits-ui'

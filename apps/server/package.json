@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Server for the Odysea ecosystem",
   "type": "module",
+  "private": true,
   "main": "src/index.ts",
   "scripts": {
     "start": "tsx src/index.ts",

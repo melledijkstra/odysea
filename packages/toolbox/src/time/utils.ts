@@ -1,12 +1,19 @@
-export function getBrowserLocale(): string {
-  if (navigator.languages !== undefined) return navigator.languages[0]
+export function getBrowserLocale(): string | undefined {
+  if (typeof navigator === 'undefined') {
+    return
+  }
+
+  if (Array.isArray(navigator?.languages)) {
+    return navigator.languages[0]
+  }
+
   return navigator.language
 }
 
 export function repeatEvery(callback: () => void, interval: number) {
   // Check current time and calculate the delay until next interval
   const delay = interval - (Date.now() % interval)
-  let intervalId: NodeJS.Timeout
+  let intervalId: ReturnType<typeof setInterval>
 
   function start() {
     callback()
@@ -41,11 +48,11 @@ export function renderTimezone(timezone: string) {
   const browserLocale = getBrowserLocale()
   return new Date().toLocaleString(browserLocale, {
     timeStyle: 'short',
-    timeZone: timezone
+    timeZone: timezone,
   })
 }
 
-export function calculateDays(timestamp: number) {
+export function calculateRemainingDays(timestamp: number) {
   const a = new Date()
   const b = new Date(timestamp)
   const _MS_PER_DAY = 1000 * 60 * 60 * 24
@@ -61,7 +68,7 @@ export function getTime(): string {
   const date = new Date()
   return date.toLocaleTimeString(locale, {
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 
@@ -81,7 +88,7 @@ export function getTimePercentage(): string {
 export function playbackLoop(
   callback: (position: number) => void,
   interval: number,
-  initialPosition: number = 0
+  initialPosition: number = 0,
 ): () => void {
   let position = initialPosition
 
@@ -93,4 +100,21 @@ export function playbackLoop(
   return () => {
     clearInterval(loop)
   }
+}
+
+export function getMomentOfDay(): 'morning' | 'afternoon' | 'evening' {
+  const hours = new Date().getHours()
+  let momentOfDay: 'morning' | 'afternoon' | 'evening'
+
+  if (hours < 12) {
+    momentOfDay = 'morning'
+  }
+  else if (hours < 18) {
+    momentOfDay = 'afternoon'
+  }
+  else {
+    momentOfDay = 'evening'
+  }
+
+  return momentOfDay
 }

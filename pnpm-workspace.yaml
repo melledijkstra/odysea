@@ -1,8 +1,16 @@
 packages:
   - apps/*
+  - packages/*
+
+allowBuilds:
+  deno: false
+  esbuild: true
+  sqlite3: true
 
 ignoredBuiltDependencies:
   - deno
+
+minimumReleaseAgeStrict: true
 
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'

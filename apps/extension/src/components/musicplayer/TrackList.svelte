@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Track } from 'MusicPlayer'
-  import { millisecondsToTime } from '@/time/utils'
+  import { millisecondsToTime } from "@melledijkstra/toolbox"
 
   const { tracks, onTrackSelected }: {
     tracks: Track[]

@@ -1,4 +1,4 @@
-import { AuthClient } from '@/oauth2/auth'
+import { AuthClient } from '@melledijkstra/extension'
 import { GoogleAuthProvider } from '@/oauth2/providers'
 import { Logger } from '@melledijkstra/toolbox'
 
@@ -12,15 +12,17 @@ export async function fetchPhotos() {
     return
   }
 
-  fetch('https://photoslibrary.googleapis.com/v1/mediaItems', {
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Bearer ${token?.toString()}`
-    }
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      logger.log('Photos:', data.mediaItems)
+  try {
+    const response = await fetch('https://photoslibrary.googleapis.com/v1/mediaItems', {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token?.toString()}`
+      }
     })
-    .catch((error) => logger.error('Error fetching photos:', error))
+  
+    const data = await response.json()
+    logger.log('Photos:', data.mediaItems)
+  } catch (error) {
+    logger.error('Error fetching photos:', error)
+  }
 }

@@ -1,20 +1,22 @@
 import { getCurrentTab } from "@/browser";
-import { log } from "@/logger";
+import { Logger } from "@/logger";
 
 const LOCK_KEY = 'music-player-tab-lock';
 
 const storage = localStorage;
+
+const logger = new Logger('TabLock');
 
 export async function acquireTabLock(): Promise<boolean> {
   const tab = await getCurrentTab();
   const tabId = tab.id?.toString() ?? '';
   const existing = storage.getItem(LOCK_KEY);
 
-  console.log('acquireTabLock', tabId, existing);
+  logger.log(tabId, existing);
 
   if (!existing) {
     storage.setItem(LOCK_KEY, tabId);
-    log('acquired tab lock', tabId);
+    logger.log('acquired tab lock', tabId);
     return true;
   }
 
@@ -25,7 +27,7 @@ export async function hasTabLockAcquired(): Promise<boolean> {
   const tab = await getCurrentTab()
   const tabId = tab.id?.toString() ?? '';
   const existing = storage.getItem(LOCK_KEY);
-  console.log('hasLockAcquired', tabId, existing, existing === tabId);
+  logger.log('hasLockAcquired', tabId, existing, existing === tabId);
   return existing === tabId
 }
 
@@ -41,7 +43,7 @@ export async function releaseTabLock(): Promise<boolean> {
   // only allow releasing the lock if it's the same tab that acquired it
   if (existing && existing === tabId) {
     storage.removeItem(LOCK_KEY);
-    log('released tab lock', tabId);
+    logger.log('released tab lock', tabId);
     return true;
   }
   return false;

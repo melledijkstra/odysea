@@ -5,7 +5,6 @@ import { MemoryAdapter } from './memory'
 describe('CacheService and Adapters', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    localStorage.clear()
   })
 
   describe('CacheService TTL and Expire Logic', () => {

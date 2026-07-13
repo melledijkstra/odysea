@@ -1,5 +1,5 @@
-import type { SleepResponse } from './definitions/fitbit'
-import { TokenBaseClient } from './tokenbaseclient'
+import type { SleepResponse } from '../definitions/fitbit'
+import { TokenBaseClient } from '../tokenbaseclient'
 
 const BASE_URL = 'https://api.fitbit.com'
 

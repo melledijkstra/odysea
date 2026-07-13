@@ -1,12 +1,12 @@
 import js from '@eslint/js';
+import { globalIgnores, defineConfig } from 'eslint/config';
 import ts from 'typescript-eslint';
 import svelte from 'eslint-plugin-svelte';
 import svelteParser from "svelte-eslint-parser";
 import tsParser from "@typescript-eslint/parser";
-import { globalIgnores } from 'eslint/config';
 import globals from 'globals';
 
-export default ts.config([
+export default defineConfig([
   js.configs.recommended,
   ...ts.configs.recommended,
   ...svelte.configs.recommended,

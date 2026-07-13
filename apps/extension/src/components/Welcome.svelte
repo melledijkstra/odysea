@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getMomentOfDay } from "@/ui"
-  import { repeatEvery } from "@/time/utils"
-  import { type User } from "@/app-state.svelte"
+  import { repeatEvery } from "@melledijkstra/toolbox"
+  import type { User } from "@/app-state.svelte"
 
   type WelcomeProps = {
     user: User

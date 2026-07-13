@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from '@/components/atoms/Button.svelte'
   import { Timer } from '@melledijkstra/toolbox'
-  import { formatSeconds } from '@/time/utils'
+  import { formatSeconds } from "@melledijkstra/toolbox"
   import { onMount } from 'svelte'
 
   const { onMinutePassed } = $props()
