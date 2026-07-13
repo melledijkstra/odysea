@@ -20,7 +20,7 @@
     "cli": "pnpm --filter=@odysea/cli run",
     "storybook:build": "pnpm --filter=@odysea/extension run storybook:build",
     "local:ci": "pnpm build && pnpm lint && CI=true pnpm test && pnpm test:e2e",
-    "clean": "rm -rf .turbo node_modules && rm -fr apps/*/node_modules && pnpm cache delete"
+    "cleanup": "rm -rf .turbo node_modules && rm -fr apps/*/node_modules && pnpm cache delete"
   },
   "engines": {
     "node": ">=20"
@@ -35,7 +35,7 @@
     "globals": "^17.7.0",
     "prettier": "^3.9.5",
     "svelte-eslint-parser": "^1.8.0",
-    "tsdown": "^0.22.7",
+    "tsdown": "^0.22.5",
     "turbo": "^2.10.4",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.63.0",
