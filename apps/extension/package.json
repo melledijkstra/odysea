@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",
+    "@melledijkstra/api": "workspace:*",
     "@melledijkstra/auth": "workspace:*",
     "@melledijkstra/extension": "workspace:*",
     "@melledijkstra/storage": "workspace:*",

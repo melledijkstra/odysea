@@ -14,7 +14,7 @@
   import Sleep from '../atoms/metrics/Sleep.svelte'
   import { AuthClient } from '@melledijkstra/extension'
   import { FitbitAuthProvider } from '@/oauth2/providers'
-  import { FitbitClient } from '@/api/fitbit'
+  import { FitbitClient } from '@melledijkstra/api'
   import { LocalStorageAdapter } from '@/cache/localstorage'
 
   const cache = new CacheService(new LocalStorageAdapter())

@@ -69,6 +69,9 @@ importers:
       '@mdi/js':
         specifier: ^7.4.47
         version: 7.4.47
+      '@melledijkstra/api':
+        specifier: workspace:*
+        version: link:../../packages/api
       '@melledijkstra/auth':
         specifier: workspace:*
         version: link:../../packages/auth
