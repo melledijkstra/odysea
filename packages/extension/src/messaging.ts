@@ -29,17 +29,15 @@ export function createMessage<Request = void, Response = void>(identifier: strin
     },
     on(callback: Handler<Request, Response>) {
       browser.runtime.onMessage.addListener(
-        (message, sender, sendResponse) => {
+        (message: unknown, sender: browser.Runtime.MessageSender) => {
           if (isMessage(message) && message.identifier === identifier) {
             logger.log(identifier, 'listener message received', { message, sender })
             const promise = callback(message?.data as Request)
-            Promise.resolve(promise).then((response) => {
+            return Promise.resolve(promise).then((response) => {
               logger.log(identifier, 'listener response:', response)
-              sendResponse(response)
+              return response
             })
-            return true
           }
-          return true
         },
       )
     },

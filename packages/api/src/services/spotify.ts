@@ -126,10 +126,9 @@ export class SpotifyApiClient extends TokenBaseClient {
 
     const body: Record<string, unknown> = {}
 
-    if (context_uri?.startsWith('spotify:track')) {
+    if (context_uri && context_uri.startsWith('spotify:track')) {
       body.uris = [context_uri]
-    }
-    else {
+    } else if (context_uri) {
       body.context_uri = context_uri
     }
 

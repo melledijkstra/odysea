@@ -21,8 +21,9 @@ const BASE_URL = 'https://api.openweathermap.org/data/2.5'
 export class WeatherClient extends ApiKeyBaseClient {
   protected urlQueryKeyName: string = 'appid'
 
-  constructor() {
-    super(BASE_URL, process.env.VITE_WEATHER_API_KEY)
+  constructor(apiKey?: string | (() => string)) {
+    const key = apiKey ?? (typeof process !== 'undefined' ? process.env.VITE_WEATHER_API_KEY : undefined)
+    super(BASE_URL, key)
   }
 
   async getWeather(position?: GeoPosition): Promise<WeatherInfo | undefined> {

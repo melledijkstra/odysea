@@ -44,6 +44,9 @@ async function fetchGeolocation(): Promise<LocationResponse | undefined> {
 const cachedFetchGeolocation = withCache(fetchGeolocation)
 
 async function getGeolocationBrowser(): Promise<[number, number] | undefined> {
+  if (typeof window === 'undefined' || !window.navigator?.geolocation) {
+    throw new Error('Geolocation is not supported in this environment')
+  }
   return new Promise((resolve, reject) => {
     window.navigator.geolocation.getCurrentPosition(
       (currentPosition) => {

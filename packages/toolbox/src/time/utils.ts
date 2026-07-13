@@ -13,7 +13,7 @@ export function getBrowserLocale(): string | undefined {
 export function repeatEvery(callback: () => void, interval: number) {
   // Check current time and calculate the delay until next interval
   const delay = interval - (Date.now() % interval)
-  let intervalId: NodeJS.Timeout
+  let intervalId: ReturnType<typeof setInterval>
 
   function start() {
     callback()

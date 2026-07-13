@@ -18,7 +18,7 @@ export class ExtensionStorage implements IStorage {
   }
 
   clear(): Promise<void> {
-    throw new Error('Method not implemented.')
+    return this.storageArea.clear()
   }
 
   async has(key: string): Promise<boolean> {

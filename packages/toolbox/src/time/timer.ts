@@ -21,7 +21,7 @@ export class Timer {
   private onStart?: TimerCallback
   private onStop?: TimerCallback
   private onComplete?: TimerCallback
-  private timerId: number | NodeJS.Timeout | null = null
+  private timerId: ReturnType<typeof setTimeout> | null = null
   private startTime: number = 0
   private remainingTime: number = 0
 
@@ -42,7 +42,8 @@ export class Timer {
 
     this.onStart?.(this.remainingTime)
 
-    this.startTime = Date.now()
+    // Set the start time to the current time minus the elapsed time (if any)
+    this.startTime = Date.now() - (this.duration - this.remainingTime)
     this.remainingTime = this.duration
     this.runTick()
   }
@@ -96,11 +97,15 @@ export class Timer {
     }
   }
 
-  stop() {
+  private clearTimer() {
     if (this.timerId) {
       clearTimeout(this.timerId)
       this.timerId = null
     }
+  }
+
+  stop() {
+    this.clearTimer()
     this.remainingTime = this.duration
     if (this.onStop) {
       this.onStop(this.remainingTime)
@@ -132,9 +137,7 @@ export class Timer {
   }
 
   pause() {
-    this.stop()
-    // save the remaining time for resumption
-    this.duration = this.remainingTime
+    this.clearTimer()
   }
 
   resume() {

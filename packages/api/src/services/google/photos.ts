@@ -1,12 +1,15 @@
 import { Logger } from '@melledijkstra/toolbox'
 import { AuthClient } from '@melledijkstra/auth'
-import { GoogleAuthProvider } from '@melledijkstra/auth'
+import { GoogleAuthConfig } from '@melledijkstra/auth'
 
 const logger = new Logger('GooglePhotos')
 
 export async function fetchPhotos() {
-  const client = new AuthClient(new GoogleAuthProvider())
-  const token = client.getAuthToken()
+  const client = new AuthClient(
+    new GoogleAuthConfig(),
+    'https://unknown.com'
+  )
+  const token = await client.getAuthToken()
 
   fetch('https://photoslibrary.googleapis.com/v1/mediaItems', {
     headers: {
