@@ -16,9 +16,8 @@
     "extension": "pnpm --filter=@odysea/extension run",
     "server": "pnpm --filter=@odysea/server run",
     "serverless": "pnpm --filter=@odysea/serverless run",
+    "packages": "pnpm --filter=@melledijkstra/* run",
     "cli": "pnpm --filter=@odysea/cli run",
-    "storybook": "turbo run storybook",
-    "storybook:build": "turbo run storybook:build",
     "local:ci": "pnpm build && pnpm lint && CI=true pnpm test && pnpm test:e2e",
     "clean": "rm -rf .turbo node_modules && rm -fr apps/*/node_modules && pnpm cache delete"
   },
@@ -35,11 +34,11 @@
     "globals": "^17.6.0",
     "prettier": "^3.8.3",
     "svelte-eslint-parser": "^1.8.0",
+    "tsdown": "^0.22.7",
     "turbo": "^2.9.18",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.61.0",
-    "vitest": "^4.1.9",
-    "yalc": "^1.0.0-pre.53"
+    "vitest": "^4.1.9"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,20 @@
+{
+  "name": "@melledijkstra/ui",
+  "version": "1.0.0",
+  "author": "Melle Dijkstra",
+  "type": "module",
+  "files": ["src"],
+  "exports": {
+    "./svelte": "./src/svelte",
+    "./react": "./src/react"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "svelte": "^5.47.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3"
+  }
+}

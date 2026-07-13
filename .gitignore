@@ -9,7 +9,3 @@ node_modules/
 .turbo/
 
 debug_storybook
-
-# yalc local development
-.yalc/
-yalc.lock

@@ -18,7 +18,3 @@ debug-storybook.log
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
-
-# yalc for development
-.yalc/
-yalc.lock

@@ -51,8 +51,7 @@
     "npm:vite-plugin-static-copy@^4.1.1": "4.1.1_vite@8.0.16__@types+node@25.9.1__tsx@4.22.4_@types+node@25.9.1_tsx@4.22.4",
     "npm:vite@^8.0.16": "8.0.16_@types+node@25.9.1_tsx@4.22.4",
     "npm:vitest@^4.1.8": "4.1.9_@types+node@25.9.1_jsdom@29.1.1_vite@8.0.16__@types+node@25.9.1__tsx@4.22.4_tsx@4.22.4",
-    "npm:webextension-polyfill@0.12": "0.12.0",
-    "npm:yalc@^1.0.0-pre.53": "1.0.0-pre.53"
+    "npm:webextension-polyfill@0.12": "0.12.0"
   },
   "jsr": {
     "@hono/hono@4.12.23": {
@@ -3823,20 +3822,6 @@
     "y18n@5.0.8": {
       "integrity": "sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA=="
     },
-    "yalc@1.0.0-pre.53": {
-      "integrity": "sha512-tpNqBCpTXplnduzw5XC+FF8zNJ9L/UXmvQyyQj7NKrDNavbJtHvzmZplL5ES/RCnjX7JR7W9wz5GVDXVP3dHUQ==",
-      "dependencies": [
-        "chalk",
-        "detect-indent",
-        "fs-extra",
-        "glob",
-        "ignore@5.3.2",
-        "ini@2.0.0",
-        "npm-packlist",
-        "yargs"
-      ],
-      "bin": true
-    },
     "yallist@5.0.0": {
       "integrity": "sha512-YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw=="
     },
@@ -3880,8 +3865,7 @@
         "npm:turbo@^2.9.15",
         "npm:typescript-eslint@^8.61.0",
         "npm:typescript@^6.0.3",
-        "npm:vitest@^4.1.8",
-        "npm:yalc@^1.0.0-pre.53"
+        "npm:vitest@^4.1.8"
       ]
     },
     "members": {
