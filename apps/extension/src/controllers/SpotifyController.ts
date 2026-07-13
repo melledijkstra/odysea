@@ -1,6 +1,6 @@
 import { Logger } from "@/logger";
 import { spotifyState } from "@/modules/spotify/spotify.state.svelte";
-import { AuthClient } from "@/oauth2/auth";
+import { AuthClient } from "@melledijkstra/extension";
 import { SpotifyAuthProvider } from "@/oauth2/providers";
 import type { Album, PlaybackState, Playlist, Track } from "MusicPlayer";
 import type { ILogger } from "@/interfaces/logger.interface";

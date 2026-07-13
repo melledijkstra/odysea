@@ -1,5 +1,7 @@
 import { withCache } from '@/cache/memory'
-import { log } from '@/logger'
+import { Logger } from '@/logger'
+
+const logger = new Logger('Geolocation')
 
 type LocationResponse = {
   status: 'success' | 'fail'
@@ -64,11 +66,11 @@ export async function getCurrentPosition(): Promise<
     return { lat: browserPos[0], lon: browserPos[1] }
   }
 
-  log('Failed to retrieve geolocation through browser, trying API service...')
+  logger.log('Failed to retrieve geolocation through browser, trying API service...')
   // if we can't get geolocation through browser we try through API service
   const data = await cachedFetchGeolocation()
   if (data?.status === 'success') {
-    log('retrieved location from API', [data.lat, data.lon])
+    logger.log('retrieved location from API', [data.lat, data.lon])
     return { lat: data.lat, lon: data.lon, locationInfo: data }
   }
 }

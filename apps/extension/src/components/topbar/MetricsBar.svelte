@@ -12,7 +12,7 @@
   import Countdown from '../atoms/metrics/Countdown.svelte'
   import { onMount } from 'svelte'
   import Sleep from '../atoms/metrics/Sleep.svelte'
-  import { AuthClient } from '@/oauth2/auth'
+  import { AuthClient } from '@melledijkstra/extension'
   import { FitbitAuthProvider } from '@/oauth2/providers'
   import { FitbitClient } from '@/api/fitbit'
   import { LocalStorageAdapter } from '@/cache/localstorage'

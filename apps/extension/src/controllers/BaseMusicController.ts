@@ -1,6 +1,6 @@
 import type { ILogger } from "@/interfaces/logger.interface";
 import { Logger } from "@/logger";
-import { playbackLoop } from "@/time/utils";
+import { playbackLoop } from "@melledijkstra/toolbox";
 import type { Album, MusicPlayerInterface, Playlist, PlaybackState, Track } from "MusicPlayer";
 
 export abstract class BaseMusicController implements MusicPlayerInterface, ILogger {

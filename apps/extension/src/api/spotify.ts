@@ -1,4 +1,4 @@
-import type { AuthClient } from '@/oauth2/auth'
+import type { AuthClient } from '@melledijkstra/extension'
 import type { Device, PlaybackState, Playlist, Track } from 'SpotifyApi'
 import { TokenBaseClient } from './tokenbaseclient'
 import { Logger } from '@/logger'

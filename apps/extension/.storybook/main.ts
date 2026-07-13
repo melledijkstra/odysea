@@ -1,4 +1,3 @@
-import { dirname, join } from "path"
 import type { StorybookConfig } from '@storybook/svelte-vite'
 
 const config: StorybookConfig = {

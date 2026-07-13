@@ -1,4 +1,4 @@
-import { AuthClient } from '@/oauth2/auth'
+import { AuthClient } from '@melledijkstra/extension'
 import { GoogleAuthProvider } from '@/oauth2/providers'
 import { Logger } from '@melledijkstra/toolbox'
 

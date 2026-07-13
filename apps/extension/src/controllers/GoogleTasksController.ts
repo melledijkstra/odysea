@@ -3,7 +3,7 @@ import { GoogleTasksApiClient } from "@/api/google/tasks"
 import type { ILogger } from "@/interfaces/logger.interface"
 import { Logger } from "@/logger"
 import type { GoogleTasksState } from "@/modules/google-tasks/state.svelte"
-import { AuthClient } from "@/oauth2/auth"
+import { AuthClient } from "@melledijkstra/extension"
 import { GoogleAuthProvider } from "@/oauth2/providers"
 import { addNotification } from "@/stores/notifications.svelte"
 

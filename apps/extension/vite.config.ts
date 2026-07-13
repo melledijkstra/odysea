@@ -33,6 +33,7 @@ const defaultConfig = defineConfig(({ mode }) => ({
     })
   ],
   build: {
+    minify: mode === 'production',
     rollupOptions: {
       input: {
         home: './index.html',

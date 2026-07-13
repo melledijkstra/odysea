@@ -4,7 +4,9 @@
   import IconButton from './atoms/IconButton.svelte'
   import { mdiCameraRetakeOutline } from '@mdi/js'
   import { settingsStore } from '@/settings/index.svelte'
-  import { log } from '@/logger'
+  import { Logger } from '@/logger'
+
+  const logger = new Logger('ImageRefreshButton')
 
   let unsplashClient = $state<UnsplashClient>(
     new UnsplashClient(
@@ -30,21 +32,21 @@
   })
 
   $effect(() => {
-    log('settings changed', {
+    logger.log('settings changed', {
       serverlessHost: settingsStore.network.serverlessHost,
       unsplashHost: unsplashClient?.host,
       dailyImageQuery: settingsStore.ui.dailyImageQuery,
       unsplashQuery: unsplashClient.query
     })
     if (!!serverlessHost && serverlessHost !== unsplashClient?.host) {
-      log('serverlessHost changed', {
+      logger.log('serverlessHost changed', {
         serverlessHost,
         unsplashHost: unsplashClient?.host
       })
       unsplashClient.setHost(settingsStore.network.serverlessHost)
     }
     if (dailyImageQuery !== unsplashClient.query) {
-      log('query changed', {
+      logger.log('query changed', {
         dailyImageQuery,
         unsplashQuery: unsplashClient.query
       })

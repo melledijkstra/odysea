@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { Timer } from '@melledijkstra/toolbox'
+  import { Timer, millisecondsToTime } from '@melledijkstra/toolbox'
   import { onDestroy, onMount } from 'svelte'
-  import { millisecondsToTime } from '@/time/utils'
   import { fade } from 'svelte/transition'
-  import { log } from '@/logger'
+  import { Logger } from '@/logger'
+
+  const logger = new Logger('Breathing')
 
   const DURATION = 5 * 60 * 1000
 
@@ -20,7 +21,7 @@
   let counter = $state(1)
 
   function onTick(remainingTime: number) {
-    log('tick', {
+    logger.log('tick', {
       breatheState,
       counter
     })
