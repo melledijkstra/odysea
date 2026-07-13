@@ -8,7 +8,7 @@ export class GoogleTasksApiClient extends TokenBaseClient {
   public taskLists: TaskList[] = []
   public tasks: Task[] = []
 
-  constructor(private auth: AuthClient) {
+  constructor(private readonly auth: AuthClient) {
     super(BASE_URL, () => this.auth.getAuthToken())
   }
 

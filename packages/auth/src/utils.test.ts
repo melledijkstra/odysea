@@ -6,7 +6,7 @@ describe('generateRandomString', () => {
     const length = 10
     const str = generateRandomString(length)
     expect(str).toBeTypeOf('string')
-    expect(str.length).toBe(length)
+    expect(str).toHaveLength(length)
   })
 
   it('should generate different strings', () => {

@@ -10,7 +10,7 @@ type FileCacheItem<T> = {
 }
 
 export class FileStorage implements IStorage {
-  private filePath: string
+  private readonly filePath: string
 
   constructor(filePath?: string) {
     if (filePath) {

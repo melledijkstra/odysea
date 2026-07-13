@@ -1,5 +1,4 @@
-import { AuthClient } from '@melledijkstra/auth'
-import { GoogleAuthProvider } from '@melledijkstra/auth'
+import { AuthClient, GoogleAuthConfig } from '@melledijkstra/auth'
 
 export type Account = {
   name: string
@@ -7,7 +6,7 @@ export type Account = {
   email: string
 }
 
-const client = new AuthClient(new GoogleAuthProvider())
+const client = new AuthClient(new GoogleAuthConfig(), 'https://unknown.com')
 
 export async function fetchAccountInfo(): Promise<Account | undefined> {
   try {

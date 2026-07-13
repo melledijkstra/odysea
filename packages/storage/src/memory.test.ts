@@ -24,7 +24,7 @@ describe('MemoryCache', () => {
 
     vi.advanceTimersByTime(MIN_5 + 1000)
 
-    expect(await cache.get('foo')).toBe(undefined)
+    expect(await cache.get('foo')).toBeUndefined()
   })
 
   it('should not remove non-expired values', async () => {

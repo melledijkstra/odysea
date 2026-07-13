@@ -8,7 +8,7 @@ const BASE_URL = 'https://api.spotify.com/v1'
 export class SpotifyApiClient extends TokenBaseClient {
   logger = new Logger('SpotifyApi')
 
-  constructor(private authClient: AuthClient) {
+  constructor(private readonly authClient: AuthClient) {
     super(BASE_URL, () => this.authClient.getAuthToken())
   }
 
@@ -112,7 +112,14 @@ export class SpotifyApiClient extends TokenBaseClient {
   }
 
   async toggleRepeatMode(repeatMode: string | number): Promise<void> {
-    const mode = typeof repeatMode === 'number' ? repeatMode : (repeatMode === 'off' ? 'off' : 'context')
+    let mode: string
+    if (typeof repeatMode === 'number') {
+      mode = repeatMode.toString()
+    } else if (repeatMode === 'off') {
+      mode = 'off'
+    } else {
+      mode = 'context'
+    }
 
     await this.request(`/me/player/repeat?state=${mode}`, {
       method: 'PUT',
@@ -126,7 +133,7 @@ export class SpotifyApiClient extends TokenBaseClient {
 
     const body: Record<string, unknown> = {}
 
-    if (context_uri && context_uri.startsWith('spotify:track')) {
+    if (context_uri?.startsWith('spotify:track')) {
       body.uris = [context_uri]
     } else if (context_uri) {
       body.context_uri = context_uri

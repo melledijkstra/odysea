@@ -1,6 +1,5 @@
 import { Logger } from '@melledijkstra/toolbox'
-import { AuthClient } from '@melledijkstra/auth'
-import { GoogleAuthConfig } from '@melledijkstra/auth'
+import { AuthClient,GoogleAuthConfig } from '@melledijkstra/auth'
 
 const logger = new Logger('GooglePhotos')
 

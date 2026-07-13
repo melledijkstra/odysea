@@ -53,7 +53,7 @@ async function getGeolocationBrowser(): Promise<[number, number] | undefined> {
         const { latitude, longitude } = currentPosition.coords
         resolve([latitude, longitude])
       },
-      error => reject(error),
+      error => reject(new Error(error.message)),
       {
         timeout: 3000, // allow 3 seconds to return the position
       },

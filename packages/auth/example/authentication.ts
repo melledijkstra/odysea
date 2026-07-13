@@ -1,4 +1,4 @@
-import { createServer } from 'http'
+import { createServer } from 'node:http'
 import { AuthClient, GoogleAuthConfig } from '../src'
 
 // const clientId = process.env.GITHUB_CLIENT_ID

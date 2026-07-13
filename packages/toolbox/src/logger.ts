@@ -10,12 +10,12 @@ export interface LoggerPrinter {
 export class Logger {
   public name: string
   public disabled = false
-  private printer: LoggerPrinter
+  private readonly printer: LoggerPrinter
 
   constructor(name: string, disabled?: boolean, printer: LoggerPrinter = console) {
     this.name = name
     this.printer = printer
-    if (typeof disabled !== 'undefined') {
+    if (disabled !== undefined) {
       this.disabled = disabled
     }
     else {

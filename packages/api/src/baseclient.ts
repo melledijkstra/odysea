@@ -1,5 +1,5 @@
 export class BaseClient {
-  private BASE_URL: string
+  private readonly BASE_URL: string
 
   constructor(
     baseUrl: string,

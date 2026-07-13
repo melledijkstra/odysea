@@ -44,7 +44,7 @@ describe('FileStorage', () => {
 
     vi.advanceTimersByTime(6000)
 
-    expect(await storage.get('foo')).toBe(undefined)
+    expect(await storage.get('foo')).toBeUndefined()
   })
 
   it('should not remove non-expired values', async () => {
@@ -76,7 +76,7 @@ describe('FileStorage', () => {
     expect(await storage.get('foo')).toBe('bar')
 
     await storage.delete('foo')
-    expect(await storage.get('foo')).toBe(undefined)
+    expect(await storage.get('foo')).toBeUndefined()
   })
 
   it('should clear all keys', async () => {
@@ -84,8 +84,8 @@ describe('FileStorage', () => {
     await storage.set('baz', 'qux')
 
     await storage.clear()
-    expect(await storage.get('foo')).toBe(undefined)
-    expect(await storage.get('baz')).toBe(undefined)
+    expect(await storage.get('foo')).toBeUndefined()
+    expect(await storage.get('baz')).toBeUndefined()
     expect(await storage.size()).toBe(0)
   })
 

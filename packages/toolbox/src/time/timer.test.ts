@@ -155,7 +155,7 @@ describe('Timer', () => {
       const callCountBeforeStop = onTick.mock.calls.length
       vi.advanceTimersToNextTimer()
 
-      expect(onTick.mock.calls.length).toBe(callCountBeforeStop)
+      expect(onTick.mock.calls).toHaveLength(callCountBeforeStop)
     })
 
     it('should call onStop callback', () => {
@@ -196,7 +196,7 @@ describe('Timer', () => {
       const callCountBeforePause = onTick.mock.calls.length
       vi.advanceTimersToNextTimer()
 
-      expect(onTick.mock.calls.length).toBe(callCountBeforePause)
+      expect(onTick.mock.calls).toHaveLength(callCountBeforePause)
     })
 
     it('should resume the timer from paused state', () => {
@@ -255,7 +255,7 @@ describe('Timer', () => {
 
       vi.advanceTimersToNextTimer()
 
-      expect(onTick.mock.calls.length).toBe(callCountBeforeReset)
+      expect(onTick.mock.calls).toHaveLength(callCountBeforeReset)
     })
   })
 
@@ -283,7 +283,7 @@ describe('Timer', () => {
 
       vi.advanceTimersToNextTimer()
 
-      expect(onTick.mock.calls.length).toBe(callCountBeforeChange)
+      expect(onTick.mock.calls).toHaveLength(callCountBeforeChange)
     })
   })
 

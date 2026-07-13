@@ -15,7 +15,7 @@ export type TimerEvent = 'tick' | 'start' | 'stop' | 'complete'
 
 export class Timer {
   private duration: number
-  private interval: number
+  private readonly interval: number
   private tickCount: number = 1
   private onTick?: TimerTick
   private onStart?: TimerCallback
