@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
-    "moduleResolution": "bundler",
-    "target": "esnext",
-    "types": ["vitest/globals"]
-  }
-}

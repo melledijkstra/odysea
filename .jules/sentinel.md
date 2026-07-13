@@ -1,4 +1,0 @@
-## 2023-10-27 - [CRITICAL] Fix unencrypted API endpoint for geolocation
-**Vulnerability:** The application was using an unencrypted HTTP endpoint (`http://ip-api.com/json...`) to fetch user geolocation data. This exposed sensitive user data (location details) and application requests to potential Man-in-the-Middle (MitM) attacks.
-**Learning:** External API integrations must always use HTTPS. The free tier of some services (like `ip-api.com`) may not support HTTPS, necessitating a switch to a secure alternative (like `ipapi.co`). Furthermore, when changing API providers, it is crucial to map the new API response to the existing internal data structures to avoid breaking changes in the application.
-**Prevention:** Enforce a policy to only use HTTPS for all external API calls. Review existing API endpoints to ensure none are using plain HTTP.
