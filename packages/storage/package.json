@@ -24,6 +24,7 @@
     "@melledijkstra/toolbox": "workspace:*"
   },
   "devDependencies": {
-    "@melledijkstra/config": "workspace:*"
+    "@melledijkstra/config": "workspace:*",
+    "@types/node": "^26.1.1"
   }
 }

@@ -1,7 +1,7 @@
 import { defineProject, mergeConfig } from 'vitest/config'
-import rootConfig from '../../vitest.config'
+import baseConfig from '@melledijkstra/config/vitest.base.config.ts'
 
 export default mergeConfig(
-  rootConfig,
+  baseConfig,
   defineProject({}),
 )

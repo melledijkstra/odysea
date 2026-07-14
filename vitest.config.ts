@@ -1,8 +1,11 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig, mergeConfig } from 'vitest/config'
+import baseConfig from './packages/config/vitest.base.config'
 
-export default defineConfig({
-  test: {
-    globals: true,
-    projects: ['apps/*', 'packages/*'],
-  }
-})
+export default mergeConfig(
+  baseConfig,
+  defineConfig({
+    test: {
+      projects: ['apps/*', 'packages/*'],
+    },
+  }),
+)
