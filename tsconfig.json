@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "references": [
+    { "path": "./apps/extension" },
+    { "path": "./apps/server" },
+    { "path": "./apps/cli" },
+    { "path": "./packages/api" },
+    { "path": "./packages/auth" },
+    { "path": "./packages/config" },
+    { "path": "./packages/extension" },
+    { "path": "./packages/storage" },
+    { "path": "./packages/toolbox" },
+    { "path": "./packages/ui" }
+  ]
+}
