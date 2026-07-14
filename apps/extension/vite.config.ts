@@ -1,5 +1,5 @@
 import { loadEnv } from 'vite';
-import { defineConfig } from 'vitest/config';
+import { defineConfig, defineProject } from 'vitest/config';
 import tailwindcss from "@tailwindcss/vite";
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
@@ -56,11 +56,13 @@ const defaultConfig = defineConfig(({ mode }) => ({
       '@': path.resolve(__dirname, '/src')
     }
   },
-  test: {
-    environment: 'jsdom',
-    setupFiles: ['./test-setup.ts'],
-    exclude: ['**/node_modules/**', '**/dist/**', '**/tests/e2e/**'],
-  }
+  ...defineProject({
+    test: {
+      environment: 'jsdom',
+      setupFiles: ['./test-setup.ts'],
+      exclude: ['**/node_modules/**', '**/dist/**', '**/tests/e2e/**'],
+    }
+  }),
 }))
 
 export default defaultConfig
