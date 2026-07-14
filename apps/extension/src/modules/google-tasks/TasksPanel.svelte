@@ -6,7 +6,7 @@
   import PopPanel from '@/components/atoms/PopPanel.svelte'
   import TasksPanelContent from './TasksPanelContent.svelte'
 
-  let tasksController = $state(new GoogleTasksController(tasksState))
+  const tasksController = $state(new GoogleTasksController(tasksState))
   let isAuthenticated = $state(false)
 
   async function triggerAuthFlow() {

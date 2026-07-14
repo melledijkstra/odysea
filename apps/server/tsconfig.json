@@ -2,10 +2,10 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "moduleDetection": "force",
-    "module": "Preserve",
+    "module": "nodenext",
     "noUnusedLocals": true,
     "strictNullChecks": true,
-    "moduleResolution": "node"
+    "moduleResolution": "nodenext"
   },
   "include": ["src/**/*", "scripts/**/*", "knexfile.ts"]
 }

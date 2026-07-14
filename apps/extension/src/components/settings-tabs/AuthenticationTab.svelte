@@ -21,7 +21,7 @@
     fitbit: new AuthClient(new FitbitAuthProvider())
   } as const
 
-  let authState = $state({
+  const authState = $state({
     google: false,
     spotify: false,
     fitbit: false

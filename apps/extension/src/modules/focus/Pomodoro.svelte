@@ -21,8 +21,8 @@
     duration: 0,
     isRunning: false
   })
-  let audio = $state<HTMLAudioElement>(new Audio())
-  let timeLeft = $derived(Timer.formatRemainingTime(pState.timeRemaining))
+  const audio = $state<HTMLAudioElement>(new Audio())
+  const timeLeft = $derived(Timer.formatRemainingTime(pState.timeRemaining))
 
   $effect(() => {
     if (pState.isRunning) {

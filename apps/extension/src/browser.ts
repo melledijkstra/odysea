@@ -1,14 +1,14 @@
-import browser from "webextension-polyfill";
+import browser from 'webextension-polyfill'
 import { NAME_STORAGE_KEY } from './constants'
 
 export async function getCurrentTab() {
-  const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-  return tabs[0];
+  const tabs = await browser.tabs.query({ active: true, currentWindow: true })
+  return tabs[0]
 }
 
 export async function retrieveUsername(): Promise<string | undefined> {
   const { [NAME_STORAGE_KEY]: name } = (await browser.storage.sync.get(
-    NAME_STORAGE_KEY
+    NAME_STORAGE_KEY,
   )) as { name: string }
 
   return name

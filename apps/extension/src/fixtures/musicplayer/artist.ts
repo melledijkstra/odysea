@@ -1,8 +1,8 @@
-import type { Artist } from "MusicPlayer";
+import type { Artist } from 'MusicPlayer'
 
 export const defaultArtist: Artist = {
-  id: "default-artist-id",
-  name: "Default Artist Name",
-  uri: "",
-  type: "artist"
+  id: 'default-artist-id',
+  name: 'Default Artist Name',
+  uri: '',
+  type: 'artist',
 }

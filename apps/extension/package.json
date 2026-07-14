@@ -8,8 +8,6 @@
   "scripts": {
     "dev": "NODE_ENV=development vite build --watch --mode development",
     "build": "vite build",
-    "test": "vitest",
-    "test:watch": "vitest watch",
     "test:e2e": "playwright test",
     "lint": "eslint .",
     "typecheck": "svelte-check",
@@ -18,6 +16,7 @@
     "storybook:start": "storybook start"
   },
   "devDependencies": {
+    "@melledijkstra/config": "workspace:*",
     "@playwright/test": "^1.61.1",
     "@storybook/addon-svelte-csf": "^5.1.2",
     "@storybook/svelte": "^10.5.0",

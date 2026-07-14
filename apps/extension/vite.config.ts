@@ -1,6 +1,6 @@
-import { loadEnv } from 'vite';
-import { defineConfig, defineProject } from 'vitest/config';
-import tailwindcss from "@tailwindcss/vite";
+import { loadEnv } from 'vite'
+import { defineConfig, defineProject } from 'vitest/config'
+import tailwindcss from '@tailwindcss/vite'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import packageJson from './package.json'
@@ -12,7 +12,7 @@ function manifestTransformer(content: string, mode: string) {
   const envVars = loadEnv(mode, process.cwd())
   content = content.replace(
     '%CLIENT_ID%',
-    envVars.VITE_GOOGLE_CLIENT_ID
+    envVars.VITE_GOOGLE_CLIENT_ID,
   )
   content = content.replace('%VERSION%', packageJson.version)
   return content
@@ -27,10 +27,10 @@ const defaultConfig = defineConfig(({ mode }) => ({
         {
           src: 'manifest.json',
           dest: '.',
-          transform: (content) => manifestTransformer(content, mode)
-        }
-      ]
-    })
+          transform: content => manifestTransformer(content, mode),
+        },
+      ],
+    }),
   ],
   build: {
     minify: mode === 'production',
@@ -40,28 +40,30 @@ const defaultConfig = defineConfig(({ mode }) => ({
         options: './options.html',
         background: './src/background.entry.ts',
         popup: './popup.html',
-        ...(ENABLE_DEBUG ? {
-          'debug': './debug.html'
-        } : {})
+        ...(ENABLE_DEBUG
+          ? {
+              debug: './debug.html',
+            }
+          : {}),
       },
       output: {
         entryFileNames: '[name].js',
         chunkFileNames: 'scripts/[name].[hash].js',
-        assetFileNames: 'assets/[name].[hash][extname]'
-      }
-    }
+        assetFileNames: 'assets/[name].[hash][extname]',
+      },
+    },
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '/src')
-    }
+      '@': path.resolve(__dirname, '/src'),
+    },
   },
   ...defineProject({
     test: {
       environment: 'jsdom',
       setupFiles: ['./test-setup.ts'],
       exclude: ['**/node_modules/**', '**/dist/**', '**/tests/e2e/**'],
-    }
+    },
   }),
 }))
 

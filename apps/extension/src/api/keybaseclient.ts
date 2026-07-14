@@ -1,4 +1,4 @@
-import { BaseClient } from "./baseclient"
+import { BaseClient } from './baseclient'
 
 export class ApiKeyBaseClient extends BaseClient {
   protected apiKey: string | (() => string)
@@ -14,7 +14,7 @@ export class ApiKeyBaseClient extends BaseClient {
 
     if (this.constructor === ApiKeyBaseClient) {
       throw new Error(
-        'ApiKeyBaseClient is abstract and cannot be instantiated directly.'
+        'ApiKeyBaseClient is abstract and cannot be instantiated directly.',
       )
     }
   }
@@ -31,7 +31,7 @@ export class ApiKeyBaseClient extends BaseClient {
     const searchParams = new URLSearchParams(query || '')
     searchParams.set(this.urlQueryKeyName, key)
     endpoint = path
-    return super.request(endpoint, config, searchParams);
+    return super.request(endpoint, config, searchParams)
   }
 
   getApiKey(): string {

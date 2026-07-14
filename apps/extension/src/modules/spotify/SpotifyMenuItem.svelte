@@ -6,7 +6,7 @@
   import { SpotifyController } from '@/controllers/SpotifyController'
   import { MPState } from '@/components/musicplayer/state.svelte'
 
-  let controller = $state<SpotifyController>(new SpotifyController(MPState))
+  const controller = $state<SpotifyController>(new SpotifyController(MPState))
 </script>
 
 <Popover.Root>

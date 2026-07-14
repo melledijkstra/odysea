@@ -3,12 +3,12 @@ import type { StorybookConfig } from '@storybook/svelte-vite'
 const config: StorybookConfig = {
   stories: [
     '../stories/**/*.stories.@(js|ts|svelte)',
-    '../stories/**/*.mdx'
+    '../stories/**/*.mdx',
   ],
   addons: [
-    "@storybook/addon-svelte-csf",
+    '@storybook/addon-svelte-csf',
   ],
-  framework: "@storybook/svelte-vite"
+  framework: '@storybook/svelte-vite',
 }
 
 export default config

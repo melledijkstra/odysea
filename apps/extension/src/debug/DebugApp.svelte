@@ -4,7 +4,7 @@
   import { loadModule } from '@/modules'
   import { onMount } from 'svelte'
 
-  let hello = $state('Hi there')
+  const hello = $state('Hi there')
   let isOpen = $state(false)
 
   onMount(() => {

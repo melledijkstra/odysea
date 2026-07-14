@@ -9,10 +9,10 @@
   const DURATION = 5 * 60 * 1000
 
   let breatheState = $state<boolean>(true)
-  let inhaling = $derived(breatheState)
-  let exhaling = $derived(!breatheState)
+  const inhaling = $derived(breatheState)
+  const exhaling = $derived(!breatheState)
   let active = $state(false)
-  let timer = $state(
+  const timer = $state(
     new Timer({
       duration: DURATION
     })

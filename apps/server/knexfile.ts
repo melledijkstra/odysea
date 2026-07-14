@@ -5,5 +5,5 @@ export default {
       filename: './odysea.db',
     },
     useNullAsDefault: true,
-  }
+  },
 }

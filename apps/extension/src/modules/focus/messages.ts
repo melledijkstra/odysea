@@ -6,11 +6,11 @@ export const startPomodoro = createMessage<void, void>('startPomodoro')
 export const stopPomodoro = createMessage<void, void>('stopPomodoro')
 
 export const getPomodoroState = createMessage<void, PomodoroState>(
-  'getPomodoroState'
+  'getPomodoroState',
 )
 
 export const stateUpdate = createMessage<PomodoroState, void>(
-  'pomodoroStateUpdate'
+  'pomodoroStateUpdate',
 )
 
 export const pomodoroComplete = createMessage<void, void>('pomodoroComplete')

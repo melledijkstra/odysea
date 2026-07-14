@@ -3,7 +3,7 @@
   import Welcome from '@/components/Welcome.svelte'
   import type { User } from '@/app-state.svelte'
 
-  let user: User = $state({
+  const user: User = $state({
     name: 'John Doe'
   });
 

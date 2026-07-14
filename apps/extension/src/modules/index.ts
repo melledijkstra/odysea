@@ -23,38 +23,38 @@ export const MODULE_CONFIG = [
   {
     id: 'google_tasks',
     title: 'Google Tasks',
-    import: () => import('./google-tasks/index.ts')
+    import: () => import('./google-tasks/index.ts'),
   },
   {
     id: 'notes',
     title: 'Quick Notes',
-    import: () => import('./notes/index.ts')
+    import: () => import('./notes/index.ts'),
   },
   {
     id: 'well_being',
     title: 'Well Being',
-    import: () => import('./well-being/index.ts')
+    import: () => import('./well-being/index.ts'),
   },
   {
     id: 'spotify',
     title: 'Spotify',
-    import: () => import('./spotify/index.ts')
+    import: () => import('./spotify/index.ts'),
   },
   {
     id: 'focus',
     title: 'Focus Sessions',
-    import: () => import('./focus/index.ts')
+    import: () => import('./focus/index.ts'),
   },
   {
     id: 'weather',
     title: 'Weather',
-    import: () => import('./weather/index.ts')
+    import: () => import('./weather/index.ts'),
   },
   {
     id: 'habits',
     title: 'Habits',
-    import: () => import('./habits/index.ts')
-  }
+    import: () => import('./habits/index.ts'),
+  },
 ] as const satisfies ReadonlyArray<ModuleConfigItem>
 
 export type ModuleID = (typeof MODULE_CONFIG)[number]['id']
@@ -66,7 +66,7 @@ function isValidModule(module: unknown): module is Module {
 const loadedModules = new Map<ModuleID, Module>()
 
 export async function loadModule(id: ModuleID): Promise<Module> {
-  const module = MODULE_CONFIG.find((m) => m.id === id)
+  const module = MODULE_CONFIG.find(m => m.id === id)
 
   if (!module) {
     throw new Error(`Module ${id} not found`)
@@ -82,7 +82,7 @@ export async function loadModule(id: ModuleID): Promise<Module> {
 
   if (!isValidModule(loadedModule.default)) {
     throw new Error(
-      `Loaded module "${id}" does not conform to the Module interface`
+      `Loaded module "${id}" does not conform to the Module interface`,
     )
   }
 

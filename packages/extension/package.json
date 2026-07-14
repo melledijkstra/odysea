@@ -19,7 +19,7 @@
   "scripts": {
     "dev": "tsdown --watch",
     "build": "tsdown",
-    "test": "vitest"
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@types/chrome": "^0.1.33",

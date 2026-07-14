@@ -24,30 +24,32 @@ describe('ui.ts', () => {
   })
 
   describe('setBackgroundImage', () => {
-    let originalImage: typeof globalThis.Image;
+    let originalImage: typeof globalThis.Image
 
     beforeEach(() => {
-      originalImage = globalThis.Image;
+      originalImage = globalThis.Image
       vi.stubGlobal('Image', class {
-        _src: string = '';
+        _src: string = ''
         get src() {
-          return this._src;
+          return this._src
         }
+
         set src(value: string) {
-          this._src = value;
+          this._src = value
           // Simulate image loading
           setTimeout(() => {
-            this.onload?.();
-          }, 0);
+            this.onload?.()
+          }, 0)
         }
-        onload: (() => void) | null = vi.fn();
-        onerror: ((error: Event) => void) | null = vi.fn();
+
+        onload: (() => void) | null = vi.fn()
+        onerror: ((error: Event) => void) | null = vi.fn()
       })
     })
 
     afterEach(() => {
-      globalThis.Image = originalImage;
-      vi.unstubAllGlobals();
+      globalThis.Image = originalImage
+      vi.unstubAllGlobals()
     })
 
     it('should set the background image', async () => {

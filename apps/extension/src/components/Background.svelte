@@ -2,7 +2,7 @@
   import { background } from '@/stores/background.svelte'
   import { fade } from 'svelte/transition'
 
-  let url = $derived(background.url)
+  const url = $derived(background.url)
 </script>
 
 {#if url}

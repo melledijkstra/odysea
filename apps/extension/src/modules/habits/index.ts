@@ -9,7 +9,7 @@ const habitsModule: Module = {
   trigger: HabitsTrigger,
   init: () => {
     habits.initialize()
-  }
+  },
 }
 
 export default habitsModule

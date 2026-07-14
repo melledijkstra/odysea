@@ -16,7 +16,8 @@
   },
   "scripts": {
     "dev": "tsdown --watch",
-    "build": "tsdown"
+    "build": "tsdown",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@melledijkstra/config": "workspace:*"

@@ -4,6 +4,9 @@
   "author": "Melle Dijkstra",
   "type": "module",
   "files": ["src"],
+  "scripts": {
+    "lint": "eslint ."
+  },
   "exports": {
     "./svelte": "./src/svelte",
     "./react": "./src/react"
@@ -14,8 +17,8 @@
     "svelte": "^5.47.1"
   },
   "devDependencies": {
+    "@melledijkstra/config": "workspace:*",
     "@types/react": "^19.2.9",
-    "@types/react-dom": "^19.2.3",
-    "@melledijkstra/config": "workspace:*"
+    "@types/react-dom": "^19.2.3"
   }
 }

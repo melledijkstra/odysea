@@ -9,7 +9,7 @@ import {
   mdiWeatherFog,
   mdiCloudQuestionOutline,
   mdiWeatherNight,
-  mdiWeatherNightPartlyCloudy
+  mdiWeatherNightPartlyCloudy,
 } from '@mdi/js'
 
 export const fahrenheitToCelsius = (kelvin: number): number =>

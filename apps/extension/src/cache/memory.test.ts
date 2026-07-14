@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest"
-import { MemoryAdapter } from "./memory"
+import { describe, expect, it } from 'vitest'
+import { MemoryAdapter } from './memory'
 
 describe('MemoryAdapter', () => {
   it('should set and get values correctly', () => {

@@ -1,12 +1,12 @@
 import { Logger } from '@melledijkstra/toolbox'
-import { AuthClient,GoogleAuthConfig } from '@melledijkstra/auth'
+import { AuthClient, GoogleAuthConfig } from '@melledijkstra/auth'
 
 const logger = new Logger('GooglePhotos')
 
 export async function fetchPhotos() {
   const client = new AuthClient(
     new GoogleAuthConfig(),
-    'https://unknown.com'
+    'https://unknown.com',
   )
   const token = await client.getAuthToken()
 

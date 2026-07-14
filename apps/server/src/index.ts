@@ -10,7 +10,7 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/status', (_req, res) => {
-  res.status(200).send('OK');
+  res.status(200).send('OK')
 })
 
 app.use('/focus-sessions', focusSessionsRouter)

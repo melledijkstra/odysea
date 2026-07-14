@@ -4,7 +4,7 @@ import { FocusService } from '@/services/focus'
 import { Logger } from '@/logger'
 import { trimCache } from './background/image-cache'
 
-declare const self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope
 
 export const logger = new Logger('background')
 
@@ -22,11 +22,10 @@ browser.runtime.onInstalled.addListener(({ reason }) => {
       title: 'Thanks for installing!',
       message:
         'Welcome to a more productive homepage tailored just for you. Click here to open your new homepage!',
-      iconUrl: browser.runtime.getURL('icons/hand-wave.png')
+      iconUrl: browser.runtime.getURL('icons/hand-wave.png'),
     })
   }
 })
-
 
 browser.notifications.onClicked.addListener((notificationId) => {
   logger.log('Notification clicked:', notificationId)
@@ -34,18 +33,18 @@ browser.notifications.onClicked.addListener((notificationId) => {
 })
 
 self.addEventListener('install', () => {
-  self.skipWaiting();
-});
+  self.skipWaiting()
+})
 
-self.addEventListener('activate', e => {
+self.addEventListener('activate', (e) => {
   // clean up any stale entries right away
-  e.waitUntil(trimCache());
-});
+  e.waitUntil(trimCache())
+})
 
 logger.log('Service worker activated')
 logger.log('Initializing services...')
 services.push(
-  new FocusService()
+  new FocusService(),
 )
 logger.log(`Services initialized: ${services.map(s => s.constructor.name).join(', ')}`)
 

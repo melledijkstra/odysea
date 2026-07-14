@@ -10,7 +10,7 @@
   import Footer from './components/Footer.svelte'
   import DefaultModeContent from './components/DefaultModeContent.svelte'
 
-  let currentTask = $derived(
+  const currentTask = $derived(
     tasksState.tasks.find((task) => task.status === 'needsAction')
   )
 </script>

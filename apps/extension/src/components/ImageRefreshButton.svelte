@@ -8,15 +8,15 @@
 
   const logger = new Logger('ImageRefreshButton')
 
-  let unsplashClient = $state<UnsplashClient>(
+  const unsplashClient = $state<UnsplashClient>(
     new UnsplashClient(
       settingsStore.network.serverlessHost,
       settingsStore.ui.dailyImageQuery
     )
   )
 
-  let serverlessHost = $derived(settingsStore.network.serverlessHost)
-  let dailyImageQuery = $derived(settingsStore.ui.dailyImageQuery)
+  const serverlessHost = $derived(settingsStore.network.serverlessHost)
+  const dailyImageQuery = $derived(settingsStore.ui.dailyImageQuery)
 
   async function refreshBackround() {
     const url = await unsplashClient?.refreshDailyImage()

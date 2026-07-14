@@ -21,14 +21,15 @@ export async function fetchAccountInfo(): Promise<Account | undefined> {
       {
         headers: {
           Accept: 'application/json',
-          Authorization: `Bearer ${token}`
-        }
-      }
+          Authorization: `Bearer ${token}`,
+        },
+      },
     )
     const data = (await response.json()) as Account
 
     return data
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Error fetching user info:', error)
   }
 }

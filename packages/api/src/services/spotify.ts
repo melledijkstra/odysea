@@ -115,9 +115,11 @@ export class SpotifyApiClient extends TokenBaseClient {
     let mode: string
     if (typeof repeatMode === 'number') {
       mode = repeatMode.toString()
-    } else if (repeatMode === 'off') {
+    }
+    else if (repeatMode === 'off') {
       mode = 'off'
-    } else {
+    }
+    else {
       mode = 'context'
     }
 
@@ -135,7 +137,8 @@ export class SpotifyApiClient extends TokenBaseClient {
 
     if (context_uri?.startsWith('spotify:track')) {
       body.uris = [context_uri]
-    } else if (context_uri) {
+    }
+    else if (context_uri) {
       body.context_uri = context_uri
     }
 

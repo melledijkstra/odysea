@@ -50,7 +50,8 @@ export class CacheService implements ICacheService {
 
       // Fallback for older non-wrapped format
       return cached as T
-    } catch (e) {
+    }
+    catch (e) {
       this.logger.error('Failed to get from cache for key:', key, e)
       return undefined
     }
@@ -60,10 +61,11 @@ export class CacheService implements ICacheService {
     try {
       const item: CacheItem<T> = {
         value,
-        expiry: ttl !== undefined ? Date.now() + ttl : undefined
+        expiry: ttl !== undefined ? Date.now() + ttl : undefined,
       }
       await this.adapter.set(key, item)
-    } catch (e) {
+    }
+    catch (e) {
       this.logger.error('Failed to set cache for key:', key, e)
     }
   }
@@ -71,7 +73,8 @@ export class CacheService implements ICacheService {
   async delete(key: string): Promise<void> {
     try {
       await this.adapter.delete(key)
-    } catch (e) {
+    }
+    catch (e) {
       this.logger.error('Failed to delete cache for key:', key, e)
     }
   }
@@ -79,7 +82,8 @@ export class CacheService implements ICacheService {
   async clear(): Promise<void> {
     try {
       await this.adapter.clear()
-    } catch (e) {
+    }
+    catch (e) {
       this.logger.error('Failed to clear cache:', e)
     }
   }

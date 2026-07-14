@@ -1,4 +1,4 @@
-import type { ICacheAdapter } from "./cache-service"
+import type { ICacheAdapter } from './cache-service'
 
 export class LocalStorageAdapter implements ICacheAdapter {
   private isAvailable(): boolean {
@@ -11,7 +11,8 @@ export class LocalStorageAdapter implements ICacheAdapter {
     if (item === null) return null
     try {
       return JSON.parse(item) as T
-    } catch {
+    }
+    catch {
       return null
     }
   }

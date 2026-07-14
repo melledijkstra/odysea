@@ -43,10 +43,10 @@
     ...props
   }: PlaybackProps = $props()
 
-  let isShuffling = $derived(state?.shuffle ?? false)
+  const isShuffling = $derived(state?.shuffle ?? false)
 
-  let repeatMode = $derived(state?.repeatMode ?? 0)
-  let repeatModeIcon = $derived.by(() => {
+  const repeatMode = $derived(state?.repeatMode ?? 0)
+  const repeatModeIcon = $derived.by(() => {
     switch (repeatMode) {
       case 1:
         return mdiRepeatOnce
@@ -57,14 +57,14 @@
         return mdiRepeatOff
     }
   })
-  let mediaItem = $derived(state?.currentItem)
-  let position_ms = $derived(state?.position_ms ?? 0)
+  const mediaItem = $derived(state?.currentItem)
+  const position_ms = $derived(state?.position_ms ?? 0)
   // let remaining = $derived(mediaItem ? mediaItem.duration_ms - position_ms : 0)
   // let timeLeft = $derived<string>(millisecondsToTime(remaining))
-  let duration = $derived(mediaItem?.duration_ms ? millisecondsToTime(mediaItem.duration_ms) : 0)
-  let currentTime = $derived<string>(millisecondsToTime(position_ms))
+  const duration = $derived(mediaItem?.duration_ms ? millisecondsToTime(mediaItem.duration_ms) : 0)
+  const currentTime = $derived<string>(millisecondsToTime(position_ms))
 
-  let volumeIcon = $derived.by(() => {
+  const volumeIcon = $derived.by(() => {
     if (state.volume === 0) {
       return mdiVolumeOff
     } else if (state.volume < 15) {

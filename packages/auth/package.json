@@ -19,6 +19,7 @@
   "scripts": {
     "dev": "tsdown --watch",
     "build": "tsdown",
+    "lint": "eslint .",
     "example": "cd example && tsx --env-file=.env"
   },
   "dependencies": {

@@ -37,18 +37,18 @@ export class UnsplashClient implements ILogger {
     this.logger.log('Fetching Unsplash image from', {
       host: this.HOST,
       endpoint: ENDPOINT,
-      query: this.query
+      query: this.query,
     })
     const serverlessUrl = new URL(ENDPOINT, this.HOST)
-    
+
     if (this.query) {
       serverlessUrl.searchParams.set('query', this.query)
     }
 
     const response = await fetch(serverlessUrl, {
       headers: {
-        'X-Extension-ID': browser.runtime.id
-      }
+        'X-Extension-ID': browser.runtime.id,
+      },
     })
 
     return (await response.json()) as UnsplashResponse
@@ -60,7 +60,7 @@ export class UnsplashClient implements ILogger {
     const next: ImageInfo = {
       id: response.id,
       url: response.urls.full,
-      date: formatDate(tomorrow)
+      date: formatDate(tomorrow),
     }
 
     await this.cache.setNextImageInfo(next)
@@ -72,7 +72,8 @@ export class UnsplashClient implements ILogger {
       if (fetchResponse.ok) {
         await imageCache.put(next.url, fetchResponse)
       }
-    } catch (e) {
+    }
+    catch (e) {
       this.logger.error('Failed to pre-cache next image:', e)
     }
 
@@ -97,7 +98,8 @@ export class UnsplashClient implements ILogger {
         const blob = await response.blob()
         return URL.createObjectURL(blob)
       }
-    } catch (error) {
+    }
+    catch (error) {
       this.logger.error('Failed to get image from cache or fetch:', error)
     }
     return url
@@ -112,7 +114,8 @@ export class UnsplashClient implements ILogger {
     if (cached?.date === today) {
       this.logger.log('retrieved daily image from cache')
       imageUrl = cached.url
-    } else {
+    }
+    else {
       const next = await this.cache.getNextImageInfo()
       let dailyImageInfo: ImageInfo
 
@@ -120,7 +123,8 @@ export class UnsplashClient implements ILogger {
         this.logger.log('next image exists, use that one instead')
         dailyImageInfo = { ...next, date: today }
         await this.cache.clearNextImage()
-      } else {
+      }
+      else {
         this.logger.log('no cached image found, fetching new one')
         const data = await this.fetchUnsplashImage()
         dailyImageInfo = { id: data.id, url: data.urls.full, date: today }

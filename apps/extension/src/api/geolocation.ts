@@ -18,8 +18,8 @@ type LocationResponse = {
 
 export type LocationInfo = Omit<LocationResponse, 'status' | 'message'>
 
-const LOCATION_API_URL =
-  'http://ip-api.com/json?fields=status,message,country,countryCode,region,regionName,city,lat,lon,timezone'
+const LOCATION_API_URL
+  = 'http://ip-api.com/json?fields=status,message,country,countryCode,region,regionName,city,lat,lon,timezone'
 
 async function fetchGeolocation(): Promise<LocationResponse | undefined> {
   const response = await fetch(LOCATION_API_URL)
@@ -38,10 +38,10 @@ async function getGeolocationBrowser(): Promise<[number, number] | undefined> {
         const { latitude, longitude } = currentPosition.coords
         resolve([latitude, longitude])
       },
-      (error) => reject(new Error(error.message)),
+      error => reject(new Error(error.message)),
       {
-        timeout: 3000 // allow 3 seconds to return the position
-      }
+        timeout: 3000, // allow 3 seconds to return the position
+      },
     )
   })
 }
@@ -61,7 +61,7 @@ export type GeoPositionResponse = {
 export async function getCurrentPosition(): Promise<
   GeoPositionResponse | undefined
 > {
-  const browserPos = await getGeolocationBrowser().catch((_err) => undefined);
+  const browserPos = await getGeolocationBrowser().catch(_err => undefined)
   if (browserPos) {
     return { lat: browserPos[0], lon: browserPos[1] }
   }

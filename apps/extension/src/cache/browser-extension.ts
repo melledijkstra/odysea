@@ -1,5 +1,5 @@
-import browser from "webextension-polyfill"
-import type { ICacheAdapter } from "./cache-service"
+import browser from 'webextension-polyfill'
+import type { ICacheAdapter } from './cache-service'
 
 export class ExtensionStorageAdapter implements ICacheAdapter {
   private storageArea: browser.Storage.StorageArea

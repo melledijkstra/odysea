@@ -1,50 +1,50 @@
-import { getCurrentTab } from "@/browser";
-import { Logger } from "@/logger";
+import { getCurrentTab } from '@/browser'
+import { Logger } from '@/logger'
 
-const LOCK_KEY = 'music-player-tab-lock';
+const LOCK_KEY = 'music-player-tab-lock'
 
-const storage = localStorage;
+const storage = localStorage
 
-const logger = new Logger('TabLock');
+const logger = new Logger('TabLock')
 
 export async function acquireTabLock(): Promise<boolean> {
-  const tab = await getCurrentTab();
-  const tabId = tab.id?.toString() ?? '';
-  const existing = storage.getItem(LOCK_KEY);
+  const tab = await getCurrentTab()
+  const tabId = tab.id?.toString() ?? ''
+  const existing = storage.getItem(LOCK_KEY)
 
-  logger.log(tabId, existing);
+  logger.log(tabId, existing)
 
   if (!existing) {
-    storage.setItem(LOCK_KEY, tabId);
-    logger.log('acquired tab lock', tabId);
-    return true;
+    storage.setItem(LOCK_KEY, tabId)
+    logger.log('acquired tab lock', tabId)
+    return true
   }
 
-  return existing === tabId;
+  return existing === tabId
 }
 
 export async function hasTabLockAcquired(): Promise<boolean> {
   const tab = await getCurrentTab()
-  const tabId = tab.id?.toString() ?? '';
-  const existing = storage.getItem(LOCK_KEY);
-  logger.log('hasLockAcquired', tabId, existing, existing === tabId);
+  const tabId = tab.id?.toString() ?? ''
+  const existing = storage.getItem(LOCK_KEY)
+  logger.log('hasLockAcquired', tabId, existing, existing === tabId)
   return existing === tabId
 }
 
 export function lockExists(): boolean {
-  return storage.getItem(LOCK_KEY) !== null;
+  return storage.getItem(LOCK_KEY) !== null
 }
 
 export async function releaseTabLock(): Promise<boolean> {
   const tab = await getCurrentTab()
-  const tabId = tab.id?.toString() ?? '';
-  const existing = storage.getItem(LOCK_KEY);
+  const tabId = tab.id?.toString() ?? ''
+  const existing = storage.getItem(LOCK_KEY)
 
   // only allow releasing the lock if it's the same tab that acquired it
   if (existing && existing === tabId) {
-    storage.removeItem(LOCK_KEY);
-    logger.log('released tab lock', tabId);
-    return true;
+    storage.removeItem(LOCK_KEY)
+    logger.log('released tab lock', tabId)
+    return true
   }
-  return false;
+  return false
 }

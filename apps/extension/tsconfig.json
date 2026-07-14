@@ -34,7 +34,7 @@
     "skipLibCheck": true,
     "paths": {
       "@/*": ["./src/*"]
-    },
+    }
   },
   "include": [
     "src/**/*.d.ts",

@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from "vitest"
-import { ExtensionStorageAdapter } from "./browser-extension"
+import { describe, expect, it, vi } from 'vitest'
+import { ExtensionStorageAdapter } from './browser-extension'
 
 import browser from 'webextension-polyfill'
 

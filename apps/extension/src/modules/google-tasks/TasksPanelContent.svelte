@@ -9,7 +9,7 @@
     state: GoogleTasksState
   }
 
-  let { controller, state: tasksState }: TasksPanelContentProps = $props()
+  const { controller, state: tasksState }: TasksPanelContentProps = $props()
 
   let selectedTaskList = $state<string>()
   let newTaskTitle = $state('')

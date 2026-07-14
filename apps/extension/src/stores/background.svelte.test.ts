@@ -11,12 +11,14 @@ describe('background store', () => {
       get src() {
         return this._src
       }
+
       set src(value: string) {
         this._src = value
         setTimeout(() => {
           this.onload?.()
         }, 0)
       }
+
       onload: (() => void) | null = null
       onerror: ((error: Event) => void) | null = null
     })
@@ -37,4 +39,3 @@ describe('background store', () => {
     expect(background.url).toBe(url)
   })
 })
- 

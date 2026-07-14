@@ -20,11 +20,11 @@ declare namespace Spotify {
     message: string
   }
 
-  type ErrorTypes =
-    | 'account_error'
-    | 'authentication_error'
-    | 'initialization_error'
-    | 'playback_error'
+  type ErrorTypes
+    = | 'account_error'
+      | 'authentication_error'
+      | 'initialization_error'
+      | 'playback_error'
 
   interface Image {
     height?: number | null | undefined
@@ -141,11 +141,11 @@ declare namespace Spotify {
 
   type AddListenerFn = ((
     event: 'ready' | 'not_ready',
-    cb: PlaybackInstanceListener
-  ) => void) &
-    ((event: 'autoplay_failed', cb: EmptyListener) => void) &
-    ((event: 'player_state_changed', cb: PlaybackStateListener) => void) &
-    ((event: ErrorTypes, cb: ErrorListener) => void)
+    cb: PlaybackInstanceListener,
+  ) => void)
+  & ((event: 'autoplay_failed', cb: EmptyListener) => void)
+  & ((event: 'player_state_changed', cb: PlaybackStateListener) => void)
+  & ((event: ErrorTypes, cb: ErrorListener) => void)
 
   class Player {
     // edit 5 July 2025 - not part of original Spotify SDK

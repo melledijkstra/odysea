@@ -6,7 +6,7 @@
     type?: 'component' | 'scene' | 'trigger'
   }
 
-  let { id, type = 'component' }: Props = $props()
+  const { id, type = 'component' }: Props = $props()
 </script>
 
 {#await loadModule(id) then Module}

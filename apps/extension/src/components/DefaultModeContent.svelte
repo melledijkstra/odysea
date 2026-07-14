@@ -9,7 +9,7 @@
     renderCurrentTask: Snippet
   }
 
-  let { renderCurrentTask }: Props = $props()
+  const { renderCurrentTask }: Props = $props()
 
   function onUsernameChange(name: string) {
     storeUsername(name)

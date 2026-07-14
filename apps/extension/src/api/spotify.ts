@@ -8,17 +8,18 @@ const BASE_URL = 'https://api.spotify.com/v1'
 
 export class SpotifyApiClient extends TokenBaseClient implements ILogger {
   logger = new Logger('SpotifyClient')
-  
+
   constructor(private readonly authClient: AuthClient) {
     super(BASE_URL, '')
   }
-  
+
   async retrieveAccessToken() {
     const token = await this.authClient.getAuthToken()
-    
+
     if (token) {
       super.setAccessToken(token)
-    } else {
+    }
+    else {
       super.setAccessToken('')
     }
   }
@@ -40,22 +41,23 @@ export class SpotifyApiClient extends TokenBaseClient implements ILogger {
 
     return []
   }
-  
+
   async transferPlaybackDevice(deviceId: string) {
     await this.retrieveAccessToken()
     try {
       await this.request(`/me/player`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           device_ids: [deviceId],
-          play: false
-        })
+          play: false,
+        }),
       })
       return true
-    } catch (error) {
+    }
+    catch (error) {
       this.logger.error('Failed to transfer playback device:', error)
       return false
     }
@@ -78,14 +80,14 @@ export class SpotifyApiClient extends TokenBaseClient implements ILogger {
   async seekToPosition(position: number) {
     await this.retrieveAccessToken()
     this.request(`/me/player/seek?position_ms=${position}`, {
-      method: 'PUT'
+      method: 'PUT',
     })
   }
 
   async toggleShuffle(state: boolean) {
     await this.retrieveAccessToken()
     await this.request(`/me/player/shuffle?state=${state ? 'true' : 'false'}`, {
-      method: 'PUT'
+      method: 'PUT',
     })
   }
 
@@ -98,7 +100,7 @@ export class SpotifyApiClient extends TokenBaseClient implements ILogger {
 
   async startPlayback(contextUri?: string, offset?: number) {
     const body: Record<string, unknown> = {
-      position_ms: 0
+      position_ms: 0,
     }
 
     if (contextUri) {
@@ -113,9 +115,9 @@ export class SpotifyApiClient extends TokenBaseClient implements ILogger {
     await this.request('/me/player/play', {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     })
   }
 
@@ -133,9 +135,9 @@ export class SpotifyApiClient extends TokenBaseClient implements ILogger {
 
   async toggleRepeatMode(repeatMode: string | number): Promise<void> {
     await this.retrieveAccessToken()
-    
+
     let mode: string
-    
+
     switch (repeatMode) {
       case 1:
         mode = 'track'
@@ -148,9 +150,9 @@ export class SpotifyApiClient extends TokenBaseClient implements ILogger {
         mode = 'off'
         break
     }
-    
+
     await this.request(`/me/player/repeat?state=${encodeURIComponent(mode)}`, {
-      method: 'PUT'
+      method: 'PUT',
     })
   }
 
@@ -164,13 +166,14 @@ export class SpotifyApiClient extends TokenBaseClient implements ILogger {
     const body: Record<string, unknown> = {}
 
     if (context_uri?.startsWith('spotify:track')) {
-      body.uris = [context_uri];
-    } else {
-      body.context_uri = context_uri;
+      body.uris = [context_uri]
+    }
+    else {
+      body.context_uri = context_uri
     }
 
     if (Object.keys(body).length > 0) {
-      options.body = JSON.stringify(body);
+      options.body = JSON.stringify(body)
     }
 
     await this.request('/me/player/play', options)
@@ -186,28 +189,28 @@ export class SpotifyApiClient extends TokenBaseClient implements ILogger {
   async previousTrack() {
     await this.retrieveAccessToken()
     await this.request('/me/player/previous', {
-      method: 'POST'
+      method: 'POST',
     })
   }
 
   async nextTrack() {
     await this.retrieveAccessToken()
     await this.request('/me/player/next', {
-      method: 'POST'
+      method: 'POST',
     })
   }
 
   async seek(position_ms: number) {
     await this.retrieveAccessToken()
     await this.request(`/me/player/seek?position_ms=${position_ms}`, {
-      method: 'PUT'
+      method: 'PUT',
     })
   }
 
   async setVolume(volume: number) {
     await this.retrieveAccessToken()
     await this.request(`/me/player/volume?volume_percent=${volume}`, {
-      method: 'PUT'
+      method: 'PUT',
     })
   }
 }

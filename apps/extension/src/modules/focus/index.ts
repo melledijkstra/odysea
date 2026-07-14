@@ -5,5 +5,5 @@ import FocusMenuItem from './FocusMenuItem.svelte'
 export default {
   component: Focus,
   scene: Focus,
-  trigger: FocusMenuItem
+  trigger: FocusMenuItem,
 } satisfies Module

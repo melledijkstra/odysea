@@ -11,7 +11,7 @@
     bottom?: Snippet
   }
 
-  let { mode, top, middle, bottom }: Props = $props()
+  const { mode, top, middle, bottom }: Props = $props()
 </script>
 
 <Background />

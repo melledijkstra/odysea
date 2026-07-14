@@ -1,4 +1,3 @@
-
 export type FocusSession = {
   id: number
   duration: number

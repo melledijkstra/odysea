@@ -11,5 +11,5 @@ export default {
     const auth = new AuthClient(new GoogleAuthProvider())
     const client = new GoogleTasksApiClient(auth)
     state.tasks = await client.fetchTasks()
-  }
+  },
 } satisfies Module

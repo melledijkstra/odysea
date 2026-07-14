@@ -4,7 +4,7 @@
   import Button from "@/components/atoms/Button.svelte"
   import type { Habit } from "@/db/habits"
 
-  let newHabit = $state<Habit & { id?: string }>({
+  const newHabit = $state<Habit & { id?: string }>({
     name: '',
     color: '#000000',
     goal: 0,

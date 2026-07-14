@@ -1,10 +1,10 @@
 const playbackTrack: Spotify.Track = {
-  id: "0iiB9CYptXO5Fz728LHHsQ",
-  media_type: "audio",
-  track_type: "audio",
+  id: '0iiB9CYptXO5Fz728LHHsQ',
+  media_type: 'audio',
+  track_type: 'audio',
   linked_from: {
     uri: null,
-    id: null
+    id: null,
   },
   uid: '0iiB9CYptXO5Fz728LHHsQ',
   uri: 'spotify:track:0iiB9CYptXO5Fz728LHHsQ',
@@ -16,7 +16,7 @@ const playbackTrack: Spotify.Track = {
       name: 'Glass Beams',
       uri: 'spotify:artist:1LTFJvVvRw7ghAyThxYmnF',
       url: 'https://api.spotify.com/v1/artists/1LTFJvVvRw7ghAyThxYmnF',
-    }
+    },
   ],
   album: {
     name: 'Mahal',
@@ -36,8 +36,8 @@ const playbackTrack: Spotify.Track = {
         url: 'https://i.scdn.co/image/ab67616d00001e02b006f089af4d18d351f06c60',
         height: 300,
         width: 300,
-      }
-    ]
+      },
+    ],
   },
   is_playable: true,
 }
@@ -45,7 +45,7 @@ const playbackTrack: Spotify.Track = {
 export const playbackState: Spotify.PlaybackState = {
   context: {
     metadata: null,
-    uri: null
+    uri: null,
   },
   disallows: {},
   duration: 0,
@@ -59,11 +59,11 @@ export const playbackState: Spotify.PlaybackState = {
   track_window: {
     current_track: playbackTrack,
     next_tracks: [],
-    previous_tracks: []
+    previous_tracks: [],
   },
   playback_id: '',
   playback_quality: '',
   playback_features: {
-    hifi_status: ''
-  }
+    hifi_status: '',
+  },
 }

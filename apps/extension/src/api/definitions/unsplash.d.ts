@@ -63,7 +63,7 @@ export type UnsplashResponse = {
       updated_at: string
       cover_photo: null
       user: null
-    }
+    },
     // ... more collections
   ]
   urls: {

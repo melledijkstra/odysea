@@ -4,12 +4,13 @@ export function getMomentOfDay(): 'morning' | 'afternoon' | 'evening' {
 
   if (hours < 12) {
     momentOfDay = 'morning'
-  } else if (hours < 18) {
+  }
+  else if (hours < 18) {
     momentOfDay = 'afternoon'
-  } else {
+  }
+  else {
     momentOfDay = 'evening'
   }
 
   return momentOfDay
 }
-

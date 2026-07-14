@@ -7,8 +7,8 @@
   import WeatherInfo from './WeatherInfo.svelte'
   import { settingsStore } from '@/settings/index.svelte'
 
-  let { currentWeather, setCurrentWeather } = createWeatherState()
-  let client = $state<WeatherClient>(new WeatherClient(() => settingsStore.apiKeys.weather || ''))
+  const { currentWeather, setCurrentWeather } = createWeatherState()
+  const client = $state<WeatherClient>(new WeatherClient(() => settingsStore.apiKeys.weather || ''))
 
   async function retrieveWeather() {
     const weather = await client.getWeather()
