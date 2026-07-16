@@ -6,7 +6,9 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -20,6 +22,8 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@melledijkstra/config": "workspace:*"
+    "@melledijkstra/config": "workspace:*",
+    "eslint": "catalog:",
+    "@types/node": "catalog:"
   }
 }

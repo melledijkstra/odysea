@@ -21,7 +21,7 @@
   <section
     class={[
       mode === 'focus' && 'bg-black/70',
-      'grid grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] snap-start h-screen animate-fade-in transition-colors'
+      'grid grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] snap-start h-screen animate-fade-in transition-colors',
     ]}
   >
     <!-- TOP --->

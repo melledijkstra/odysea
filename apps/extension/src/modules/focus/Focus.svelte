@@ -27,7 +27,7 @@
     <Button
       class={[
         mode === 'count-up' && 'opacity-50',
-        'bg-black/50 p-2 rounded-sm'
+        'bg-black/50 p-2 rounded-sm',
       ]}
       onclick={() => (mode = 'count-up')}
     >
@@ -36,7 +36,7 @@
     <Button
       class={[
         mode === 'pomodoro' && 'opacity-50',
-        'bg-black/50 p-2 rounded-sm'
+        'bg-black/50 p-2 rounded-sm',
       ]}
       onclick={() => (mode = 'pomodoro')}
     >

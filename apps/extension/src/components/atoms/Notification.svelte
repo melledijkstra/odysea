@@ -6,7 +6,7 @@
     mdiCheckCircleOutline,
     mdiClose,
     mdiCloseCircleOutline,
-    mdiInformationOutline
+    mdiInformationOutline,
   } from '@mdi/js'
 
   type NotiticationProps = Notification & {
@@ -47,8 +47,8 @@
 
     <button
       class={[
-        "-m-3 rounded-full p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 cursor-pointer",
-        "dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+        '-m-3 rounded-full p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 cursor-pointer',
+        'dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200',
       ]}
       type="button"
       aria-label="Dismiss notification"
@@ -60,10 +60,11 @@
 
     {#if duration}
       <hr class={[
-        "h-1 duration-indicator border-none p-0 m-0 outline-none",
-        "absolute bottom-0 left-0",
-        type === 'success' ? 'bg-green-600' :
-        type === 'error' ? 'bg-red-600' : 'bg-blue-600'
+        'h-1 duration-indicator border-none p-0 m-0 outline-none',
+        'absolute bottom-0 left-0',
+        type === 'success'
+          ? 'bg-green-600'
+          : type === 'error' ? 'bg-red-600' : 'bg-blue-600',
       ]} style="--progress-duration: {duration}ms" />
     {/if}
   </div>

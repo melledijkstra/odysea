@@ -1,12 +1,12 @@
 <script lang="ts">
   import { CacheService } from '@/cache/cache-service'
   import {
-  getIsSleepMetricEnabled,
+    getIsSleepMetricEnabled,
     setIsSleepMetricEnabled,
     trackers,
     type CountDown,
     type Counter,
-    type WorldClock
+    type WorldClock,
   } from '@/modules/trackers/state.svelte'
   import Clock from '@/components/atoms/metrics/WorldClock.svelte'
   import Countdown from '../atoms/metrics/Countdown.svelte'
@@ -37,10 +37,10 @@
       return props.metrics.filter(metric => metric.pinned)
     }
 
-    const pinnedCounters = trackers.counters.filter((counter) => counter.pinned)
-    const pinnedClocks = trackers.worldClocks.filter((clock) => clock.pinned)
+    const pinnedCounters = trackers.counters.filter(counter => counter.pinned)
+    const pinnedClocks = trackers.worldClocks.filter(clock => clock.pinned)
     const pinnedCountdowns = trackers.countdowns.filter(
-      (countdown) => countdown.pinned
+      countdown => countdown.pinned,
     )
     return [...pinnedClocks, ...pinnedCountdowns, ...pinnedCounters]
   })
@@ -84,7 +84,7 @@
     }
 
     const tokenData = await authClient.getTokenFromStoreOrRefreshToken()
-    
+
     if (tokenData) {
       token = tokenData
       getSleepData(token)

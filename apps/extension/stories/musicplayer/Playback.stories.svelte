@@ -9,7 +9,7 @@
     component: SpotifyPlayback,
     args: {
       playbackState,
-    }
+    },
   })
 </script>
 

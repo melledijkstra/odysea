@@ -7,8 +7,8 @@
     title: 'Music Player/Track List',
     component: TrackList,
     args: {
-      tracks
-    }
+      tracks,
+    },
   })
 </script>
 
@@ -17,6 +17,6 @@
 <Story
   name="Empty"
   args={{
-    tracks: []
+    tracks: [],
   }}
 />

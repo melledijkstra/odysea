@@ -1,12 +1,12 @@
 <script lang="ts">
-  import Button from "@/components/atoms/Button.svelte"
-  import type { FocusSession } from "@/db/focus"
-  import { getAllFocusSessions } from "@/db/focus"
-  import type { Habit } from "@/db/habits"
-  import { getAllHabits } from "@/db/habits"
-  import type { Note } from "@/db/notes"
-  import { getAllNotes } from "@/db/notes"
-  import { settings, type SettingsState } from "@/settings/index.svelte"
+  import Button from '@/components/atoms/Button.svelte'
+  import type { FocusSession } from '@/db/focus'
+  import { getAllFocusSessions } from '@/db/focus'
+  import type { Habit } from '@/db/habits'
+  import { getAllHabits } from '@/db/habits'
+  import type { Note } from '@/db/notes'
+  import { getAllNotes } from '@/db/notes'
+  import { settings, type SettingsState } from '@/settings/index.svelte'
 
   type Export = {
     databases?: {
@@ -25,9 +25,9 @@
       databases: {
         focusSessions,
         habits,
-        notes
+        notes,
       },
-      settings: settings.export()
+      settings: settings.export(),
     }
     const data = JSON.stringify(exportData)
     const blob = new Blob([data], { type: 'application/json' })

@@ -26,7 +26,7 @@
     'bg-white/40 text-black',
     // dark theme
     'dark:bg-black/60 dark:text-white',
-    props.class
+    props.class,
   ]}
 >
   {@render children()}

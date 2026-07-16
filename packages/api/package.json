@@ -23,11 +23,12 @@
     "example": "cd examples && tsx"
   },
   "dependencies": {
-    "@melledijkstra/toolbox": "workspace:*",
     "@melledijkstra/auth": "workspace:*",
-    "@melledijkstra/storage": "workspace:*"
+    "@melledijkstra/storage": "workspace:*",
+    "@melledijkstra/toolbox": "workspace:*"
   },
   "devDependencies": {
-    "@melledijkstra/config": "workspace:*"
+    "@melledijkstra/config": "workspace:*",
+    "eslint": "catalog:"
   }
 }

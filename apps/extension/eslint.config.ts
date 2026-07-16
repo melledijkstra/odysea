@@ -1,27 +1,13 @@
-/// <reference types="node" />
-import { defineConfig } from 'eslint/config'
-import baseConfig from '@melledijkstra/config/base.eslint.config.ts'
-import svelteConfig from '@melledijkstra/config/svelte.eslint.config.ts'
+import { defineConfig, globalIgnores } from 'eslint/config'
+import baseConfig from '@melledijkstra/config/eslint/base.ts'
+import webConfig from '@melledijkstra/config/eslint/web.ts'
+import svelteConfig from '@melledijkstra/config/eslint/svelte.ts'
 
 export default defineConfig([
   ...baseConfig,
+  ...webConfig,
   ...svelteConfig,
-  {
-    languageOptions: {
-      parserOptions: {
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  },
-  // Extension Configuration
-  {
-    files: [
-      '**/*.{ts,svelte,svelte.js,svelte.ts}',
-    ],
-    languageOptions: {
-      globals: {
-        Spotify: 'readonly',
-      },
-    },
-  },
+  globalIgnores([
+    './public/spotify-sdk.min.js',
+  ], 'Ignore minified Spotify SDK file'),
 ])

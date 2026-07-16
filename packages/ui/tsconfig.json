@@ -1,9 +1,7 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@melledijkstra/config/tsconfig/base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "rootDir": "src",
-    "outDir": "dist"
   },
-  "include": ["src/**/*"]
+  "include": ["."]
 }

@@ -1,14 +1,14 @@
 <script lang="ts">
-  import Icon from '@/components/atoms/Icon.svelte';
-  import { fahrenheitToCelsius, celsiusToFahrenheit, weatherToMdiIcon } from './utils';
+  import Icon from '@/components/atoms/Icon.svelte'
+  import { fahrenheitToCelsius, celsiusToFahrenheit, weatherToMdiIcon } from './utils'
 
   export type WeatherInfoProps = {
-    iconId: string;
-    location: string;
-    temperatureC?: number;
-    temperatureF?: number;
-    displayUnit?: 'C' | 'F';
-  };
+    iconId: string
+    location: string
+    temperatureC?: number
+    temperatureF?: number
+    displayUnit?: 'C' | 'F'
+  }
 
   const {
     iconId,
@@ -16,19 +16,20 @@
     temperatureC,
     temperatureF,
     displayUnit = 'C',
-  }: WeatherInfoProps = $props();
+  }: WeatherInfoProps = $props()
 
   const temperature = $derived.by(() => {
     if (displayUnit === 'F') {
-      if (temperatureF !== undefined) return Math.round(temperatureF);
-      if (temperatureC !== undefined) return celsiusToFahrenheit(temperatureC);
-    } else {
-      if (temperatureC !== undefined) return Math.round(temperatureC);
-      if (temperatureF !== undefined) return fahrenheitToCelsius(temperatureF);
+      if (temperatureF !== undefined) return Math.round(temperatureF)
+      if (temperatureC !== undefined) return celsiusToFahrenheit(temperatureC)
     }
-  });
+    else {
+      if (temperatureC !== undefined) return Math.round(temperatureC)
+      if (temperatureF !== undefined) return fahrenheitToCelsius(temperatureF)
+    }
+  })
 
-  const temperatureSymbol = $derived(displayUnit === 'F' ? '°F' : '°C');
+  const temperatureSymbol = $derived(displayUnit === 'F' ? '°F' : '°C')
 </script>
 
 <div class="flex flex-col items-end text-black dark:text-white">

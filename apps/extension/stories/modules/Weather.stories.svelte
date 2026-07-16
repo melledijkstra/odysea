@@ -18,12 +18,12 @@
 
 <Story name="Fahrenheit" args={{
   temperatureF: 59,
-  displayUnit: 'F'
+  displayUnit: 'F',
 }} />
 
 <Story name="Long city name" args={{
   iconId: '01d',
   location: 'Winchester-on-the-Severn, Maryland',
   temperatureF: 79,
-  displayUnit: 'F'
+  displayUnit: 'F',
 }} />

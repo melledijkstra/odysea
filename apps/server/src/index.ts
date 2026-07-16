@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import { router as focusSessionsRouter } from './routes/focus-sessions'
+import { router as focusSessionsRouter } from './routes/focus-sessions.ts'
 
 dotenv.config()
 

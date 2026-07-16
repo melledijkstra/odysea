@@ -41,7 +41,7 @@
 
 <PopPanel panelProps={{
   size: 'large',
-  nopadding: true
+  nopadding: true,
 }} class="flex flex-col">
   {#if !hasTabLock}
     <div class="flex flex-col gap-4 items-center justify-center h-full">

@@ -4,12 +4,12 @@ import svelteParser from 'svelte-eslint-parser'
 import tsParser from '@typescript-eslint/parser'
 
 export default defineConfig([
-  ...svelte.configs.recommended.map(config => ({
-    ...config,
-    files: config.files ?? ['**/*.svelte', '**/*.svelte.js', '**/*.svelte.ts'],
-  })),
+  svelte.configs.recommended,
   // Svelte Configuration
+  // config docs:
+  // https://github.com/sveltejs/svelte-eslint-parser
   {
+    name: 'Svelte Parser Configuration',
     files: [
       '**/*.svelte',
       '*.svelte',
@@ -21,12 +21,10 @@ export default defineConfig([
     languageOptions: {
       parser: svelteParser,
       parserOptions: {
-        parser: tsParser,
+        parser: {
+          ts: tsParser,
+        }
       },
-    },
-    rules: {
-      // Svelte 5 props destructured from $props() must not trigger prefer-const
-      'prefer-const': 'off',
     },
   },
 ])

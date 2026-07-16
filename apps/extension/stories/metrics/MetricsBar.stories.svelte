@@ -6,47 +6,46 @@
   const { Story } = defineMeta({
     title: 'Metrics (localstorage)',
     component: Metrics,
-    argTypes: {}
+    argTypes: {},
   })
 
   const metricMock = [
     {
       name: 'Counter',
       value: 42,
-      pinned: true
+      pinned: true,
     },
     {
       name: 'World Clock (New York)',
       timeZone: 'America/New_York',
-      pinned: true
+      pinned: true,
     },
     {
       name: 'Countdown (1 day)',
       date: Date.now() + 1000 * 60 * 60 * 24, // 1 day from now
-      pinned: true
+      pinned: true,
     },
     {
       name: 'Counter (not pinned)',
       value: 100,
-      pinned: false
+      pinned: false,
     },
     {
       name: 'World Clock (Tokyo)',
       timeZone: 'Asia/Tokyo',
-      pinned: false
+      pinned: false,
     },
     {
       name: 'Countdown (2 days)',
       date: Date.now() + 1000 * 60 * 60 * 48, // 2 days from now
-      pinned: false
-    }
+      pinned: false,
+    },
   ]
 </script>
 
 <!-- More on writing stories with args: https://storybook.js.org/docs/writing-stories/args -->
 <Story name="Default" args={{
-  metrics: metricMock
+  metrics: metricMock,
 }} />
 
 <Story name="Empty" args={{ metrics: [] }} />
-

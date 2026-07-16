@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { getMomentOfDay } from "@/ui"
-  import { repeatEvery } from "@melledijkstra/toolbox"
-  import type { User } from "@/app-state.svelte"
+  import { getMomentOfDay } from '@/ui'
+  import { repeatEvery } from '@melledijkstra/toolbox'
+  import type { User } from '@/app-state.svelte'
 
   type WelcomeProps = {
     user: User
@@ -47,9 +47,9 @@
 
 <!-- make sure to render some space when loading in the welcome message to avoid flickering -->
 <h2 class={[
-  "text-white text-5xl antialiased empty:min-h-18 text-shadow-lg/30 leading-normal",
+  'text-white text-5xl antialiased empty:min-h-18 text-shadow-lg/30 leading-normal',
   // creates a shadow behind the text
-  'relative before:absolute before:inset-[-0.05em] before:bg-black/10 before:blur-xl before:rounded-lg before:z-[-1]'
+  'relative before:absolute before:inset-[-0.05em] before:bg-black/10 before:blur-xl before:rounded-lg before:z-[-1]',
 ]}>
   {#if user?.name}
     <span>Good {dayPart}, <button class="cursor-pointer hover:line-through text-shadow-lg/30" onclick={onClearUsername}>{user.name}</button></span>

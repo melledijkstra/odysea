@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Input from "@/components/atoms/Input.svelte"
-  import { settings, settingsStore } from "@/settings/index.svelte"
-  import Toggle from "../atoms/Toggle.svelte"
+  import Input from '@/components/atoms/Input.svelte'
+  import { settings, settingsStore } from '@/settings/index.svelte'
+  import Toggle from '../atoms/Toggle.svelte'
 
   let unsplashQuery = $state(settingsStore.ui.dailyImageQuery)
 </script>
@@ -14,7 +14,7 @@
   type="text"
   bind:value={unsplashQuery}
   onkeydown={(e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       settingsStore.ui.dailyImageQuery = unsplashQuery
       settings.saveSettingsToStorage()
     }

@@ -13,15 +13,15 @@
     },
     args: {
       playerDeviceId: devices[0]?.id,
-      devices
-    }
+      devices,
+    },
   })
 </script>
 
 <Story name="Default" />
 
 <Story name="Without active device" args={{
-  devices: devices.map(device => ({ ...device, is_active: false }))
+  devices: devices.map(device => ({ ...device, is_active: false })),
 }}/>
 
 <Story name="With SDK Version" args={{

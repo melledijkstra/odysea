@@ -18,5 +18,5 @@
     <Module.trigger />
   {/if}
 {:catch error}
-  <p class="text-red-500 text-sm">Failed to load module '{id}': {error.message}</p>  
+  <p class="text-red-500 text-sm">Failed to load module '{id}': {error.message}</p>
 {/await}

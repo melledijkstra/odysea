@@ -12,7 +12,7 @@
     state: MPState,
     controller,
     devices,
-    deviceId
+    deviceId,
   }: {
     state: PlaybackState
     controller: MusicPlayerInterface
@@ -26,7 +26,8 @@
     // Use play or pause based on current playback state
     if (MPState.isPlaying) {
       controller.pause()
-    } else {
+    }
+    else {
       controller.play()
     }
   }
@@ -43,8 +44,8 @@
     {:then playlists}
       <Playlists
         playlists={playlists}
-        onPlaylistPlay={(playlist) => controller.playItem(playlist)}
-        onPlaylistSelected={(playlist) => selectPlaylist(playlist)}
+        onPlaylistPlay={playlist => controller.playItem(playlist)}
+        onPlaylistSelected={playlist => selectPlaylist(playlist)}
       />
     {:catch error}
       <p class="text-sm text-red-500">Error loading playlists: {error.message}</p>
@@ -56,7 +57,7 @@
     {:then trackList}
       <TrackList
         tracks={trackList ?? []}
-        onTrackSelected={(track) => controller.playItem(track)}
+        onTrackSelected={track => controller.playItem(track)}
       />
     {/await}
   </ScrollArea>
@@ -66,16 +67,16 @@
     onPreviousTrack={() => controller.previous()}
     onPlayPause={playPause}
     onNextTrack={() => controller.next()}
-    onSeek={(pos) => controller.seek(pos)}
-    onVolumeChange={(volume) => controller.setVolume(volume)}
-    onToggleShuffle={(shuffle) => controller.toggleShuffle?.(shuffle)}
-    onSwitchRepeatMode={(mode) => controller.switchRepeatMode?.(mode)}
+    onSeek={pos => controller.seek(pos)}
+    onVolumeChange={volume => controller.setVolume(volume)}
+    onToggleShuffle={shuffle => controller.toggleShuffle?.(shuffle)}
+    onSwitchRepeatMode={mode => controller.switchRepeatMode?.(mode)}
   />
   <Devices
     class="col-span-2"
     playerDeviceId={deviceId}
     devices={devices}
-    onActivate={(deviceId) => controller.activateDevice?.(deviceId)}
+    onActivate={deviceId => controller.activateDevice?.(deviceId)}
   />
 </div>
 

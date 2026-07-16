@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Popover } from "bits-ui"
-  import TasksPanel from "./TasksPanel.svelte"
+  import { Popover } from 'bits-ui'
+  import TasksPanel from './TasksPanel.svelte'
 </script>
 
 <Popover.Root>

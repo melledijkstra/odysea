@@ -1,8 +1,7 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@melledijkstra/config/tsconfig/node.json",
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "dist"
   },
-  "include": ["src/**/*"]
+  "include": ["."],
 }

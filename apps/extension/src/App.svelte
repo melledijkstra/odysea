@@ -11,7 +11,7 @@
   import DefaultModeContent from './components/DefaultModeContent.svelte'
 
   const currentTask = $derived(
-    tasksState.tasks.find((task) => task.status === 'needsAction')
+    tasksState.tasks.find(task => task.status === 'needsAction'),
   )
 </script>
 

@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@melledijkstra/config": "workspace:*",
-    "@types/node": "^26.1.1"
+    "@types/node": "catalog:",
+    "eslint": "catalog:"
   }
 }

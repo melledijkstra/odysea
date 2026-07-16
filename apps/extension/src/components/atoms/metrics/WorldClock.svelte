@@ -1,15 +1,15 @@
 <script lang="ts">
-  import type { WorldClock } from "@/modules/trackers/state.svelte"
-  import { renderTimezone, repeatEvery } from "@melledijkstra/toolbox"
-  import { onDestroy, onMount } from "svelte"
-  import { fade } from "svelte/transition"
+  import type { WorldClock } from '@/modules/trackers/state.svelte'
+  import { renderTimezone, repeatEvery } from '@melledijkstra/toolbox'
+  import { onDestroy, onMount } from 'svelte'
+  import { fade } from 'svelte/transition'
 
-  const { metric }: { metric: WorldClock} = $props()
+  const { metric }: { metric: WorldClock } = $props()
 
   let updateKey = $state(Date.now())
 
   let cancelUpdater = $state<() => void>()
-  
+
   onMount(() => {
     cancelUpdater = repeatEvery(() => {
       updateKey = Date.now()

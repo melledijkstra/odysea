@@ -9,7 +9,7 @@
 
     const loadEnabledModules = async () => {
       const modulePromises = Object.entries(settingsStore.modules)
-        .filter(([_, enabled]) => enabled)
+        .filter(([, enabled]) => enabled)
         .map(([name]) => loadModule(name as ModuleID))
 
       const loadedModulesResults = await Promise.allSettled(modulePromises)

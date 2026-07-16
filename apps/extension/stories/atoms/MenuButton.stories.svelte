@@ -12,15 +12,15 @@
         values: [
           {
             name: 'light',
-            value: '#f9f9f9'
+            value: '#f9f9f9',
           },
           {
             name: 'dark',
-            value: '#333333'
-          }
+            value: '#333333',
+          },
         ],
-        default: 'light'
-      }
+        default: 'light',
+      },
     },
     args: {
       mdiIcon: mdiSpa,
@@ -31,7 +31,7 @@
 <!-- More on writing stories with args: https://storybook.js.org/docs/writing-stories/args -->
 <Story name="Default" args={{
   tooltip: 'This is an airplane!',
-  mdiIcon: mdiAirplane
+  mdiIcon: mdiAirplane,
 }} />
 
 <Story name="Without Tooltip" />

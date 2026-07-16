@@ -5,7 +5,7 @@ import type { Task, TaskList } from '@/api/definitions/google'
 export class MockTasksController implements TaskControllerInterface {
   constructor(private readonly state: GoogleTasksState) {}
 
-  async getTasks(taskListId?: string): Promise<Task[]> {
+  async getTasks(): Promise<Task[]> {
     return this.state.tasks
   }
 
@@ -13,7 +13,7 @@ export class MockTasksController implements TaskControllerInterface {
     return this.state.taskLists
   }
 
-  async createTask(taskTitle: string, taskListId?: string): Promise<boolean> {
+  async createTask(taskTitle: string): Promise<boolean> {
     const id = (this.state.tasks.length + 1).toString()
     this.state.tasks.push({
       id,
@@ -27,7 +27,7 @@ export class MockTasksController implements TaskControllerInterface {
     return this.state.tasks.find(task => task.id === taskId)
   }
 
-  async setTaskStatus(taskId: string, status: boolean, taskListId?: string): Promise<boolean> {
+  async setTaskStatus(taskId: string, status: boolean): Promise<boolean> {
     const idx = this.state.tasks.findIndex(task => task.id === taskId)
     const updatedTask: Task = {
       ...this.state.tasks[idx],
@@ -39,7 +39,7 @@ export class MockTasksController implements TaskControllerInterface {
     return true
   }
 
-  async deleteTask(taskId: string, taskListId?: string): Promise<boolean> {
+  async deleteTask(taskId: string): Promise<boolean> {
     const idx = this.state.tasks.findIndex(task => task.id === taskId)
     if (idx !== -1) {
       this.state.tasks.splice(idx, 1)

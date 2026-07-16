@@ -1,12 +1,12 @@
 <script lang="ts">
   import browser, { type Manifest } from 'webextension-polyfill'
-  import { onMount } from 'svelte';
+  import { onMount } from 'svelte'
 
   let manifest = $state<Manifest.WebExtensionManifest>()
 
   onMount(async () => {
     manifest = browser.runtime.getManifest()
-  });
+  })
 </script>
 
 <h1 class="text-xl">About</h1>

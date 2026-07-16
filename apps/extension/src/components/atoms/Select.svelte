@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { HTMLSelectAttributes, HTMLLabelAttributes } from "svelte/elements"
-  
+  import type { HTMLSelectAttributes, HTMLLabelAttributes } from 'svelte/elements'
+
   export type SelectOption = {
     value: string
     label: string

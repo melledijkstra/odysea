@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@melledijkstra/config/tsconfig/base.json",
   "compilerOptions": {
     "moduleDetection": "force",
     "module": "ESNext",
@@ -7,5 +7,5 @@
     "strictNullChecks": true,
     "types": ["node"]
   },
-  "include": ["src/**/*"]
+  "include": ["."]
 }

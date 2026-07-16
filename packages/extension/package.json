@@ -24,12 +24,13 @@
   "devDependencies": {
     "@types/chrome": "^0.1.33",
     "@types/webextension-polyfill": "^0.12.3",
+    "eslint": "catalog:",
     "webextension-polyfill": "^0.12.0"
   },
   "dependencies": {
+    "@melledijkstra/auth": "workspace:*",
     "@melledijkstra/config": "workspace:*",
-    "@melledijkstra/toolbox": "workspace:*",
     "@melledijkstra/storage": "workspace:*",
-    "@melledijkstra/auth": "workspace:*"
+    "@melledijkstra/toolbox": "workspace:*"
   }
 }

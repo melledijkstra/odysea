@@ -9,8 +9,7 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "start": "turbo run start",
-    "test": "vitest run",
-    "test:watch": "vitest watch",
+    "test": "vitest",
     "test:e2e": "turbo run test:e2e",
     "lint": "turbo run lint",
     "extension": "pnpm --filter=@odysea/extension run",
@@ -27,20 +26,10 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.4",
-    "@types/node": "^26.1.1",
-    "@typescript-eslint/eslint-plugin": "^8.63.0",
-    "@typescript-eslint/parser": "^8.63.0",
-    "eslint": "^10.6.0",
-    "eslint-plugin-svelte": "^3.20.0",
-    "globals": "^17.7.0",
-    "prettier": "^3.9.5",
-    "svelte-eslint-parser": "^1.8.0",
     "tsdown": "^0.22.5",
-    "turbo": "^2.10.4",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.63.0",
-    "vitest": "^4.1.10"
+    "turbo": "^2.10.5",
+    "vitest": "^4.1.10",
+    "@melledijkstra/config": "workspace:*"
   },
   "repository": {
     "type": "git",

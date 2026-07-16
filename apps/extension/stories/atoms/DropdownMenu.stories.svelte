@@ -5,7 +5,7 @@
   import { mdiDotsHorizontal } from '@mdi/js'
 
   // set this to true to keep the menu open during development
-  const keepOpen = false;
+  const keepOpen = false
 
   const onSelect = (label: string) => {
     console.log('onSelect', label)
@@ -17,7 +17,7 @@
     args: {
       contentProps: {
         sideOffset: 5,
-        forceMount: keepOpen
+        forceMount: keepOpen,
       },
       items: [
         {
@@ -32,8 +32,8 @@
           label: 'Open Project',
           onSelect,
         },
-      ]
-    }
+      ],
+    },
   })
 </script>
 

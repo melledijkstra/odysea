@@ -9,7 +9,7 @@
 
   const state: MusicPlayerState = $state({
     playback: playbackState,
-    playlists: []
+    playlists: [],
   })
 
   const controller = new MockMusicPlayerController(state)
@@ -21,8 +21,8 @@
       state: state.playback,
       controller,
       devices: devices,
-      deviceId: devices[0].id
-    }
+      deviceId: devices[0].id,
+    },
   })
 </script>
 

@@ -4,7 +4,7 @@
   const {
     playlist,
     onPlaylistPlay,
-    onPlaylistSelected
+    onPlaylistSelected,
   }: {
     playlist: Playlist
     onPlaylistPlay: (playlist: Playlist) => void

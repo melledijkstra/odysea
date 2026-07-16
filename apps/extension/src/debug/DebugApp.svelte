@@ -18,7 +18,7 @@
   const menuItems = [
     { label: 'Dunder Mifflin', onSelect },
     { label: 'Vance Refrigeration', onSelect },
-    { label: 'Michael Scott Paper Company', onSelect }
+    { label: 'Michael Scott Paper Company', onSelect },
   ]
 </script>
 
@@ -47,7 +47,6 @@
     <button onclick={() => (isOpen = true)}>Open Dropdown Menu</button>
   </DropdownMenu>
 </div>
-
 
 <style>
   :global(body) {

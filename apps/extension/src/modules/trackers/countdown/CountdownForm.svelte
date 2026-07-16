@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    mdiCalendarOutline
+    mdiCalendarOutline,
   } from '@mdi/js'
   import IconButton from '@/components/atoms/IconButton.svelte'
   import Form from './Form.svelte'

@@ -51,8 +51,8 @@
   tasks={tasksState.tasks}
   onToggleTask={(taskId, status) =>
     controller.setTaskStatus(taskId, status, selectedTaskList)}
-  onSaveEdit={(task) => controller.updateTask(task, selectedTaskList)}
-  onRemoveTask={(taskId) => controller.deleteTask(taskId, selectedTaskList)}
+  onSaveEdit={task => controller.updateTask(task, selectedTaskList)}
+  onRemoveTask={taskId => controller.deleteTask(taskId, selectedTaskList)}
 />
 <input
   name="new-task-input"

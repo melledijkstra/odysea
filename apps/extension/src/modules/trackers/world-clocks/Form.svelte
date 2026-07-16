@@ -34,9 +34,9 @@
       id="timezone-select"
       required
       bind:value={inputTimezone}
-      options={Intl.supportedValuesOf('timeZone').map((tz) => ({
+      options={Intl.supportedValuesOf('timeZone').map(tz => ({
         value: tz,
-        label: tz.replace(/_/g, ' ')
+        label: tz.replace(/_/g, ' '),
       }))}
       placeholder="Select timezone"
       label="Timezone"

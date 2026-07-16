@@ -8,7 +8,8 @@
   function toggleDisplay() {
     if (open) {
       open = false
-    } else {
+    }
+    else {
       open = true
     }
   }

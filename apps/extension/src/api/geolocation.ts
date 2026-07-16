@@ -61,7 +61,7 @@ export type GeoPositionResponse = {
 export async function getCurrentPosition(): Promise<
   GeoPositionResponse | undefined
 > {
-  const browserPos = await getGeolocationBrowser().catch(_err => undefined)
+  const browserPos = await getGeolocationBrowser().catch(() => undefined)
   if (browserPos) {
     return { lat: browserPos[0], lon: browserPos[1] }
   }

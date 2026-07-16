@@ -1,6 +1,5 @@
-/// <reference types="node" />
 import { defineConfig } from 'eslint/config'
-import baseConfig from '@melledijkstra/config/base.eslint.config.ts'
+import baseConfig from '@melledijkstra/config/eslint/base.ts'
 
 export default defineConfig([
   ...baseConfig,

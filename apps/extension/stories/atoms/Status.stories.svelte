@@ -15,4 +15,3 @@
 <Story name="Online" args={{ status: true }} />
 
 <Story name="Offline" args={{ status: false }} />
-  

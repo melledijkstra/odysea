@@ -11,14 +11,14 @@
     mdiVolumeHigh,
     mdiVolumeLow,
     mdiVolumeMedium,
-    mdiVolumeOff
+    mdiVolumeOff,
   } from '@mdi/js'
   import Icon from '../atoms/Icon.svelte'
-  import { millisecondsToTime } from "@melledijkstra/toolbox"
+  import { millisecondsToTime } from '@melledijkstra/toolbox'
   import type { PlaybackState } from 'MusicPlayer'
   import type { HTMLAttributes } from 'svelte/elements'
   import { Slider } from 'bits-ui'
-  
+
   type PlaybackProps = {
     playbackState: PlaybackState
     onToggleShuffle?: (shuffle: boolean) => void
@@ -67,22 +67,25 @@
   const volumeIcon = $derived.by(() => {
     if (state.volume === 0) {
       return mdiVolumeOff
-    } else if (state.volume < 15) {
+    }
+    else if (state.volume < 15) {
       return mdiVolumeLow
-    } else if (state.volume < 55) {
+    }
+    else if (state.volume < 55) {
       return mdiVolumeMedium
-    } else {
+    }
+    else {
       return mdiVolumeHigh
     }
   })
 </script>
 
-<div class={["text-white", props.class]}>
+<div class={['text-white', props.class]}>
   <!-- Seeker -->
   <Slider.Root
     type="single"
     value={position_ms}
-    onValueCommit={(value) => onSeek?.(value)}
+    onValueCommit={value => onSeek?.(value)}
     max={mediaItem?.duration_ms ?? 0}
     class="bg-transparent relative flex w-full touch-none select-none items-center cursor-pointer group/seeker"
   >
@@ -94,12 +97,12 @@
     <Slider.Thumb
       index={0}
       class={[
-        "block size-2.5 bg-background shadow-sm cursor-pointer rounded-full",
-        "dark:bg-white dark:shadow-black/30",
-        "border border-white/70 hover:border-white",
-        "scale-0 group-hover/seeker:scale-100 data-active:scale-120 transition-transform",
-        "disabled:pointer-events-none disabled:opacity-50",
-        "focus-visible:outline-hidden",
+        'block size-2.5 bg-background shadow-sm cursor-pointer rounded-full',
+        'dark:bg-white dark:shadow-black/30',
+        'border border-white/70 hover:border-white',
+        'scale-0 group-hover/seeker:scale-100 data-active:scale-120 transition-transform',
+        'disabled:pointer-events-none disabled:opacity-50',
+        'focus-visible:outline-hidden',
       ]}
     />
   </Slider.Root>
@@ -160,7 +163,7 @@
           type="single"
           orientation="horizontal"
           bind:value={state.volume}
-          onValueCommit={(value) => onVolumeChange?.(value)}
+          onValueCommit={value => onVolumeChange?.(value)}
           min={0}
           step={1}
           max={100}
@@ -176,12 +179,12 @@
           <Slider.Thumb
             index={0}
             class={[
-              "block size-2 bg-background shadow-sm cursor-pointer rounded-full",
-              "dark:bg-white dark:shadow-black/30",
-              "border border-white/70 hover:border-white",
-              "scale-0 group-hover/volume:scale-100 data-active:scale-120 transition-transform",
-              "disabled:pointer-events-none disabled:opacity-50",
-              "focus-visible:outline-hidden",
+              'block size-2 bg-background shadow-sm cursor-pointer rounded-full',
+              'dark:bg-white dark:shadow-black/30',
+              'border border-white/70 hover:border-white',
+              'scale-0 group-hover/volume:scale-100 data-active:scale-120 transition-transform',
+              'disabled:pointer-events-none disabled:opacity-50',
+              'focus-visible:outline-hidden',
             ]}
           />
         </Slider.Root>

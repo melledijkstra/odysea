@@ -14,7 +14,7 @@
   function onUsernameChange(name: string) {
     storeUsername(name)
     appState.user = {
-      name
+      name,
     }
   }
 
@@ -27,7 +27,7 @@
     const username = await retrieveUsername()
     if (username) {
       appState.user = {
-        name: username
+        name: username,
       }
     }
   })

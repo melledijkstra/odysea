@@ -25,7 +25,7 @@
       <div {...wrapperProps}>
         <Popover.Arrow class={[
           // align with panel background
-          "dark:text-black/40 text-white/40"
+          'dark:text-black/40 text-white/40',
         ]} />
         <Panel {...panelProps} {...props}>
           {@render children()}

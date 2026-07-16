@@ -22,10 +22,9 @@
     variant === 'auto' && 'aspect-auto',
     // spacing
     !nopadding && 'p-6',
-    className
+    className,
   ]}
   {...props}
 >
   {@render children?.()}
 </div>
-

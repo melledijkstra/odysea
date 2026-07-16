@@ -3,23 +3,23 @@
   import Icon from './Icon.svelte'
 
   type IconButtonProps = {
-    icon: string;
-    size?: number;
-  } & HTMLButtonAttributes;
+    icon: string
+    size?: number
+  } & HTMLButtonAttributes
 
   const { icon, size = 36, ...props }: IconButtonProps = $props()
 
   function hasColorClass(classProp: ClassValue | null | undefined): boolean {
     if (typeof classProp === 'string') {
-      return classProp.includes('text-') || classProp.includes('bg-');
+      return classProp.includes('text-') || classProp.includes('bg-')
     }
     if (Array.isArray(classProp)) {
-      return classProp.some((cls) => cls.includes('text-') || cls.includes('bg-'));
+      return classProp.some(cls => cls.includes('text-') || cls.includes('bg-'))
     }
-    return false;
+    return false
   }
 
-  const hasColor = $derived(!!props?.class && hasColorClass(props?.class));
+  const hasColor = $derived(!!props?.class && hasColorClass(props?.class))
 </script>
 
 <button

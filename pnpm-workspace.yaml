@@ -2,6 +2,18 @@ packages:
   - apps/*
   - packages/*
 
+catalogMode: strict
+
+catalog:
+  typescript: ^6.0.0
+  eslint: ^10.7.0
+  "@types/node": ^25.9.1
+  "react": ^19.0.0
+  "react-dom": ^19.0.0
+  "@types/react": ^19.2.9
+  "@types/react-dom": ^19.2.3
+  eslint-plugin-turbo: ^2.10.5
+
 allowBuilds:
   deno: false
   esbuild: true
@@ -13,6 +25,6 @@ ignoredBuiltDependencies:
 minimumReleaseAgeStrict: true
 
 onlyBuiltDependencies:
-  - '@tailwindcss/oxide'
+  - "@tailwindcss/oxide"
   - esbuild
   - sqlite3

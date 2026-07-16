@@ -8,16 +8,16 @@
     argTypes: {
       children: {
         control: {
-          type: 'text'
-        }
+          type: 'text',
+        },
       },
       provider: {
         control: {
           type: 'select',
-          options: ['google', 'github', 'fitbit']
-        }
-      }
-    }
+          options: ['google', 'github', 'fitbit'],
+        },
+      },
+    },
   })
 </script>
 

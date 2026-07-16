@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-  import { appState } from "./app-state.svelte"
-  import { getPomodoroState } from "./modules/focus/messages"
-  import type { PomodoroState } from "./modules/focus/types"
-  import { Timer } from "@melledijkstra/toolbox"
+  import { onMount } from 'svelte'
+  import { appState } from './app-state.svelte'
+  import { getPomodoroState } from './modules/focus/messages'
+  import type { PomodoroState } from './modules/focus/types'
+  import { Timer } from '@melledijkstra/toolbox'
 
   let pomodoroState = $state<PomodoroState>()
 

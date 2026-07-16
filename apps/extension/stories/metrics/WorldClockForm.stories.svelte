@@ -7,7 +7,7 @@
     title: 'Metrics (localstorage)/World Clock Form',
     component: Form,
     argTypes: {},
-    args: {}
+    args: {},
   })
 </script>
 

@@ -1,14 +1,3 @@
-/// <reference types="node" />
-import { defineConfig } from 'eslint/config'
-import baseConfig from '@melledijkstra/config/base.eslint.config.ts'
+import nodeConfig from '@melledijkstra/config/eslint/node.ts'
 
-export default defineConfig([
-  ...baseConfig,
-  {
-    languageOptions: {
-      parserOptions: {
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  },
-])
+export default nodeConfig

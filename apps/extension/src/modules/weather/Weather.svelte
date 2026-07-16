@@ -12,7 +12,7 @@
 
   async function retrieveWeather() {
     const weather = await client.getWeather()
-    
+
     if (weather) {
       setCurrentWeather(weather)
     }

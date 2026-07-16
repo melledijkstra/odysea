@@ -6,7 +6,7 @@
     GoogleAuthProvider,
     SpotifyAuthProvider,
     FitbitAuthProvider,
-    type OauthProvider
+    type OauthProvider,
   } from '@/oauth2/providers'
   import Input from '@/components/atoms/Input.svelte'
   import { onMount, onDestroy } from 'svelte'
@@ -18,13 +18,13 @@
   const clients = {
     google: new AuthClient(new GoogleAuthProvider()),
     spotify: new AuthClient(new SpotifyAuthProvider()),
-    fitbit: new AuthClient(new FitbitAuthProvider())
+    fitbit: new AuthClient(new FitbitAuthProvider()),
   } as const
 
   const authState = $state({
     google: false,
     spotify: false,
-    fitbit: false
+    fitbit: false,
   })
 
   function handleStorageChange(changes: Record<string, browser.Storage.StorageChange>) {
