@@ -9,3 +9,7 @@ node_modules/
 .turbo/
 
 debug_storybook
+
+# rollup visualizer file
+stats.html
+stats-*.html
