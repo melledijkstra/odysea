@@ -1,4 +1,4 @@
-import type { WeatherInfo } from '@/api/weather'
+import type { WeatherInfo } from '@melledijkstra/api'
 
 export function createWeatherState() {
   const currentWeather = $state<{ data: WeatherInfo | null }>({

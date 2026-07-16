@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Task } from '@/api/definitions/google'
+  import type { Task } from '@melledijkstra/api'
   import TaskItem from './TaskItem.svelte'
   import type { HTMLAttributes } from 'svelte/elements'
 

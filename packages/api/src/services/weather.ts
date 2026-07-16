@@ -32,8 +32,8 @@ export class WeatherClient extends ApiKeyBaseClient {
 
     if (!position) {
       const pos = await getCurrentPosition()
-      lat = pos?.[0]
-      lon = pos?.[1]
+      lat = pos?.lat
+      lon = pos?.lon
     }
 
     const response = await this.request<WeatherResponse>(

@@ -1,6 +1,6 @@
 import type { GoogleTasksState } from '@/modules/google-tasks/state.svelte'
 import type { TaskControllerInterface } from '../controllers/GoogleTasksController'
-import type { Task, TaskList } from '@/api/definitions/google'
+import type { Task, TaskList } from '@melledijkstra/api'
 
 export class MockTasksController implements TaskControllerInterface {
   constructor(private readonly state: GoogleTasksState) {}

@@ -1,18 +1,14 @@
 import { BaseClient } from './baseclient'
 
 export class ApiKeyBaseClient extends BaseClient {
-  protected apiKey: string
+  protected apiKey: string | (() => string)
   protected urlQueryKeyName = 'key'
 
   constructor(
     baseUrl: string,
-    apiKey: string,
+    apiKey: string | (() => string),
   ) {
     super(baseUrl)
-
-    if (!apiKey) {
-      throw new Error('ApiKeyBaseClient needs to be instantiated with a valid API key.')
-    }
 
     this.apiKey = apiKey
 
@@ -27,16 +23,22 @@ export class ApiKeyBaseClient extends BaseClient {
     endpoint: string,
     config?: RequestInit,
   ): Promise<T | undefined> {
-    const searchParams = new URLSearchParams(endpoint.split('?')[1] || '')
-    searchParams.set(this.urlQueryKeyName, this.apiKey)
+    const key = this.getApiKey()
+    if (!key) {
+      throw new Error('ApiKeyBaseClient needs to be instantiated with a valid API key.')
+    }
+    const [path, query] = endpoint.split('?')
+    const searchParams = new URLSearchParams(query || '')
+    searchParams.set(this.urlQueryKeyName, key)
+    endpoint = path
     return super.request(endpoint, config, searchParams)
   }
 
-  getApiKey() {
-    return this.apiKey
+  getApiKey(): string {
+    return typeof this.apiKey === 'function' ? this.apiKey() : this.apiKey
   }
 
-  setApiKey(token: string) {
+  setApiKey(token: string | (() => string)) {
     this.apiKey = token
   }
 }

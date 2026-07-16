@@ -3,7 +3,7 @@
   import Playback from './Playback.svelte'
   import Playlists from './Playlists.svelte'
   import type { MusicPlayerInterface, Playlist, PlaybackState, Track } from 'MusicPlayer'
-  import type { Device } from 'SpotifyApi'
+  import type { Device } from '@melledijkstra/api'
   import ListSkeleton from './ListSkeleton.svelte'
   import ScrollArea from '../atoms/ScrollArea.svelte'
   import TrackList from './TrackList.svelte'

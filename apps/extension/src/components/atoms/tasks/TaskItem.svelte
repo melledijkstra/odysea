@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Task } from '@/api/definitions/google'
+  import type { Task } from '@melledijkstra/api'
   import ContextMenu from '@/components/atoms/ContextMenu.svelte'
   import Icon from '@/components/atoms/Icon.svelte'
   import { mdiDotsVertical } from '@mdi/js'

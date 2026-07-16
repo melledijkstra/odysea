@@ -1,45 +1,27 @@
+import { UnsplashClient as BaseUnsplashClient, type UnsplashResponse } from '@melledijkstra/api'
 import { SERVERLESS_HOST_URL } from '@/constants'
 import browser from 'webextension-polyfill'
 import { addDays, formatDate } from '@/date'
-import { Logger } from '@/logger'
-import type { UnsplashResponse } from '@/api/definitions/unsplash'
-import type { ILogger } from '@/interfaces/logger.interface'
 import { ImageCache, type ImageInfo } from '../cache/image-cache'
 
 const ENDPOINT = '/api/daily-image'
 
-export class UnsplashClient implements ILogger {
-  public logger: Logger = new Logger('UnsplashClient')
-  private HOST: string
-  public query?: string
+export class UnsplashClient extends BaseUnsplashClient {
   private readonly cache: ImageCache
 
   constructor(host: string = SERVERLESS_HOST_URL, query?: string) {
-    this.HOST = host ?? SERVERLESS_HOST_URL
-    this.logger.log('UnsplashClient initialized with host:', this.HOST)
-    this.query = query
+    super(host || SERVERLESS_HOST_URL, query)
     this.cache = new ImageCache()
   }
 
-  get host(): string {
-    return this.HOST
-  }
-
-  setHost(host: string) {
-    if (!host || host.trim() === '') {
-      throw new Error('Serverless host domain cannot be empty')
-    }
-    this.logger.log('Setting new host for UnsplashClient:', host)
-    this.HOST = host
-  }
-
+  // Override fetchUnsplashImage to append the Chrome Extension X-Extension-ID header
   async fetchUnsplashImage(): Promise<UnsplashResponse> {
     this.logger.log('Fetching Unsplash image from', {
-      host: this.HOST,
+      host: this.host,
       endpoint: ENDPOINT,
       query: this.query,
     })
-    const serverlessUrl = new URL(ENDPOINT, this.HOST)
+    const serverlessUrl = new URL(ENDPOINT, this.host)
 
     if (this.query) {
       serverlessUrl.searchParams.set('query', this.query)

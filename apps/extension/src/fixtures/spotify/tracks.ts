@@ -1,4 +1,4 @@
-import type { Track } from 'SpotifyApi'
+import type { Track } from '@melledijkstra/api'
 
 export const singleTrack: Track = {
   id: '0iiB9CYptXO5Fz728LHHsQ',

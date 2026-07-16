@@ -61,25 +61,35 @@ async function getGeolocationBrowser(): Promise<[number, number] | undefined> {
   })
 }
 
+export type GeoPositionResponse = {
+  lat: number
+  lon: number
+  locationInfo?: LocationInfo
+}
+
 /**
  * Retrieves the current geolocation of the user.
  * First attempts to get the position through the browser's geolocation API.
  * If that fails, it falls back to an external API service.
- * @returns the current position as [latitude, longitude] or undefined if it fails to retrieve the position
+ * @returns the current position and optional location info, or undefined if it fails to retrieve the position
  */
 export async function getCurrentPosition(): Promise<
-  [number, number] | undefined
+  GeoPositionResponse | undefined
 > {
   try {
-    return await getGeolocationBrowser()
+    const browserPos = await getGeolocationBrowser()
+    if (browserPos) {
+      return { lat: browserPos[0], lon: browserPos[1] }
+    }
   }
   catch {
     logger.log('Failed to retrieve geolocation through browser, trying API service...')
-    // if we can't get geolocation through browser we try through API service
-    const data = await cachedFetchGeolocation()
-    if (data?.status === 'success') {
-      logger.log('retrieved location from API', [data.lat, data.lon])
-      return [data.lat, data.lon]
-    }
+  }
+
+  // if we can't get geolocation through browser we try through API service
+  const data = await cachedFetchGeolocation()
+  if (data?.status === 'success') {
+    logger.log('retrieved location from API', [data.lat, data.lon])
+    return { lat: data.lat, lon: data.lon, locationInfo: data }
   }
 }

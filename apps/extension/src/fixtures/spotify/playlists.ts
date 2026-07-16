@@ -1,4 +1,4 @@
-import type { Playlist } from 'SpotifyApi'
+import type { Playlist } from '@melledijkstra/api'
 
 const generatePlaylist = (overrides: Partial<Playlist> = {}): Playlist => ({
   collaborative: false,

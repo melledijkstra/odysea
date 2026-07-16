@@ -1,4 +1,5 @@
-import { AuthClient, GoogleAuthConfig } from '@melledijkstra/auth'
+import { TokenBaseClient } from '../../tokenbaseclient'
+import type { AuthClient } from '@melledijkstra/auth'
 
 export type Account = {
   name: string
@@ -6,29 +7,12 @@ export type Account = {
   email: string
 }
 
-const client = new AuthClient(new GoogleAuthConfig(), 'https://unknown.com')
-
-export async function fetchAccountInfo(): Promise<Account | undefined> {
-  try {
-    const token = await client.getAuthToken()
-    if (!token) {
-      return
-    }
-
-    const response = await fetch(
-      'https://www.googleapis.com/oauth2/v2/userinfo',
-      {
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    )
-    const data = (await response.json()) as Account
-
-    return data
+export class GoogleAccountApiClient extends TokenBaseClient {
+  constructor(auth: AuthClient) {
+    super('https://www.googleapis.com', () => auth.getAuthToken())
   }
-  catch (error) {
-    console.error('Error fetching user info:', error)
+
+  async fetchAccountInfo(): Promise<Account | undefined> {
+    return this.request<Account>('/oauth2/v2/userinfo')
   }
 }
