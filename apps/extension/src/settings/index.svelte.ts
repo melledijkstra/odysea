@@ -10,7 +10,7 @@ export type SettingsState = {
   network: {
     serverlessHost: string
     databaseUri: string
-  },
+  }
   modules: {
     [key in ModuleID]: boolean
   }
@@ -36,22 +36,22 @@ const DEFAULT_MODULE_SETTINGS: { [key in ModuleID]: boolean } = {
   google_tasks: false,
   notes: false,
   spotify: false,
-  habits: false
+  habits: false,
 }
 
 export const DEFAULT_SETTINGS: SettingsState = {
   loaded: false,
   network: {
     serverlessHost: '',
-    databaseUri: ''
+    databaseUri: '',
   },
   modules: DEFAULT_MODULE_SETTINGS,
   ui: {
     showCurrentTask: false,
     dailyImageQuery: 'landscape',
-    showQuotes: true
+    showQuotes: true,
   },
-  apiKeys: {}
+  apiKeys: {},
 }
 
 export const settingsStore = $state<SettingsState>(structuredClone(DEFAULT_SETTINGS))
@@ -88,23 +88,23 @@ export class Settings implements ILogger {
     this.loading = true
 
     const { settings: storageSettings } = (await browser.storage.sync.get(
-      SETTINGS_KEY
+      SETTINGS_KEY,
     )) as { settings: SettingsState }
-    
+
     this.logger.log('syncing settings store with storage...', {
-      storageSettings
+      storageSettings,
     })
 
     const mergedSettings = {
       ...DEFAULT_SETTINGS,
       ...storageSettings,
-      loaded: true
+      loaded: true,
     }
 
     Object.assign(settingsStore, mergedSettings)
 
     if (!changeListenersSet) {
-      browser.storage.sync.onChanged.addListener((changes) => this.onStorageSettingsChanged(changes))
+      browser.storage.sync.onChanged.addListener(changes => this.onStorageSettingsChanged(changes))
       changeListenersSet = true
     }
 
@@ -113,7 +113,7 @@ export class Settings implements ILogger {
 
   async getSettingsFromStorage(): Promise<SettingsState> {
     const { settings: storageSettings } = (await browser.storage.sync.get(
-      SETTINGS_KEY
+      SETTINGS_KEY,
     )) as { settings: SettingsState }
 
     return { ...DEFAULT_SETTINGS, ...storageSettings, loaded: true }
@@ -125,18 +125,18 @@ export class Settings implements ILogger {
     const settingsToStore = structuredClone($state.snapshot(settingsStore))
     delete settingsToStore.loaded
     this.logger.log('Saving settings to storage', {
-      settingsToStore
+      settingsToStore,
     })
     await browser.storage.sync.set({ settings: settingsToStore })
-    this.isLocalSettingsChange = false;
+    this.isLocalSettingsChange = false
   }
 
   removeSettingsChangeListener() {
-    browser.storage.onChanged.removeListener((changes) => this.onStorageSettingsChanged(changes))
+    browser.storage.onChanged.removeListener(changes => this.onStorageSettingsChanged(changes))
   }
-  
+
   onStorageSettingsChanged = (
-    changes: Storage.StorageAreaOnChangedChangesType
+    changes: Storage.StorageAreaOnChangedChangesType,
   ) => {
     // ignore changes if they are from the same source as the listener
     if (!changes[SETTINGS_KEY] || this.isLocalSettingsChange) {
@@ -145,7 +145,7 @@ export class Settings implements ILogger {
 
     const newSettings = changes[SETTINGS_KEY].newValue as SettingsState
     this.logger.log('onStorageSettingsChanged: settings changed, updating in memory', {
-      newSettings
+      newSettings,
     })
 
     Object.assign(settingsStore, newSettings, { loaded: true })

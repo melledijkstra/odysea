@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest"
-import { LocalStorageAdapter } from "./localstorage"
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { LocalStorageAdapter } from './localstorage'
 
 describe('LocalStorageAdapter', () => {
   let store: Record<string, string> = {}

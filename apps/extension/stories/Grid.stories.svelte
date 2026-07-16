@@ -5,7 +5,7 @@
   import Toggle from '@/components/atoms/Toggle.svelte'
   import { mdiPlay, mdiRepeat, mdiShuffle, mdiSkipNext, mdiSkipPrevious, mdiSpotify, mdiWifi } from '@mdi/js'
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  
+
   type Args = {
     items: number
   }
@@ -13,8 +13,8 @@
   const { Story } = defineMeta({
     title: 'WidgetGrid',
     args: {
-      items: 10
-    } satisfies Args
+      items: 10,
+    } satisfies Args,
   })
 
   const spanning: Record<number, string> = {

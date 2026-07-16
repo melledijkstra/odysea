@@ -18,12 +18,15 @@
   },
   "scripts": {
     "dev": "tsdown --watch",
-    "build": "tsdown"
+    "build": "tsdown",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@melledijkstra/toolbox": "workspace:*"
   },
   "devDependencies": {
-    "@melledijkstra/config": "workspace:*"
+    "@melledijkstra/config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:"
   }
 }

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
 import { retrieveUsername, storeUsername } from './browser'
 import browser from 'webextension-polyfill'
-import { NAME_STORAGE_KEY } from './constants';
+import { NAME_STORAGE_KEY } from './constants'
 
-const fakeStorage = vi.mocked(browser.storage.sync);
+const fakeStorage = vi.mocked(browser.storage.sync)
 
 describe('ui.ts', () => {
   describe('retrieveUsername', () => {

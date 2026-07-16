@@ -2,12 +2,12 @@ import type {
   Artist as SpotifyArtist,
   Track as SpotifyTrack,
   PlaybackState as ApiPlaybackState,
-  Playlist as SpotifyPlaylist
-} from 'SpotifyApi';
-import type { Playlist, PlaybackState, Track, Album, Artist } from 'MusicPlayer';
+  Playlist as SpotifyPlaylist,
+} from 'SpotifyApi'
+import type { Playlist, PlaybackState, Track, Album, Artist } from 'MusicPlayer'
 
 export function convertAlbumToMPAlbum(album: SpotifyTrack['album']): Album {
-  const artist = album.artists?.[0];
+  const artist = album.artists?.[0]
   return {
     id: album.id,
     uri: album.uri,
@@ -15,21 +15,21 @@ export function convertAlbumToMPAlbum(album: SpotifyTrack['album']): Album {
     artist: artist && convertSpotifyArtistToMPArtist(artist),
     releaseDate: album.release_date,
     coverArtUrl: album.images?.[0]?.url,
-    type: 'album'
+    type: 'album',
   }
 }
 
 export function convertSpotifyArtistToMPArtist(artist: SpotifyArtist): Artist {
   return {
-  id: artist.id,
-  uri: artist.uri,
-  name: artist.name,
-  type: 'artist'
-}
+    id: artist.id,
+    uri: artist.uri,
+    name: artist.name,
+    type: 'artist',
+  }
 }
 
 export function convertSpotifyTrackToMPTrack(track: SpotifyTrack): Track {
-  const mainArtist = track.artists?.[0];
+  const mainArtist = track.artists?.[0]
   return {
     id: track.id,
     uri: track.uri,
@@ -38,8 +38,8 @@ export function convertSpotifyTrackToMPTrack(track: SpotifyTrack): Track {
     album: convertAlbumToMPAlbum(track.album),
     duration_ms: track.duration_ms,
     coverArtUrl: track.album.images?.[0]?.url,
-    type: 'track'
-  };
+    type: 'track',
+  }
 }
 
 export const convertSpotifyPlaylist = (playlist: SpotifyPlaylist): Playlist => ({
@@ -49,7 +49,7 @@ export const convertSpotifyPlaylist = (playlist: SpotifyPlaylist): Playlist => (
   description: playlist.description || '',
   coverArtUrl: playlist.images[0]?.url || '',
   trackCount: playlist.tracks?.total,
-  type: 'playlist'
+  type: 'playlist',
 })
 
 export const convertApiPlaybackState = (state: ApiPlaybackState): PlaybackState => {
@@ -68,10 +68,10 @@ export const convertApiPlaybackState = (state: ApiPlaybackState): PlaybackState 
 }
 
 export const convertPlayerState = (state: Spotify.PlaybackState, currentState?: PlaybackState): PlaybackState => {
-  const currentTrack = state.track_window.current_track;
-  const album = currentTrack.album;
-  const artists = currentTrack.artists;
-  const mainArtist = artists[0];
+  const currentTrack = state.track_window.current_track
+  const album = currentTrack.album
+  const artists = currentTrack.artists
+  const mainArtist = artists[0]
   return {
     isPlaying: !state.paused,
     position_ms: state.position,
@@ -87,7 +87,7 @@ export const convertPlayerState = (state: Spotify.PlaybackState, currentState?: 
         id: mainArtist.uri,
         uri: mainArtist.uri,
         name: mainArtist.name,
-        type: 'artist'
+        type: 'artist',
       },
       album: {
         id: album.uri,
@@ -97,12 +97,12 @@ export const convertPlayerState = (state: Spotify.PlaybackState, currentState?: 
           id: mainArtist.uri,
           uri: mainArtist.uri,
           name: mainArtist.name,
-          type: 'artist'
+          type: 'artist',
         },
         coverArtUrl: album.images[0]?.url,
-        type: 'album'
+        type: 'album',
       },
-      type: 'track'
-    }
+      type: 'track',
+    },
   }
 }

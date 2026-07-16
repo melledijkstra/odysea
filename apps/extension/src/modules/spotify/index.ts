@@ -3,7 +3,7 @@ import SpotifyMenuItem from './SpotifyMenuItem.svelte'
 
 const module: Module = {
   component: SpotifyMenuItem,
-  trigger: SpotifyMenuItem
+  trigger: SpotifyMenuItem,
 }
 
 export default module

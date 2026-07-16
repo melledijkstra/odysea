@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { habits } from "@/stores/habits.svelte"
-  import Input from "@/components/atoms/Input.svelte"
-  import Button from "@/components/atoms/Button.svelte"
-  import type { Habit } from "@/db/habits"
+  import { habits } from '@/stores/habits.svelte'
+  import Input from '@/components/atoms/Input.svelte'
+  import Button from '@/components/atoms/Button.svelte'
+  import type { Habit } from '@/db/habits'
 
-  let newHabit = $state<Habit & { id?: string }>({
+  const newHabit = $state<Habit & { id?: string }>({
     name: '',
     color: '#000000',
     goal: 0,
     step: 1,
-    unit: 'count'
+    unit: 'count',
   })
 </script>
 
@@ -62,7 +62,8 @@
   event.preventDefault()
   if (newHabit?.id) {
     habits.update(newHabit as Habit & { id: string })
-  } else {
+  }
+  else {
     habits.add(newHabit)
   }
 }}>

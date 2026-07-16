@@ -11,14 +11,14 @@
     mdiVolumeHigh,
     mdiVolumeLow,
     mdiVolumeMedium,
-    mdiVolumeOff
+    mdiVolumeOff,
   } from '@mdi/js'
   import Icon from '../atoms/Icon.svelte'
-  import { millisecondsToTime } from "@melledijkstra/toolbox"
+  import { millisecondsToTime } from '@melledijkstra/toolbox'
   import type { PlaybackState } from 'MusicPlayer'
   import type { HTMLAttributes } from 'svelte/elements'
   import { Slider } from 'bits-ui'
-  
+
   type PlaybackProps = {
     playbackState: PlaybackState
     onToggleShuffle?: (shuffle: boolean) => void
@@ -43,10 +43,10 @@
     ...props
   }: PlaybackProps = $props()
 
-  let isShuffling = $derived(state?.shuffle ?? false)
+  const isShuffling = $derived(state?.shuffle ?? false)
 
-  let repeatMode = $derived(state?.repeatMode ?? 0)
-  let repeatModeIcon = $derived.by(() => {
+  const repeatMode = $derived(state?.repeatMode ?? 0)
+  const repeatModeIcon = $derived.by(() => {
     switch (repeatMode) {
       case 1:
         return mdiRepeatOnce
@@ -57,32 +57,35 @@
         return mdiRepeatOff
     }
   })
-  let mediaItem = $derived(state?.currentItem)
-  let position_ms = $derived(state?.position_ms ?? 0)
+  const mediaItem = $derived(state?.currentItem)
+  const position_ms = $derived(state?.position_ms ?? 0)
   // let remaining = $derived(mediaItem ? mediaItem.duration_ms - position_ms : 0)
   // let timeLeft = $derived<string>(millisecondsToTime(remaining))
-  let duration = $derived(mediaItem?.duration_ms ? millisecondsToTime(mediaItem.duration_ms) : 0)
-  let currentTime = $derived<string>(millisecondsToTime(position_ms))
+  const duration = $derived(mediaItem?.duration_ms ? millisecondsToTime(mediaItem.duration_ms) : 0)
+  const currentTime = $derived<string>(millisecondsToTime(position_ms))
 
-  let volumeIcon = $derived.by(() => {
+  const volumeIcon = $derived.by(() => {
     if (state.volume === 0) {
       return mdiVolumeOff
-    } else if (state.volume < 15) {
+    }
+    else if (state.volume < 15) {
       return mdiVolumeLow
-    } else if (state.volume < 55) {
+    }
+    else if (state.volume < 55) {
       return mdiVolumeMedium
-    } else {
+    }
+    else {
       return mdiVolumeHigh
     }
   })
 </script>
 
-<div class={["text-white", props.class]}>
+<div class={['text-white', props.class]}>
   <!-- Seeker -->
   <Slider.Root
     type="single"
     value={position_ms}
-    onValueCommit={(value) => onSeek?.(value)}
+    onValueCommit={value => onSeek?.(value)}
     max={mediaItem?.duration_ms ?? 0}
     class="bg-transparent relative flex w-full touch-none select-none items-center cursor-pointer group/seeker"
   >
@@ -94,12 +97,12 @@
     <Slider.Thumb
       index={0}
       class={[
-        "block size-2.5 bg-background shadow-sm cursor-pointer rounded-full",
-        "dark:bg-white dark:shadow-black/30",
-        "border border-white/70 hover:border-white",
-        "scale-0 group-hover/seeker:scale-100 data-active:scale-120 transition-transform",
-        "disabled:pointer-events-none disabled:opacity-50",
-        "focus-visible:outline-hidden",
+        'block size-2.5 bg-background shadow-sm cursor-pointer rounded-full',
+        'dark:bg-white dark:shadow-black/30',
+        'border border-white/70 hover:border-white',
+        'scale-0 group-hover/seeker:scale-100 data-active:scale-120 transition-transform',
+        'disabled:pointer-events-none disabled:opacity-50',
+        'focus-visible:outline-hidden',
       ]}
     />
   </Slider.Root>
@@ -160,7 +163,7 @@
           type="single"
           orientation="horizontal"
           bind:value={state.volume}
-          onValueCommit={(value) => onVolumeChange?.(value)}
+          onValueCommit={value => onVolumeChange?.(value)}
           min={0}
           step={1}
           max={100}
@@ -176,12 +179,12 @@
           <Slider.Thumb
             index={0}
             class={[
-              "block size-2 bg-background shadow-sm cursor-pointer rounded-full",
-              "dark:bg-white dark:shadow-black/30",
-              "border border-white/70 hover:border-white",
-              "scale-0 group-hover/volume:scale-100 data-active:scale-120 transition-transform",
-              "disabled:pointer-events-none disabled:opacity-50",
-              "focus-visible:outline-hidden",
+              'block size-2 bg-background shadow-sm cursor-pointer rounded-full',
+              'dark:bg-white dark:shadow-black/30',
+              'border border-white/70 hover:border-white',
+              'scale-0 group-hover/volume:scale-100 data-active:scale-120 transition-transform',
+              'disabled:pointer-events-none disabled:opacity-50',
+              'focus-visible:outline-hidden',
             ]}
           />
         </Slider.Root>

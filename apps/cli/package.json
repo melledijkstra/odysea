@@ -10,13 +10,16 @@
   "scripts": {
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "commander": "^12.1.0"
   },
   "devDependencies": {
-    "@types/node": "^25.9.1",
+    "@melledijkstra/config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
     "tsx": "^4.22.4"
   }
 }

@@ -6,14 +6,14 @@
   import { SpotifyController } from '@/controllers/SpotifyController'
   import { MPState } from '@/components/musicplayer/state.svelte'
 
-  let controller = $state<SpotifyController>(new SpotifyController(MPState))
+  const controller = $state<SpotifyController>(new SpotifyController(MPState))
 </script>
 
 <Popover.Root>
   <Popover.Trigger
     class={[
       'dark:text-white/70 dark:hover:text-white text-zinc-500 hover:text-zinc-700',
-      'block cursor-pointer transition-colors'
+      'block cursor-pointer transition-colors',
     ]}
   >
     <Icon path={mdiSpotify} size={36} />

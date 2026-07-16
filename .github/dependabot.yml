@@ -24,3 +24,16 @@ updates:
           - "vite*"
           - "vitest"
           - "@vitest/coverage-v8"
+      eslint:
+        patterns:
+          - "eslint"
+          - "@eslint/*"
+          - "eslint-plugin-*"
+          - "typescript-eslint"
+          - "@typescript-eslint*"
+      svelte:
+        patterns:
+          - "svelte"
+          - "@sveltejs/*"
+          - "svelte-eslint-parser"
+          - "eslint-plugin-svelte"

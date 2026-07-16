@@ -3,9 +3,9 @@
   import Welcome from '@/components/Welcome.svelte'
   import type { User } from '@/app-state.svelte'
 
-  let user: User = $state({
-    name: 'John Doe'
-  });
+  const user: User = $state({
+    name: 'John Doe',
+  })
 
   const { Story } = defineMeta({
     title: 'Atoms/Welcome',
@@ -17,8 +17,8 @@
       },
       onClearUsername: () => {
         user.name = ''
-      }
-    }
+      },
+    },
   })
 </script>
 

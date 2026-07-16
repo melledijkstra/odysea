@@ -5,5 +5,5 @@ import BreathingMenuItem from './BreathingMenuItem.svelte'
 export default {
   component: Breathing,
   scene: Breathing,
-  trigger: BreathingMenuItem
+  trigger: BreathingMenuItem,
 } satisfies Module

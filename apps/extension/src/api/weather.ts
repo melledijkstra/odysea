@@ -25,7 +25,7 @@ const BASE_URL = 'https://api.openweathermap.org/data/2.5'
 
 export class WeatherClient extends ApiKeyBaseClient {
   protected urlQueryKeyName: string = 'appid'
-  
+
   constructor(apiKey: string | (() => string)) {
     super(BASE_URL, apiKey)
   }
@@ -52,7 +52,7 @@ export class WeatherClient extends ApiKeyBaseClient {
     }
 
     const response = await this.request<WeatherResponse>(
-      `/weather?lat=${lat}&lon=${lon}`
+      `/weather?lat=${lat}&lon=${lon}`,
     )
 
     if (response) {
@@ -60,7 +60,7 @@ export class WeatherClient extends ApiKeyBaseClient {
       const info: WeatherInfo = {
         location: response.name,
         temperature: response.main.temp,
-        icon: response.weather[0].icon
+        icon: response.weather[0].icon,
       }
       await cache.set('weather', info, MIN_10)
       return info

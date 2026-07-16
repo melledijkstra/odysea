@@ -12,20 +12,20 @@
       id: '1',
       title: 'Note 1',
       text: 'This is the first note',
-      createdAt: new Date()
+      createdAt: new Date(),
     },
     {
       id: '2',
       title: 'Note 2',
       text: 'This is the second note',
-      createdAt: new Date()
+      createdAt: new Date(),
     },
     {
       id: '3',
       title: 'Note 3',
       text: 'This is the third note',
-      createdAt: new Date()
-    }
+      createdAt: new Date(),
+    },
   ]
 
   const { Story } = defineMeta({
@@ -34,7 +34,7 @@
     component: NotesPanelContent,
     args: {
       notes,
-    }
+    },
   })
 </script>
 
@@ -47,5 +47,5 @@
 <Story name="Default" />
 
 <Story name="No notes" args={{
-  notes: []
+  notes: [],
 }} />

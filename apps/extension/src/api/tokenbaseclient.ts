@@ -1,11 +1,11 @@
-import { BaseClient } from "./baseclient"
+import { BaseClient } from './baseclient'
 
 export class TokenBaseClient extends BaseClient {
   protected token: string
 
   constructor(
     baseUrl: string,
-    token: string
+    token: string,
   ) {
     super(baseUrl)
 
@@ -13,7 +13,7 @@ export class TokenBaseClient extends BaseClient {
 
     if (this.constructor === TokenBaseClient) {
       throw new Error(
-        'TokenBaseClient is abstract and cannot be instantiated directly.'
+        'TokenBaseClient is abstract and cannot be instantiated directly.',
       )
     }
   }

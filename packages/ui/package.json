@@ -3,18 +3,25 @@
   "version": "1.0.0",
   "author": "Melle Dijkstra",
   "type": "module",
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "lint": "eslint ."
+  },
   "exports": {
     "./svelte": "./src/svelte",
     "./react": "./src/react"
   },
   "peerDependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "svelte": "^5.47.1"
   },
   "devDependencies": {
-    "@types/react": "^19.2.9",
-    "@types/react-dom": "^19.2.3"
+    "@melledijkstra/config": "workspace:*",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:"
   }
 }

@@ -20,8 +20,8 @@
       <div
         class="w-8 h-8 flex items-center justify-center rounded-full
                 {isToday(day)
-          ? 'bg-blue-500 text-white'
-          : 'bg-gray-500 text-white dark:bg-gray-100 dark:text-gray-800'}"
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-500 text-white dark:bg-gray-100 dark:text-gray-800'}"
       >
         {day}
       </div>

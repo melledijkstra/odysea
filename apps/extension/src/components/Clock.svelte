@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import { repeatEvery, getTime, getTimePercentage } from "@melledijkstra/toolbox"
+  import { repeatEvery, getTime, getTimePercentage } from '@melledijkstra/toolbox'
 
   const ONE_MINUTE = 60 * 1000 // in ms
 
@@ -36,7 +36,8 @@
     // if parent is overriding clockMode then we shouldn't set it based on localStorage
     if (props.clockMode) {
       mode = props.clockMode
-    } else {
+    }
+    else {
       const clockMode = localStorage.getItem(CLOCK_STORAGE_KEY) as ClockMode
       mode = clockMode ?? 'time'
     }
@@ -52,9 +53,9 @@
 <button
   onclick={toggleMode}
   class={[
-    "clock empty:min-h-32 time text-white text-10xl antialiased drop-shadow-lg text-shadow-lg/30 cursor-pointer",
+    'clock empty:min-h-32 time text-white text-10xl antialiased drop-shadow-lg text-shadow-lg/30 cursor-pointer',
     // creates a shadow behind the text
-    'relative before:absolute before:inset-[-0.05em] before:bg-black/10 before:blur-xl before:rounded-lg before:z-[-1]'
+    'relative before:absolute before:inset-[-0.05em] before:bg-black/10 before:blur-xl before:rounded-lg before:z-[-1]',
   ]}
   >{time}</button
 >

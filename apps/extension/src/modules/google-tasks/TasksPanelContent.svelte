@@ -9,7 +9,7 @@
     state: GoogleTasksState
   }
 
-  let { controller, state: tasksState }: TasksPanelContentProps = $props()
+  const { controller, state: tasksState }: TasksPanelContentProps = $props()
 
   let selectedTaskList = $state<string>()
   let newTaskTitle = $state('')
@@ -51,8 +51,8 @@
   tasks={tasksState.tasks}
   onToggleTask={(taskId, status) =>
     controller.setTaskStatus(taskId, status, selectedTaskList)}
-  onSaveEdit={(task) => controller.updateTask(task, selectedTaskList)}
-  onRemoveTask={(taskId) => controller.deleteTask(taskId, selectedTaskList)}
+  onSaveEdit={task => controller.updateTask(task, selectedTaskList)}
+  onRemoveTask={taskId => controller.deleteTask(taskId, selectedTaskList)}
 />
 <input
   name="new-task-input"

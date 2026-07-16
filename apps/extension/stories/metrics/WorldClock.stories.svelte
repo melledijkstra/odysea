@@ -10,8 +10,8 @@
       metric: {
         type: 'symbol',
         control: 'object',
-      }
-    }
+      },
+    },
   })
 </script>
 
@@ -20,14 +20,14 @@
   metric: {
     name: 'Amsterdam',
     pinned: true,
-    timeZone: 'Europe/Amsterdam'
-  }
+    timeZone: 'Europe/Amsterdam',
+  },
 }} />
 
 <Story name="Tokyo" args={{
   metric: {
     name: 'Tokyo',
     pinned: true,
-    timeZone: 'Asia/Tokyo'
-  }
+    timeZone: 'Asia/Tokyo',
+  },
 }} />

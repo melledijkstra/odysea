@@ -10,9 +10,9 @@
         type: 'number',
         control: 'number',
         description:
-          'The number of minutes slept, used to calculate hours and minutes.'
-      }
-    }
+          'The number of minutes slept, used to calculate hours and minutes.',
+      },
+    },
   })
 </script>
 
@@ -20,21 +20,21 @@
 <Story
   name="Default"
   args={{
-    minutes: 483 // 8 hours and 3 minutes
+    minutes: 483, // 8 hours and 3 minutes
   }}
 />
 
 <Story
   name="Hours Only"
   args={{
-    minutes: 300 // 5 hours
+    minutes: 300, // 5 hours
   }}
 />
 
 <Story
   name="Minutes Only"
   args={{
-    minutes: 30
+    minutes: 30,
   }}
 />
 

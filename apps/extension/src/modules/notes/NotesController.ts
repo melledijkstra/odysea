@@ -1,5 +1,5 @@
-import { type Note } from "@/db/notes";
-import type { DbStore } from "@/stores/databaseStore.svelte";
+import { type Note } from '@/db/notes'
+import type { DbStore } from '@/stores/databaseStore.svelte'
 
 export class NotesController {
   constructor(protected store: DbStore<Note>) {}

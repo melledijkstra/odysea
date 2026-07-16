@@ -7,7 +7,7 @@
     component: PlaylistSkeleton,
     args: {
       amount: 20,
-    }
+    },
   })
 </script>
 

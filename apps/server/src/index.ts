@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import { router as focusSessionsRouter } from './routes/focus-sessions'
+import { router as focusSessionsRouter } from './routes/focus-sessions.ts'
 
 dotenv.config()
 
@@ -10,7 +10,7 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/status', (_req, res) => {
-  res.status(200).send('OK');
+  res.status(200).send('OK')
 })
 
 app.use('/focus-sessions', focusSessionsRouter)

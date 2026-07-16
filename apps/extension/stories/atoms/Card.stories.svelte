@@ -10,7 +10,7 @@
     mdiSkipNext,
     mdiSkipPrevious,
     mdiSpotify,
-    mdiWifi
+    mdiWifi,
   } from '@mdi/js'
   import Toggle from '@/components/atoms/Toggle.svelte'
 
@@ -18,8 +18,8 @@
     title: 'Atoms/Card',
     component: Card,
     args: {
-      variant: 'square'
-    }
+      variant: 'square',
+    },
   })
 </script>
 

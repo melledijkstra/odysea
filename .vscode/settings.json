@@ -1,4 +1,7 @@
 {
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
   "js/ts.tsdk.path": "node_modules/typescript/lib",
-  "css.customData": [".vscode/tailwind.json"]
+  "css.customData": [".vscode/tailwind.json"],
 }

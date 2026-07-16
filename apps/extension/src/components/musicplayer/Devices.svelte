@@ -14,8 +14,8 @@
   }
 
   const { playerDeviceId, devices, onActivate, sdkVersion, ...props }: DevicesProps = $props()
-  const activeDevice = $derived(devices.find((device) => device.is_active))
-  const otherDevices = $derived(devices.filter((device) => !device.is_active))
+  const activeDevice = $derived(devices.find(device => device.is_active))
+  const otherDevices = $derived(devices.filter(device => !device.is_active))
   const isActiveDevice = $derived(playerDeviceId === activeDevice?.id)
 </script>
 
@@ -44,7 +44,7 @@
     'text-xs',
     'transition-colors duration-1000',
     isActiveDevice ? 'bg-green-700' : 'transparent',
-    props.class
+    props.class,
   ]}
 >
   {#if sdkVersion}

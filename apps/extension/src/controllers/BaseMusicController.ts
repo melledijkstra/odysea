@@ -1,16 +1,16 @@
-import type { ILogger } from "@/interfaces/logger.interface";
-import { Logger } from "@/logger";
-import { playbackLoop } from "@melledijkstra/toolbox";
-import type { Album, MusicPlayerInterface, Playlist, PlaybackState, Track } from "MusicPlayer";
+import type { ILogger } from '@/interfaces/logger.interface'
+import { Logger } from '@/logger'
+import { playbackLoop } from '@melledijkstra/toolbox'
+import type { Album, MusicPlayerInterface, Playlist, PlaybackState, Track } from 'MusicPlayer'
 
 export abstract class BaseMusicController implements MusicPlayerInterface, ILogger {
-  logger: Logger = new Logger('BaseMusicController');
+  logger: Logger = new Logger('BaseMusicController')
 
   constructor(public state: { playback: PlaybackState }) {}
 
   protected cancelPlaybackLoop?: () => void
-  
-  abstract playItem(item: Track | Playlist | Album): Promise<void> | void;
+
+  abstract playItem(item: Track | Playlist | Album): Promise<void> | void
   abstract getPlaylistItems(playlist: Playlist): Promise<Track[]>
   abstract getPlaylists(): Promise<Playlist[]>
   abstract next(): Promise<void> | void
@@ -20,7 +20,7 @@ export abstract class BaseMusicController implements MusicPlayerInterface, ILogg
   abstract getPlaybackState(): Promise<PlaybackState>
   abstract toggleShuffle(enabled?: boolean): Promise<void> | void
   abstract switchRepeatMode?(repeatMode: string | number): Promise<void> | void
-  
+
   protected trackEnded() {
     this.stopPlaybackLoop()
   }
@@ -54,7 +54,7 @@ export abstract class BaseMusicController implements MusicPlayerInterface, ILogg
     this.cancelPlaybackLoop = playbackLoop(
       () => this.updatePosition(),
       1000, // Update every second
-      initialPos ?? this.state.playback.position_ms
+      initialPos ?? this.state.playback.position_ms,
     )
   }
 
@@ -79,7 +79,8 @@ export abstract class BaseMusicController implements MusicPlayerInterface, ILogg
         this.trackEnded()
         return
       }
-    } else {
+    }
+    else {
       this.stopPlaybackLoop()
     }
     if (this.state.playback.isPlaying) {
@@ -88,7 +89,7 @@ export abstract class BaseMusicController implements MusicPlayerInterface, ILogg
   }
 
   async seek(position: number): Promise<void> {
-    if(position < 0) {
+    if (position < 0) {
       this.state.playback.position_ms = 0
     }
 

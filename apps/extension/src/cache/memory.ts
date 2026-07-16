@@ -51,7 +51,7 @@ type CacheOptions = {
  */
 export function withCache<T, A extends unknown[]>(
   originalFunc: (...args: A) => Promise<T>,
-  options: CacheOptions = {}
+  options: CacheOptions = {},
 ): (...args: A) => Promise<T> {
   const defaultTTL = MIN_5
 

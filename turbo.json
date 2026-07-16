@@ -1,11 +1,25 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
+  "ui": "tui",
+  "globalEnv": ["PORT", "DEV", "MODE", "CI", "NODE_ENV"],
   "tasks": {
+    "build": {
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "dependsOn": ["^build"],
+      "outputs": [
+        "dist/**",
+        ".dist/**",
+        "build/**",
+        ".next/**",
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**"
+      ]
+    },
     "dev": {
+      "dependsOn": ["^build"],
       "persistent": true,
       "cache": false,
-      "dependsOn": ["^dev"],
-      "outputs": []
     },
     "start": {
       "persistent": true,
@@ -13,32 +27,21 @@
       "dependsOn": ["^start"],
       "outputs": []
     },
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".dist/**"]
-    },
     "lint": {
-      "outputs": []
+      "dependsOn": ["^build", "^lint"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build", "^typecheck"]
     },
     "test": {
-      "dependsOn": ["^test"],
-      "outputs": []
-    },
-    "test:watch": {
-      "cache": false,
-      "persistent": true
+      "dependsOn": [],
+      "outputs": ["coverage/**"]
     },
     "test:e2e": {
       "outputs": [
         "playwright-report/**",
         "test-results/**"
       ]
-    },
-    "storybook": {
-      "persistent": true,
-      "cache": false,
-      "dependsOn": ["^storybook"],
-      "outputs": []
     },
     "storybook:build": {
       "outputs": ["storybook-static/**"]

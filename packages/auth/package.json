@@ -19,15 +19,17 @@
   "scripts": {
     "dev": "tsdown --watch",
     "build": "tsdown",
+    "lint": "eslint .",
     "example": "cd example && tsx --env-file=.env"
   },
   "dependencies": {
-    "@melledijkstra/toolbox": "workspace:*",
     "@melledijkstra/storage": "workspace:*",
+    "@melledijkstra/toolbox": "workspace:*",
     "arctic": "^3.7.0"
   },
   "devDependencies": {
-    "octokit": "^5.0.5",
-    "@melledijkstra/config": "workspace:*"
+    "@melledijkstra/config": "workspace:*",
+    "eslint": "catalog:",
+    "octokit": "^5.0.5"
   }
 }

@@ -1,4 +1,4 @@
-import { vi } from "vitest";
+import { vi } from 'vitest'
 
 export const browser = {
   runtime: {
@@ -20,6 +20,6 @@ export const browser = {
     query: vi.fn(() => Promise.resolve([])),
   },
   // add more mocks as needed
-};
+}
 
-export default browser;
+export default browser

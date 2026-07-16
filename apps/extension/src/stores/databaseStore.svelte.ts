@@ -1,4 +1,4 @@
-// we don't want svelte reactivity for the createdAt and 
+// we don't want svelte reactivity for the createdAt and
 // updatedAt fields because they are managed by the database and not the UI
 /* eslint-disable svelte/prefer-svelte-reactivity */
 
@@ -10,14 +10,14 @@ export interface IExport<T> {
   update(item: T & { id: string }): Promise<void>
 }
 
-export type DBItem<T> = T & { id: string; createdAt: Date; updatedAt: Date }
+export type DBItem<T> = T & { id: string, createdAt: Date, updatedAt: Date }
 
 export class DbStore<T> implements IExport<DBItem<T>> {
   private readonly fetchAll: () => Promise<T[]>
   private readonly addItem: (item: T) => Promise<void>
   private readonly updateItem: (item: T & { id: string }) => Promise<void>
   private readonly deleteItem: (id: string) => Promise<void>
-  
+
   private _items = $state<DBItem<T>[]>([])
 
   get items() {
@@ -28,7 +28,7 @@ export class DbStore<T> implements IExport<DBItem<T>> {
     fetchAll: () => Promise<T[]>,
     addItem: (item: T) => Promise<void>,
     updateItem: (item: T & { id: string }) => Promise<void>,
-    deleteItem: (id: string) => Promise<void>
+    deleteItem: (id: string) => Promise<void>,
   ) {
     this.fetchAll = fetchAll
     this.addItem = addItem
@@ -45,7 +45,7 @@ export class DbStore<T> implements IExport<DBItem<T>> {
     await this.addItem({
       ...item,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     })
     const items = await this.fetchAll() as DBItem<T>[]
     this._items = items
@@ -63,7 +63,7 @@ export class DbStore<T> implements IExport<DBItem<T>> {
     const updatedAt = new Date()
     await this.updateItem({
       ...updatedItem,
-      updatedAt
+      updatedAt,
     })
     const index = this._items.findIndex(item => item.id === updatedItem.id)
     if (index !== -1) {

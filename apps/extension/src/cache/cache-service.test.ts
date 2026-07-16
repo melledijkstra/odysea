@@ -23,7 +23,7 @@ describe('CacheService and Adapters', () => {
 
       vi.useFakeTimers()
       await service.set('test', 'hello', 1000) // TTL 1 second
-      
+
       // Fast forward time by 2 seconds
       vi.advanceTimersByTime(2000)
 
@@ -51,7 +51,7 @@ describe('CacheService and Adapters', () => {
 
       // Directly put old format (raw string) into the adapter
       adapter.set('old-key', 'raw-value')
-      
+
       const val = await service.get('old-key')
       expect(val).toBe('raw-value')
     })

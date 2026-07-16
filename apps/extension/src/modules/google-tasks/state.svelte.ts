@@ -7,5 +7,5 @@ export type GoogleTasksState = {
 
 export const state = $state<GoogleTasksState>({
   taskLists: [],
-  tasks: []
+  tasks: [],
 })

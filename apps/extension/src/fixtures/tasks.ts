@@ -1,4 +1,4 @@
-import type { Task, TaskList } from "@/api/definitions/google";
+import type { Task, TaskList } from '@/api/definitions/google'
 
 export const mockTaskLists: TaskList[] = [
   {
@@ -46,4 +46,3 @@ export const mockTasks: Task[] = [
     status: 'completed',
   },
 ]
-

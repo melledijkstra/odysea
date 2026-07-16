@@ -1,8 +1,8 @@
 <script>
-  import Toggle from "@/components/atoms/Toggle.svelte"
-  import { settings, settingsStore } from "@/settings/index.svelte"
+  import Toggle from '@/components/atoms/Toggle.svelte'
+  import { settings, settingsStore } from '@/settings/index.svelte'
 
-  let googleTasksEnabled = $derived(settingsStore.modules.google_tasks)
+  const googleTasksEnabled = $derived(settingsStore.modules.google_tasks)
 </script>
 
 <h1 class="text-xl">General Settings</h1>

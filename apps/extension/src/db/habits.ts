@@ -23,4 +23,3 @@ export async function updateHabit(habit: Habit) {
 export async function deleteHabit(id: string) {
   await deleteInDB('habits', id)
 }
-

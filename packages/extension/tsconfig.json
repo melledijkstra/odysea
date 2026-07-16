@@ -1,11 +1,10 @@
 {
+  "extends": "@melledijkstra/config/tsconfig/base.json",
   "compilerOptions": {
     "moduleResolution": "bundler",
     "module": "preserve",
     "types": ["@types/chrome", "vitest/globals"],
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "noEmit": true,
-    "esModuleInterop": true,
-    "allowImportingTsExtensions": true
-  }
+    "lib": ["DOM", "DOM.Iterable", "ESNext"]
+  },
+  "include": ["."]
 }

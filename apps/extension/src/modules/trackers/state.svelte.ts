@@ -19,7 +19,7 @@ export type WorldClock = {
 const STORAGE_KEYS = {
   counters: 'counters',
   countdowns: 'countdowns',
-  worldClocks: 'worldClocks'
+  worldClocks: 'worldClocks',
 } as const
 
 class Trackers {
@@ -66,7 +66,8 @@ class Trackers {
       if (stored) {
         this.counters = JSON.parse(stored) as Counter[]
       }
-    } catch {
+    }
+    catch {
       this.counters = []
       localStorage.removeItem(STORAGE_KEYS.counters) // clear invalid data
     }
@@ -78,7 +79,8 @@ class Trackers {
       if (stored) {
         this.countdowns = JSON.parse(stored) as CountDown[]
       }
-    } catch {
+    }
+    catch {
       this.countdowns = []
       localStorage.removeItem(STORAGE_KEYS.countdowns) // clear invalid data
     }
@@ -90,7 +92,8 @@ class Trackers {
       if (stored) {
         this.worldClocks = JSON.parse(stored) as WorldClock[]
       }
-    } catch {
+    }
+    catch {
       this.worldClocks = []
       localStorage.removeItem(STORAGE_KEYS.worldClocks) // clear invalid data
     }
@@ -101,7 +104,7 @@ class Trackers {
     const newCountdown: CountDown = { name, date: countdownDate.valueOf(), pinned }
     this.setCountdowns([
       ...this.countdowns,
-      newCountdown
+      newCountdown,
     ])
   }
 
@@ -109,7 +112,7 @@ class Trackers {
     const newCounter: Counter = { name, value, pinned }
     this.setCounters([
       ...this.counters,
-      newCounter
+      newCounter,
     ])
   }
 
@@ -117,7 +120,7 @@ class Trackers {
     const newWorldClock: WorldClock = { name, timeZone, pinned }
     this.setWorldClocks([
       ...this.worldClocks,
-      newWorldClock
+      newWorldClock,
     ])
   }
 

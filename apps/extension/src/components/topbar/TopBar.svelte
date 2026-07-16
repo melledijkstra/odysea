@@ -20,9 +20,9 @@
 {/snippet}
 
 <header class={[
-  "w-full p-6",
+  'w-full p-6',
   // add vignette effect from top to bottom
-  "bg-gradient-to-b from-zinc-600/60 to-80% to-transparent",
+  'bg-gradient-to-b from-zinc-600/60 to-80% to-transparent',
 ]}>
   <div
     class="float-left flex flex-row items-center justify-start align-middle gap-5"
@@ -40,7 +40,7 @@
   <div
     class={[
       appState.mode === 'focus' ? 'invisible' : 'visible',
-      'group float-right flex flex-row items-center justify-end align-middle gap-5'
+      'group float-right flex flex-row items-center justify-end align-middle gap-5',
     ]}
   >
     <MetricsPanel />

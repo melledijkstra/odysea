@@ -11,7 +11,7 @@
     bottom?: Snippet
   }
 
-  let { mode, top, middle, bottom }: Props = $props()
+  const { mode, top, middle, bottom }: Props = $props()
 </script>
 
 <Background />
@@ -21,7 +21,7 @@
   <section
     class={[
       mode === 'focus' && 'bg-black/70',
-      'grid grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] snap-start h-screen animate-fade-in transition-colors'
+      'grid grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] snap-start h-screen animate-fade-in transition-colors',
     ]}
   >
     <!-- TOP --->

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { MODULE_CONFIG } from "@/modules"
-  import { settings, DEFAULT_SETTINGS, settingsStore } from "@/settings/index.svelte"
+  import { MODULE_CONFIG } from '@/modules'
+  import { settings, DEFAULT_SETTINGS, settingsStore } from '@/settings/index.svelte'
 </script>
 
 <h1 class="text-xl">Modules Settings</h1>

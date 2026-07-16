@@ -1,16 +1,15 @@
 <script lang="ts">
-  import type { Tooltip as TooltipType } from "bits-ui";
-  import Tooltip from "./Tooltip.svelte";
-  import Icon from "./Icon.svelte"
+  import type { Tooltip as TooltipType } from 'bits-ui'
+  import Tooltip from './Tooltip.svelte'
+  import Icon from './Icon.svelte'
 
   type MenuButtonProps = {
-    mdiIcon: string;
-    tooltip?: string;
-  } & TooltipType.TriggerProps;
+    mdiIcon: string
+    tooltip?: string
+  } & TooltipType.TriggerProps
 
-  const { mdiIcon, tooltip, ...props }: MenuButtonProps = $props();
+  const { mdiIcon, tooltip, ...props }: MenuButtonProps = $props()
 </script>
-
 
 <Tooltip disabled={!tooltip} triggerProps={props}>
   {#snippet trigger()}

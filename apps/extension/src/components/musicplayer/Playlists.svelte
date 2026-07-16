@@ -6,7 +6,7 @@
     playlists: Playlist[]
     onPlaylistSelected: (playlist: Playlist) => void
     onPlaylistPlay: (playlist: Playlist) => void
-  } = $props();
+  } = $props()
 </script>
 
 {#if playlists.length}

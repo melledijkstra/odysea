@@ -17,7 +17,7 @@
     'appearance',
     'network',
     'export',
-    'about'
+    'about',
   ] as const
 
   type Section = (typeof sections)[number]
@@ -53,7 +53,7 @@
         class={[
           sectionName === tab ? 'underline' : '',
           'dark:hover:text-slate-300 hover:text-zinc-800',
-          'text-left text-lg font-bold capitalize'
+          'text-left text-lg font-bold capitalize',
         ]}
       >
         {sectionName}

@@ -16,13 +16,14 @@ export async function fetchPhotos() {
     const response = await fetch('https://photoslibrary.googleapis.com/v1/mediaItems', {
       headers: {
         Accept: 'application/json',
-        Authorization: `Bearer ${token?.toString()}`
-      }
+        Authorization: `Bearer ${token?.toString()}`,
+      },
     })
-  
+
     const data = await response.json()
     logger.log('Photos:', data.mediaItems)
-  } catch (error) {
+  }
+  catch (error) {
     logger.error('Error fetching photos:', error)
   }
 }

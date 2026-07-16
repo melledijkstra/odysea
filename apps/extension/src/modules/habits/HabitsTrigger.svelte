@@ -16,7 +16,7 @@
         color: '#eee',
         goal: 0,
         step: 1,
-        unit: 'count'
+        unit: 'count',
       })
       newHabit = ''
     }

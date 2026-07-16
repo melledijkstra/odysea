@@ -1,0 +1,3 @@
+{
+  "extends": "@melledijkstra/config/tsconfig/base.json",
+}

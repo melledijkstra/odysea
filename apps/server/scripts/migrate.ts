@@ -1,1 +1,1 @@
-import '../../../node_modules/knex/bin/cli';
+import 'knex/bin/cli.js'

@@ -8,15 +8,15 @@
 
   const logger = new Logger('ImageRefreshButton')
 
-  let unsplashClient = $state<UnsplashClient>(
+  const unsplashClient = $state<UnsplashClient>(
     new UnsplashClient(
       settingsStore.network.serverlessHost,
-      settingsStore.ui.dailyImageQuery
-    )
+      settingsStore.ui.dailyImageQuery,
+    ),
   )
 
-  let serverlessHost = $derived(settingsStore.network.serverlessHost)
-  let dailyImageQuery = $derived(settingsStore.ui.dailyImageQuery)
+  const serverlessHost = $derived(settingsStore.network.serverlessHost)
+  const dailyImageQuery = $derived(settingsStore.ui.dailyImageQuery)
 
   async function refreshBackround() {
     const url = await unsplashClient?.refreshDailyImage()
@@ -36,19 +36,19 @@
       serverlessHost: settingsStore.network.serverlessHost,
       unsplashHost: unsplashClient?.host,
       dailyImageQuery: settingsStore.ui.dailyImageQuery,
-      unsplashQuery: unsplashClient.query
+      unsplashQuery: unsplashClient.query,
     })
     if (!!serverlessHost && serverlessHost !== unsplashClient?.host) {
       logger.log('serverlessHost changed', {
         serverlessHost,
-        unsplashHost: unsplashClient?.host
+        unsplashHost: unsplashClient?.host,
       })
       unsplashClient.setHost(settingsStore.network.serverlessHost)
     }
     if (dailyImageQuery !== unsplashClient.query) {
       logger.log('query changed', {
         dailyImageQuery,
-        unsplashQuery: unsplashClient.query
+        unsplashQuery: unsplashClient.query,
       })
       unsplashClient.query = settingsStore.ui.dailyImageQuery
       unsplashClient.clearNextImage()

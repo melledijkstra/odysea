@@ -6,7 +6,7 @@
   {...props}
   class={[
     'text-slate-200 hover:text-white text-lg capitalize cursor-pointer',
-    props.class
+    props.class,
   ]}
 >
   {@render children()}

@@ -1,4 +1,4 @@
 export interface BackgroundService {
-  initialize(): void;
-  destroy(): void;
+  initialize(): void
+  destroy(): void
 }

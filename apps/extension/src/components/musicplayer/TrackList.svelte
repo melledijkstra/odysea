@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { Track } from 'MusicPlayer'
-  import { millisecondsToTime } from "@melledijkstra/toolbox"
+  import { millisecondsToTime } from '@melledijkstra/toolbox'
 
   const { tracks, onTrackSelected }: {
     tracks: Track[]
     onTrackSelected: (track: Track) => void
-  } = $props();
+  } = $props()
 </script>
 
 {#snippet trackItem(track: Track)}

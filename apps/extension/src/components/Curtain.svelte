@@ -3,7 +3,7 @@
   import { UnsplashClient } from '@/api/unsplash'
   import { setBackgroundImage } from '@/stores/background.svelte'
 
-  let client = $state<UnsplashClient>(new UnsplashClient())
+  const client = $state<UnsplashClient>(new UnsplashClient())
   let loaded = $state(false)
 
   onMount(async () => {

@@ -1,4 +1,3 @@
-import { describe, vi, it, expect, beforeAll, afterAll } from 'vitest'
 import { MemoryCache, MIN_5 } from './memory'
 
 describe('MemoryCache', () => {

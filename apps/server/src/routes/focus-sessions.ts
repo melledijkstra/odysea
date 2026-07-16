@@ -1,15 +1,16 @@
-import { Router } from 'express';
-import { db } from '../db';
-import { FocusSession } from '../types';
+import { Router } from 'express'
+import { db } from '../db.ts'
+import { FocusSession } from '../types.ts'
 
-const router = Router();
+const router = Router()
 
 router.get('/', async (_req, res) => {
   try {
     const sessions = await db<FocusSession>('focus-sessions').select('*')
     res.json(sessions)
-  } catch (err) {
-    res.status(500).json({ error: err })
+  }
+  catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) })
     return
   }
 })
@@ -25,8 +26,9 @@ router.post('/', async (req, res) => {
       .insert({ duration, task })
       .returning('*')
     res.status(201).json(session)
-  } catch (err) {
-    res.status(500).json({ error: err })
+  }
+  catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) })
     return
   }
 })
@@ -48,8 +50,9 @@ router.put('/:id', async (req, res) => {
       return
     }
     res.json(session)
-  } catch (err) {
-    res.status(500).json({ error: err })
+  }
+  catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) })
     return
   }
 })
@@ -66,8 +69,9 @@ router.get('/:id', async (req, res) => {
       return
     }
     res.json(session)
-  } catch (err) {
-    res.status(500).json({ error: err })
+  }
+  catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) })
     return
   }
 })
@@ -83,8 +87,9 @@ router.delete('/:id', async (req, res) => {
       return
     }
     res.status(204).send()
-  } catch (err) {
-    res.status(500).json({ error: err })
+  }
+  catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) })
     return
   }
 })
