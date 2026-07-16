@@ -21,7 +21,7 @@
     duration: 0,
     isRunning: false,
   });
-  const audio = $state<HTMLAudioElement>(new Audio());
+  const audio = new Audio();
   const timeLeft = $derived(Timer.formatRemainingTime(pState.timeRemaining));
 
   $effect(() => {

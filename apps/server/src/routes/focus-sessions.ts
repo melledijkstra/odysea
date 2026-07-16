@@ -10,7 +10,7 @@ router.get('/', async (_req, res) => {
     res.json(sessions)
   }
   catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) })
     return
   }
 })
@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
     res.status(201).json(session)
   }
   catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) })
     return
   }
 })
@@ -52,7 +52,7 @@ router.put('/:id', async (req, res) => {
     res.json(session)
   }
   catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) })
     return
   }
 })
@@ -71,7 +71,7 @@ router.get('/:id', async (req, res) => {
     res.json(session)
   }
   catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) })
     return
   }
 })
@@ -89,7 +89,7 @@ router.delete('/:id', async (req, res) => {
     res.status(204).send()
   }
   catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) })
     return
   }
 })

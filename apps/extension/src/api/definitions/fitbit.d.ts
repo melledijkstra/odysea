@@ -7,7 +7,6 @@ export type SleepResponse = {
       wake: number
     }
     totalMinutesAsleep: number
-    totalMinutesAsleep: number
     totalSleepRecords: number
     totalTimeInBed: number
   }
