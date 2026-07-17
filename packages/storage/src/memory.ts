@@ -80,19 +80,6 @@ export class MemoryCache implements IStorage {
     this._cache = {}
   }
 
-  isExpired(key: string): boolean {
-    const cachedItem = this._cache[key]
-    if (!cachedItem) {
-      return true // No item means it's "expired" or never existed
-    }
-
-    if (Date.now() - cachedItem.timestamp > cachedItem.ttl) {
-      delete this._cache[key]
-      return true
-    }
-
-    return false
-  }
 
   async has(key: string): Promise<boolean> {
     const cachedItem = this._cache[key]
