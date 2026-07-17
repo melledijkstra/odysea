@@ -12,8 +12,9 @@ test('should render the new tab page and take a screenshot', async ({ page, exte
   // The title in index.html is "New Tab"
   await expect(page).toHaveTitle(/New Tab/)
 
-  await page.waitForLoadState('domcontentloaded')
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('load')
+
+  await expect(page.getByTestId('background-image')).toHaveCSS('background-image', /url\(["']?.*["']?\)/)
 
   // Take a screenshot
   const screenshotPath = testInfo.outputPath('newtab.png')
