@@ -2,10 +2,8 @@
   import Button from '@/components/atoms/Button.svelte'
   import type { FocusSession } from '@/db/focus'
   import { getAllFocusSessions } from '@/db/focus'
-  import type { Habit } from '@/db/habits'
-  import { getAllHabits } from '@/db/habits'
-  import type { Note } from '@/db/notes'
-  import { getAllNotes } from '@/db/notes'
+  import { habitsRepository, type Habit } from '@/db/habits'
+  import { notesRepository, type Note } from '@/db/notes'
   import { settings, type SettingsState } from '@/settings/index.svelte'
 
   type Export = {
@@ -19,8 +17,8 @@
 
   async function exportData() {
     const focusSessions = await getAllFocusSessions()
-    const notes = await getAllNotes()
-    const habits = await getAllHabits()
+    const notes = await notesRepository.getAll()
+    const habits = await habitsRepository.getAll()
     const exportData: Export = {
       databases: {
         focusSessions,
