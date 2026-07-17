@@ -1,5 +1,5 @@
 import { SpotifyApiClient } from '@melledijkstra/api'
-import { MemoryCache, MIN_5 } from '@/cache/memory'
+import { MemoryCache, MIN_5 } from '@melledijkstra/storage'
 import type { AuthClient } from '@melledijkstra/extension'
 import type { Playlist, Track } from 'MusicPlayer'
 import { convertSpotifyPlaylist, convertSpotifyTrackToMPTrack, convertApiPlaybackState } from '@/transforms/spotify'

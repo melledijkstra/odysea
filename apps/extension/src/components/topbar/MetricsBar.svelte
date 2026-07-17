@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CacheService } from '@/cache/cache-service'
+  import { WebLocalStorage } from '@melledijkstra/storage'
   import {
     getIsSleepMetricEnabled,
     setIsSleepMetricEnabled,
@@ -15,9 +15,8 @@
   import { AuthClient } from '@melledijkstra/extension'
   import { FitbitAuthProvider } from '@/oauth2/providers'
   import { FitbitClient } from '@melledijkstra/api'
-  import { LocalStorageAdapter } from '@/cache/localstorage'
 
-  const cache = new CacheService(new LocalStorageAdapter())
+  const cache = new WebLocalStorage()
 
   type Metric = CountDown | WorldClock | Counter
 

@@ -1,12 +1,10 @@
 import { WeatherClient as BaseWeatherClient, getCurrentPosition, type WeatherInfo, type GeoPosition } from '@melledijkstra/api'
-import { CacheService } from '@/cache/cache-service'
+import { WebLocalStorage, MIN_10 } from '@melledijkstra/storage'
 import { Logger } from '@/logger'
 import { appState } from '@/app-state.svelte'
-import { LocalStorageAdapter } from '@/cache/localstorage'
-import { MIN_10 } from '@/cache/memory'
 
 const logger = new Logger('weather')
-const cache = new CacheService(new LocalStorageAdapter())
+const cache = new WebLocalStorage()
 
 export class WeatherClient extends BaseWeatherClient {
   async getWeather(position?: GeoPosition): Promise<WeatherInfo | undefined> {

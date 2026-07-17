@@ -1,8 +1,7 @@
 import { DAILY_IMAGE_KEY, NEXT_IMAGE_KEY } from '@/constants'
 import { Logger } from '@/logger'
 import type { ILogger } from '@/interfaces/logger.interface'
-import { CacheService } from './cache-service'
-import { ExtensionStorageAdapter } from './browser-extension'
+import { ExtensionStorage } from '@melledijkstra/extension'
 
 export type ImageInfo = {
   id: string
@@ -12,7 +11,7 @@ export type ImageInfo = {
 
 export class ImageCache implements ILogger {
   logger = new Logger('ImageCache')
-  private cache = new CacheService(new ExtensionStorageAdapter())
+  private cache = new ExtensionStorage()
 
   async getDailyImageInfo(): Promise<ImageInfo | undefined> {
     return this.cache.get<ImageInfo>(DAILY_IMAGE_KEY)
