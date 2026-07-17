@@ -18,7 +18,7 @@ export class CronTriggerManager {
     if (workflow.trigger.type !== 'cron') return
 
     this.checkMissedExecution(workflow)
-    
+
     logger.log(
       `Scheduling workflow "${workflow.name}" <${workflow.id}> with cron: ${workflow.trigger.expression}`
     )
@@ -98,7 +98,11 @@ export class CronTriggerManager {
       const nextRun = handle.getNextRun ? handle.getNextRun() : undefined
       if (nextRun instanceof Date) {
         return nextRun.toString()
-      } else if (nextRun && typeof nextRun === 'object' && 'toDate' in nextRun) {
+      } else if (
+        nextRun &&
+        typeof nextRun === 'object' &&
+        'toDate' in nextRun
+      ) {
         return (nextRun as { toDate: () => Date }).toDate().toString()
       } else if (nextRun) {
         return new Date(nextRun as unknown as string | number).toString()
@@ -238,7 +242,7 @@ export class WorkflowScheduler {
   getWorkflows(): ReadonlyArray<Workflow> {
     return Array.from(this.workflows.values())
   }
-  
+
   getCronManager(): CronTriggerManager {
     return this.cronManager
   }

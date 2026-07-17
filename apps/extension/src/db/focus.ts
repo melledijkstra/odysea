@@ -4,6 +4,7 @@ import { Logger } from '@/logger'
 const logger = new Logger('FocusDB')
 
 export type FocusSession = {
+  id: number
   topic?: string
   startDateTime: Date
   endDateTime: Date

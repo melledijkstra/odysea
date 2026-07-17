@@ -26,7 +26,7 @@ export class DbStore<T extends Identifiable> {
     this._items.push(createdItem)
   }
 
-  async remove(id: string) {
+  async remove(id: number) {
     await this.adapter.delete(id)
     const index = this._items.findIndex((item) => item.id === id)
     if (index !== -1) {

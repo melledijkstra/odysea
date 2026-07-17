@@ -7,7 +7,7 @@ import {
 const DB_NAME = 'habits' as const
 
 export type Habit = {
-  id: string
+  id: number
   name: string
   color: string
   goal: number
@@ -37,7 +37,7 @@ class HabitsRepository implements IRepositoryAdapter<Habit> {
     await updateInDB(DB_NAME, habit)
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     await deleteInDB(DB_NAME, id)
   }
 }

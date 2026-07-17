@@ -7,7 +7,7 @@ import {
 export const DB_NAME = 'notes' as const
 
 export type Note = {
-  id: string
+  id: number
   title: string
   text: string
   createdAt: Date
@@ -34,7 +34,7 @@ class NotesRepository implements IRepositoryAdapter<Note> {
     await updateInDB(DB_NAME, note)
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     await deleteInDB(DB_NAME, id)
   }
 }

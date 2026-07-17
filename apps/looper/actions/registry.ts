@@ -13,11 +13,16 @@ export const actionRegistry: ActionRegistry = {
 }
 
 function withGoogleAuth<TArgs>(
-  action: (ctx: ActionContext, args: TArgs & { token: string }) => Promise<unknown>
+  action: (
+    ctx: ActionContext,
+    args: TArgs & { token: string }
+  ) => Promise<unknown>
 ) {
   return async (ctx: ActionContext, args: Record<string, unknown>) => {
     const token = await authClient.getAuthToken()
     if (!token) throw new Error('Not authenticated with Google')
-    return action(ctx, { ...args, token } as unknown as TArgs & { token: string })
+    return action(ctx, { ...args, token } as unknown as TArgs & {
+      token: string
+    })
   }
 }

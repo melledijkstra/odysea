@@ -9,12 +9,12 @@ export const logger = new Logger('db')
 
 export interface OdyseaExtensionDB extends DBSchema {
   habits: {
-    key: string
+    key: number
     value: Habit
     indexes: { id: number }
   }
   notes: {
-    key: string
+    key: number
     value: Note
     indexes: { id: number }
   }
@@ -58,16 +58,16 @@ export async function getAllItems<DBName extends StoreNames<OdyseaExtensionDB>>(
 export async function storeInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
   dbName: DBName,
   value: StoreValue<OdyseaExtensionDB, DBName>
-): Promise<string> {
+): Promise<number> {
   const db = await dbPromise
   const key = await db.add(dbName, value)
-  return String(key)
+  return key
 }
 
 export async function updateInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
   dbName: DBName,
   value: StoreValue<OdyseaExtensionDB, DBName>,
-  key?: string
+  key?: number
 ) {
   const db = await dbPromise
   await db.put(dbName, value, key)
@@ -75,7 +75,7 @@ export async function updateInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
 
 export async function deleteInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
   dbName: DBName,
-  id: string
+  id: number
 ) {
   const db = await dbPromise
   await db.delete(dbName, id)

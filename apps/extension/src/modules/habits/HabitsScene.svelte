@@ -5,7 +5,7 @@
   import type { Habit } from '@/db/habits'
   import type { Insertable } from '@melledijkstra/storage'
 
-  const newHabit = $state<Insertable<Habit> & { id?: string }>({
+  const newHabit = $state<Insertable<Habit> & { id?: number }>({
     name: '',
     color: '#000000',
     goal: 0,
