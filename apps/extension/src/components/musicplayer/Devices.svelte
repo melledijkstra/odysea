@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Device } from 'SpotifyApi'
+  import type { Device } from '@melledijkstra/api'
   import Icon from '@/components/atoms/Icon.svelte'
   import { mdiCellphone, mdiMonitor, mdiSpeaker } from '@mdi/js'
   import { DropdownMenu } from 'bits-ui'

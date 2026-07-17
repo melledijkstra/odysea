@@ -2,8 +2,6 @@ packages:
   - apps/*
   - packages/*
 
-catalogMode: strict
-
 catalog:
   typescript: ^6.0.0
   eslint: ^10.7.0

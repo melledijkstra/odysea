@@ -7,9 +7,11 @@ export * from './services/fitbit'
 export * from './services/geolocation'
 export * from './services/spotify'
 export * from './services/unsplash'
+export * from './services/weather'
 
 // Google Apis
 export * from './services/google/account'
+export * from './services/google/photos'
 export * from './services/google/tasks'
 
 export type * from './definitions/fitbit'

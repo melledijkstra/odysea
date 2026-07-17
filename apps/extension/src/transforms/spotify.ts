@@ -3,7 +3,7 @@ import type {
   Track as SpotifyTrack,
   PlaybackState as ApiPlaybackState,
   Playlist as SpotifyPlaylist,
-} from 'SpotifyApi'
+} from '@melledijkstra/api'
 import type { Playlist, PlaybackState, Track, Album, Artist } from 'MusicPlayer'
 
 export function convertAlbumToMPAlbum(album: SpotifyTrack['album']): Album {

@@ -20,14 +20,14 @@
     "@eslint/js": "^9.39.4",
     "@eslint/json": "^2.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/node": "catalog:",
     "@typescript-eslint/parser": "^8.63.0",
     "eslint": "catalog:",
     "eslint-plugin-svelte": "^3.20.0",
     "eslint-plugin-turbo": "catalog:",
-    "rollup-plugin-visualizer": "^6.0.5",
+    "rollup-plugin-visualizer": "^6.0.11",
     "svelte-eslint-parser": "^1.8.0",
     "typescript": "catalog:",
-    "@types/node": "catalog:",
     "typescript-eslint": "^8.63.0"
   }
 }

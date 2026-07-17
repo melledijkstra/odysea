@@ -1,3 +1,5 @@
+import { vi } from 'vitest'
+
 const identityMock = {
   getRedirectURL: vi.fn(),
   getAuthToken: vi.fn(),

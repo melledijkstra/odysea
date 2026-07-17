@@ -1,4 +1,4 @@
-import { SpotifyApiClient } from '@/api/spotify'
+import { SpotifyApiClient } from '@melledijkstra/api'
 import { MemoryCache, MIN_5 } from '@/cache/memory'
 import type { AuthClient } from '@melledijkstra/extension'
 import type { Playlist, Track } from 'MusicPlayer'

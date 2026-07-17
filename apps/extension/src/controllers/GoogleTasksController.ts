@@ -1,5 +1,5 @@
-import type { Task, TaskList } from '@/api/definitions/google'
-import { GoogleTasksApiClient } from '@/api/google/tasks'
+import type { Task, TaskList } from '@melledijkstra/api'
+import { GoogleTasksApiClient } from '@melledijkstra/api'
 import type { ILogger } from '@/interfaces/logger.interface'
 import { Logger } from '@/logger'
 import type { GoogleTasksState } from '@/modules/google-tasks/state.svelte'

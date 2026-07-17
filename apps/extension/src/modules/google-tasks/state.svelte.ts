@@ -1,4 +1,4 @@
-import type { Task, TaskList } from '@/api/definitions/google'
+import type { Task, TaskList } from '@melledijkstra/api'
 
 export type GoogleTasksState = {
   taskLists: TaskList[]

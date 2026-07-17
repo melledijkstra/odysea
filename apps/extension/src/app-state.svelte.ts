@@ -1,5 +1,4 @@
-import type { LocationInfo } from './api/geolocation'
-import type { WeatherInfo } from './api/weather'
+import type { LocationInfo, WeatherInfo } from '@melledijkstra/api'
 
 const STORAGE_KEY = 'appMode'
 

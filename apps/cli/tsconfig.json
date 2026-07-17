@@ -7,5 +7,6 @@
     "strictNullChecks": true,
     "types": ["node"]
   },
-  "include": ["."]
+  "include": ["."],
+  "exclude": ["dist", "node_modules", ".turbo"]
 }

@@ -1,4 +1,4 @@
-import type { Device } from 'SpotifyApi'
+import type { Device } from '@melledijkstra/api'
 
 export const devices: Device[] = [
   {

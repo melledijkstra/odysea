@@ -6,5 +6,10 @@
     "types": ["@types/chrome", "vitest/globals"],
     "lib": ["DOM", "DOM.Iterable", "ESNext"]
   },
-  "include": ["."]
+  "include": ["."],
+  "exclude": [
+    "dist",
+    "node_modules",
+    ".turbo",
+  ]
 }

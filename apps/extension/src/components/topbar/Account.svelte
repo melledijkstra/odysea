@@ -1,7 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { ACCOUNT_CACHE_KEY } from '../../constants'
-  import { fetchAccountInfo, type Account } from '@/api/google/account'
+  import { GoogleAccountApiClient, type Account } from '@melledijkstra/api'
+  import { AuthClient } from '@melledijkstra/extension'
+  import { GoogleAuthProvider } from '@/oauth2/providers'
+
+  const auth = new AuthClient(new GoogleAuthProvider())
+  const client = new GoogleAccountApiClient(auth)
 
   let accountInfo = $state<Account>()
 
@@ -13,7 +18,7 @@
       return
     }
 
-    const fetchedAccountInfo = await fetchAccountInfo()
+    const fetchedAccountInfo = await client.fetchAccountInfo()
 
     if (fetchedAccountInfo) {
       accountInfo = fetchedAccountInfo

@@ -113,14 +113,14 @@ export class SpotifyApiClient extends TokenBaseClient {
 
   async toggleRepeatMode(repeatMode: string | number): Promise<void> {
     let mode: string
-    if (typeof repeatMode === 'number') {
-      mode = repeatMode.toString()
+    if (repeatMode === 1 || repeatMode === 'track') {
+      mode = 'track'
     }
-    else if (repeatMode === 'off') {
-      mode = 'off'
+    else if (repeatMode === 2 || repeatMode === 'context') {
+      mode = 'context'
     }
     else {
-      mode = 'context'
+      mode = 'off'
     }
 
     await this.request(`/me/player/repeat?state=${mode}`, {
