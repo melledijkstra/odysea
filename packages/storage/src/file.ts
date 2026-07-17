@@ -2,12 +2,8 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 import * as os from 'node:os'
 import { IStorage } from './storage.interface'
-
-type FileCacheItem<T> = {
-  data: T
-  timestamp: number
-  ttl: number
-}
+import { CacheItem } from './types'
+import { isExpired } from './utils'
 
 export class FileStorage implements IStorage {
   private readonly filePath: string
@@ -23,7 +19,7 @@ export class FileStorage implements IStorage {
     }
   }
 
-  private readStore(): Record<string, FileCacheItem<unknown> | undefined> {
+  private readStore(): Record<string, CacheItem<unknown> | undefined> {
     if (!fs.existsSync(this.filePath)) {
       return {}
     }
@@ -36,7 +32,7 @@ export class FileStorage implements IStorage {
     }
   }
 
-  private writeStore(store: Record<string, FileCacheItem<unknown> | undefined>): void {
+  private writeStore(store: Record<string, CacheItem<unknown> | undefined>): void {
     const dir = path.dirname(this.filePath)
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true })
@@ -55,11 +51,6 @@ export class FileStorage implements IStorage {
     }
   }
 
-  private isExpired(item: FileCacheItem<unknown>): boolean {
-    if (item.ttl === Infinity || item.ttl === null || item.ttl === undefined || String(item.ttl) === 'Infinity') return false
-    return Date.now() - item.timestamp > item.ttl
-  }
-
   async get<T>(key: string): Promise<T | undefined> {
     const store = this.readStore()
     const item = store[key]
@@ -67,7 +58,7 @@ export class FileStorage implements IStorage {
       return undefined
     }
 
-    if (this.isExpired(item)) {
+    if (isExpired(item)) {
       await this.delete(key)
       return undefined
     }
@@ -107,7 +98,7 @@ export class FileStorage implements IStorage {
     const activeKeys: string[] = []
     for (const key of Object.keys(store)) {
       const item = store[key]
-      if (item && !this.isExpired(item)) {
+      if (item && !isExpired(item)) {
         activeKeys.push(key)
       }
       else if (item) {

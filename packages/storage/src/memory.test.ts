@@ -1,4 +1,5 @@
-import { MemoryCache, MIN_5 } from './memory'
+import { MemoryCache } from './memory'
+import { minutes } from './utils'
 
 describe('MemoryCache', () => {
   beforeAll(() => {
@@ -19,9 +20,9 @@ describe('MemoryCache', () => {
   it('should remove expired values', async () => {
     const cache = new MemoryCache()
 
-    await cache.set('foo', 'bar', MIN_5)
+    await cache.set('foo', 'bar', minutes(5))
 
-    vi.advanceTimersByTime(MIN_5 + 1000)
+    vi.advanceTimersByTime(minutes(5) + 1000)
 
     expect(await cache.get('foo')).toBeUndefined()
   })
@@ -29,9 +30,9 @@ describe('MemoryCache', () => {
   it('should not remove non-expired values', async () => {
     const cache = new MemoryCache()
 
-    await cache.set('foo', 'bar', MIN_5)
+    await cache.set('foo', 'bar', minutes(5))
 
-    vi.advanceTimersByTime(MIN_5 / 2)
+    vi.advanceTimersByTime(minutes(5) / 2)
 
     expect(await cache.get('foo')).toBe('bar')
   })

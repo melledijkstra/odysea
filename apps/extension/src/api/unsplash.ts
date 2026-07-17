@@ -1,7 +1,7 @@
 import { UnsplashClient as BaseUnsplashClient, type UnsplashResponse } from '@melledijkstra/api'
 import { SERVERLESS_HOST_URL } from '@/constants'
 import browser from 'webextension-polyfill'
-import { addDays, formatDate } from '@/date'
+import { addDays, formatDate } from '@melledijkstra/toolbox'
 import { ImageCache, type ImageInfo } from '../cache/image-cache'
 
 const ENDPOINT = '/api/daily-image'

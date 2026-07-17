@@ -1,6 +1,6 @@
 <script lang="ts">
   import Icon from '@/components/atoms/Icon.svelte'
-  import { formatDate } from '@/date'
+  import { formatDate } from '@melledijkstra/toolbox'
   import type { Note } from '@/db/notes'
   import { mdiNote } from '@mdi/js'
 

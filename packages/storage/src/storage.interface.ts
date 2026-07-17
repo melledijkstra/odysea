@@ -1,7 +1,3 @@
-/**
- * Abstract interface for various storage solutions
- * Supports: localStorage, sessionStorage, cookies, IndexedDB, memory, etc.
- */
 export interface IStorage {
   /**
    * Retrieve a value from storage

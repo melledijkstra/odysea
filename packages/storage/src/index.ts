@@ -1,3 +1,6 @@
 export * from './memory'
 export * from './file'
 export * from './storage.interface'
+export * from './localstorage'
+export * from './types'
+export * from './utils'

@@ -1,43 +1,14 @@
 import { Logger } from '@melledijkstra/toolbox'
 import { IStorage } from './storage.interface'
+import type { CacheItem } from './types'
+import { isExpired } from './utils'
 
-const logger = new Logger('cache')
-
-type CacheItem<T> = {
-  data: T
-  timestamp: number
-  ttl: number
+export async function get<T>(key: string): Promise<T | undefined> {
+  return globalMemoryCache.get<T>(key)
 }
 
-const cache: Record<string, CacheItem<unknown> | undefined> = {}
-
-// Default TTL Times (Time To Live)
-export const SEC_30 = 30 * 1000
-export const MIN_1 = 1 * 60 * 1000
-export const MIN_3 = 3 * 60 * 1000
-export const MIN_5 = 5 * 60 * 1000
-export const MIN_10 = 10 * 60 * 1000
-export const MIN_15 = 15 * 60 * 1000
-
-export function get(key: string) {
-  const cachedItem = cache[key]
-  if (cachedItem) {
-    if (Date.now() - cachedItem.timestamp > cachedItem.ttl) {
-      delete cache[key]
-    }
-    else {
-      logger.log('Cache hit:', key)
-      return cachedItem.data
-    }
-  }
-}
-
-export function set(key: string, value: unknown, ttl = Infinity): void {
-  cache[key] = {
-    data: value,
-    timestamp: Date.now(),
-    ttl: ttl ?? MIN_5,
-  }
+export async function set(key: string, value: unknown, ttl = Infinity): Promise<void> {
+  await globalMemoryCache.set(key, value, ttl)
 }
 
 type CacheOptions = {
@@ -56,19 +27,19 @@ export function withCache<T, A extends unknown[]>(
   const defaultTTL = 5 * 60 * 1000 // 5 minutes
 
   // Return a new function that expects the actual async function
-  const cachedFunction = async <T>(...args: A): Promise<T> => {
+  const cachedFunction = async (...args: A): Promise<T> => {
     const cacheKey = options?.key ?? originalFunc.name
     const cacheTTL = options?.ttl ?? defaultTTL
 
     // Attempt to get from cache
-    const cachedData = get(cacheKey)
+    const cachedData = await get<T>(cacheKey)
     if (cachedData !== undefined) {
-      return cachedData as T
+      return cachedData
     }
 
     // Otherwise, call the original function, then store and return its result
-    const result = (await originalFunc(...args)) as T
-    set(cacheKey, result, cacheTTL)
+    const result = await originalFunc(...args)
+    await set(cacheKey, result, cacheTTL)
     return result
   }
 
@@ -85,7 +56,7 @@ export class MemoryCache implements IStorage {
       return
     }
 
-    if (Date.now() - cachedItem.timestamp > cachedItem.ttl) {
+    if (isExpired(cachedItem)) {
       delete this._cache[key]
     }
     else {
@@ -130,11 +101,7 @@ export class MemoryCache implements IStorage {
       return false
     }
 
-    if (this.isExpired(key)) {
-      return false
-    }
-
-    if (Date.now() - cachedItem.timestamp > cachedItem.ttl) {
+    if (isExpired(cachedItem)) {
       delete this._cache[key]
       return false
     }
@@ -150,3 +117,5 @@ export class MemoryCache implements IStorage {
     return Object.keys(this._cache).length
   }
 }
+
+export const globalMemoryCache = new MemoryCache()
