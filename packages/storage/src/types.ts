@@ -5,5 +5,5 @@
 export type CacheItem<T> = {
   data: T
   timestamp: number
-  ttl: number
+  ttl?: number
 }
