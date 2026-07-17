@@ -1,17 +1,13 @@
 import { IStorage } from './storage.interface'
 import type { CacheItem } from './types'
 import { Logger } from '@melledijkstra/toolbox'
+import { isCacheItem, isExpired } from './utils'
 
 const logger = new Logger('WebLocalStorage')
 
 export class WebLocalStorage implements IStorage {
   private isAvailable(): boolean {
     return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
-  }
-
-  private isExpired(item: CacheItem<unknown>): boolean {
-    if (item.ttl === Infinity || item.ttl === null || item.ttl === undefined || String(item.ttl) === 'Infinity') return false
-    return Date.now() - item.timestamp > item.ttl
   }
 
   async get<T>(key: string): Promise<T | undefined> {
@@ -21,19 +17,19 @@ export class WebLocalStorage implements IStorage {
     if (!raw) return undefined
 
     try {
-      const item = JSON.parse(raw) as CacheItem<T>
-      
+      const item = JSON.parse(raw)
+
       // Basic validation of the cache item structure
-      if (!item || typeof item !== 'object' || !('data' in item) || !('timestamp' in item)) {
+      if (!isCacheItem(item)) {
          return undefined
       }
 
-      if (this.isExpired(item)) {
+      if (isExpired(item)) {
         await this.delete(key)
         return undefined
       }
 
-      return item.data
+      return item.data as T
     } catch {
       // Failed to parse, probably corrupted or old format
       return undefined

@@ -58,9 +58,10 @@ export async function getAllItems<DBName extends StoreNames<OdyseaExtensionDB>>(
 export async function storeInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
   dbName: DBName,
   value: StoreValue<OdyseaExtensionDB, DBName>,
-) {
+): Promise<string> {
   const db = await dbPromise
-  await db.add(dbName, value)
+  const key = await db.add(dbName, value)
+  return String(key)
 }
 
 export async function updateInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
@@ -68,7 +69,6 @@ export async function updateInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
   value: StoreValue<OdyseaExtensionDB, DBName>,
   key?: string,
 ) {
-  console.log('updateInDB', dbName, value, key)
   const db = await dbPromise
   await db.put(dbName, value, key)
 }
