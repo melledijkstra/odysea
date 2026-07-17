@@ -1,5 +1,5 @@
 import { WeatherClient as BaseWeatherClient, getCurrentPosition, type WeatherInfo, type GeoPosition } from '@melledijkstra/api'
-import { WebLocalStorage, MIN_10 } from '@melledijkstra/storage'
+import { WebLocalStorage, minutes } from '@melledijkstra/storage'
 import { Logger } from '@/logger'
 import { appState } from '@/app-state.svelte'
 
@@ -36,7 +36,7 @@ export class WeatherClient extends BaseWeatherClient {
 
     if (info) {
       logger.log('retrieved weather data from API, storing in cache')
-      await cache.set('weather', info, MIN_10)
+      await cache.set('weather', info, minutes(10))
       return info
     }
   }

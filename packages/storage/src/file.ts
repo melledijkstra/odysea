@@ -1,7 +1,9 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import * as os from 'node:os'
-import { IStorage, CacheItem } from './storage.interface'
+import { IStorage } from './storage.interface'
+import { CacheItem } from './types'
+import { isExpired } from './utils'
 
 export class FileStorage implements IStorage {
   private readonly filePath: string
@@ -49,11 +51,6 @@ export class FileStorage implements IStorage {
     }
   }
 
-  private isExpired(item: CacheItem<unknown>): boolean {
-    if (item.ttl === Infinity || item.ttl === null || item.ttl === undefined || String(item.ttl) === 'Infinity') return false
-    return Date.now() - item.timestamp > item.ttl
-  }
-
   async get<T>(key: string): Promise<T | undefined> {
     const store = this.readStore()
     const item = store[key]
@@ -61,7 +58,7 @@ export class FileStorage implements IStorage {
       return undefined
     }
 
-    if (this.isExpired(item)) {
+    if (isExpired(item)) {
       await this.delete(key)
       return undefined
     }
@@ -101,7 +98,7 @@ export class FileStorage implements IStorage {
     const activeKeys: string[] = []
     for (const key of Object.keys(store)) {
       const item = store[key]
-      if (item && !this.isExpired(item)) {
+      if (item && !isExpired(item)) {
         activeKeys.push(key)
       }
       else if (item) {

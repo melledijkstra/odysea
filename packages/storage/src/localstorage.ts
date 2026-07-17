@@ -1,4 +1,5 @@
-import { IStorage, CacheItem } from './storage.interface'
+import { IStorage } from './storage.interface'
+import type { CacheItem } from './types'
 import { Logger } from '@melledijkstra/toolbox'
 
 const logger = new Logger('WebLocalStorage')
@@ -74,14 +75,18 @@ export class WebLocalStorage implements IStorage {
     if (!this.isAvailable()) return []
     const activeKeys: string[] = []
     
-    // We iterate over all keys, and only return those that are not expired and have our structure
+    const allKeys: string[] = []
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
       if (key) {
-        const val = await this.get(key)
-        if (val !== undefined) {
-           activeKeys.push(key)
-        }
+        allKeys.push(key)
+      }
+    }
+
+    for (const key of allKeys) {
+      const val = await this.get(key)
+      if (val !== undefined) {
+        activeKeys.push(key)
       }
     }
     return activeKeys

@@ -1,13 +1,8 @@
 import * as browser from 'webextension-polyfill'
-import { IStorage, CacheItem } from '@melledijkstra/storage'
+import { IStorage, CacheItem, isCacheItem, isExpired } from '@melledijkstra/storage'
 
 export class ExtensionStorage implements IStorage {
   storageArea: browser.Storage.StorageArea
-
-  private isExpired(item: CacheItem<unknown>): boolean {
-    if (item.ttl === Infinity || item.ttl === null || item.ttl === undefined || String(item.ttl) === 'Infinity') return false
-    return Date.now() - item.timestamp > item.ttl
-  }
 
   constructor(storageType = browser.storage.local) {
     this.storageArea = storageType
@@ -22,11 +17,11 @@ export class ExtensionStorage implements IStorage {
       const item = raw as CacheItem<T>
       
       // Basic validation of the cache item structure
-      if (!item || typeof item !== 'object' || !('data' in item) || !('timestamp' in item)) {
+      if (!isCacheItem(item)) {
          return undefined
       }
 
-      if (this.isExpired(item)) {
+      if (isExpired(item)) {
         await this.delete(key)
         return undefined
       }
@@ -63,12 +58,21 @@ export class ExtensionStorage implements IStorage {
     const allItems = await this.storageArea.get(null)
     const activeKeys: string[] = []
     
-    for (const key of Object.keys(allItems)) {
-      const val = await this.get(key)
-      if (val !== undefined) {
+    for (const [key, raw] of Object.entries(allItems)) {
+      if (raw === undefined || raw === null) continue
+    
+      try {
+        if (isCacheItem(raw) && isExpired(raw)) {
+          await this.delete(key)
+          continue
+        }
+        activeKeys.push(key)
+      } catch {
+        // If parsing fails, consider it an active key (not a cache item)
         activeKeys.push(key)
       }
     }
+
     return activeKeys
   }
 

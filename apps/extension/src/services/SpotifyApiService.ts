@@ -1,5 +1,5 @@
 import { SpotifyApiClient } from '@melledijkstra/api'
-import { MemoryCache, MIN_5 } from '@melledijkstra/storage'
+import { MemoryCache, minutes } from '@melledijkstra/storage'
 import type { AuthClient } from '@melledijkstra/extension'
 import type { Playlist, Track } from 'MusicPlayer'
 import { convertSpotifyPlaylist, convertSpotifyTrackToMPTrack, convertApiPlaybackState } from '@/transforms/spotify'
@@ -27,7 +27,7 @@ export class SpotifyApiService {
     try {
       const playlists = await this.api.userPlaylists()
       const converted = playlists.map(convertSpotifyPlaylist)
-      await this.cache.set('playlists', converted, MIN_5)
+      await this.cache.set('playlists', converted, minutes(5))
       return converted
     }
     catch (error) {

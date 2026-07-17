@@ -1,14 +1,7 @@
 import { Logger } from '@melledijkstra/toolbox'
-import { IStorage, CacheItem } from './storage.interface'
-
-// Default TTL Times (Time To Live)
-export const SEC_30 = 30 * 1000
-export const MIN_1 = 1 * 60 * 1000
-export const MIN_3 = 3 * 60 * 1000
-export const MIN_5 = 5 * 60 * 1000
-export const MIN_10 = 10 * 60 * 1000
-export const MIN_15 = 15 * 60 * 1000
-
+import { IStorage } from './storage.interface'
+import type { CacheItem } from './types'
+import { isExpired } from './utils'
 
 export async function get<T>(key: string): Promise<T | undefined> {
   return globalMemoryCache.get<T>(key)
@@ -63,7 +56,7 @@ export class MemoryCache implements IStorage {
       return
     }
 
-    if (Date.now() - cachedItem.timestamp > cachedItem.ttl) {
+    if (isExpired(cachedItem)) {
       delete this._cache[key]
     }
     else {
@@ -108,11 +101,7 @@ export class MemoryCache implements IStorage {
       return false
     }
 
-    if (this.isExpired(key)) {
-      return false
-    }
-
-    if (Date.now() - cachedItem.timestamp > cachedItem.ttl) {
+    if (isExpired(cachedItem)) {
       delete this._cache[key]
       return false
     }
