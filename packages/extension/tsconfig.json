@@ -11,6 +11,5 @@
     "dist",
     "node_modules",
     ".turbo",
-    "test-setup.ts",
   ]
 }
