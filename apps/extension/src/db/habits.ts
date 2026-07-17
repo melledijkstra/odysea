@@ -1,5 +1,5 @@
 import { storeInDB, getAllItems, updateInDB, deleteInDB } from '@/db'
-import { type IRepositoryAdapter } from '@melledijkstra/storage'
+import { type IRepositoryAdapter, type Insertable } from '@melledijkstra/storage'
 
 const DB_NAME = 'habits' as const
 
@@ -19,7 +19,7 @@ class HabitsRepository implements IRepositoryAdapter<Habit> {
     return await getAllItems(DB_NAME)
   }
 
-  async add(habit: Omit<Habit, 'id'>): Promise<Habit> {
+  async add(habit: Insertable<Habit>): Promise<Habit> {
     const habitWithMeta = {
       ...habit,
       createdAt: new Date(),

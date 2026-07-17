@@ -1,0 +1,22 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@hono/hono@^4.7.11": "4.12.23"
+  },
+  "jsr": {
+    "@hono/hono@4.12.23": {
+      "integrity": "9d9f3da498f69c311b5f92d973eb3b8ebc973b5fd2b4972781b556e07818a745"
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@hono/hono@^4.7.11"
+    ],
+    "packageJson": {
+      "dependencies": [
+        "npm:@jsr/hono__hono@^4.7.11",
+        "npm:deno@^2.4.0"
+      ]
+    }
+  }
+}

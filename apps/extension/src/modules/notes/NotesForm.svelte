@@ -2,14 +2,15 @@
   import Button from '@/components/atoms/Button.svelte'
   import Input from '@/components/atoms/Input.svelte'
   import type { Note } from '@/db/notes'
+  import type { Insertable } from '@melledijkstra/storage'
 
-  const { onSubmitNote }: { onSubmitNote: (note: Omit<Note, 'id' | 'createdAt'>) => void } = $props()
+  const { onSubmitNote }: { onSubmitNote: (note: Insertable<Note>) => void } = $props()
 
   let inputTitle = $state('')
   let inputText = $state('')
 
   function onClick() {
-    const note = {
+    const note: Insertable<Note> = {
       title: inputTitle,
       text: inputText,
     }

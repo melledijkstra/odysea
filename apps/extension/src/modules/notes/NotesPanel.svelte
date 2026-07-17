@@ -4,10 +4,11 @@
   import PopPanel from '@/components/atoms/PopPanel.svelte'
   import type { Note } from '@/db/notes'
   import { NotesController } from './NotesController'
+  import type { Insertable } from '@melledijkstra/storage'
 
   const controller = new NotesController(notes)
 
-  function onSubmitNote(note: Note) {
+  function onSubmitNote(note: Insertable<Note>) {
     controller.addNote(note)
   }
 </script>

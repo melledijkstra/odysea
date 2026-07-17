@@ -1,4 +1,4 @@
-import { type IRepositoryAdapter, type Identifiable } from '@melledijkstra/storage'
+import { type IRepositoryAdapter, type Identifiable, type Insertable } from '@melledijkstra/storage'
 
 export class DbStore<T extends Identifiable> {
   private readonly adapter: IRepositoryAdapter<T>
@@ -17,7 +17,7 @@ export class DbStore<T extends Identifiable> {
     this._items = await this.adapter.getAll()
   }
 
-  async add(item: Omit<T, 'id'>) {
+  async add(item: Insertable<T>) {
     const createdItem = await this.adapter.add(item)
     this._items.push(createdItem)
   }

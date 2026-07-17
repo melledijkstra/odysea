@@ -14,6 +14,11 @@ console.log('Trying to authenticate...')
 
 const authUrl = await authClient.createAuthUrl()
 
+if (!authUrl) {
+  console.error('Failed to create auth URL')
+  process.exit(1)
+}
+
 console.log(authUrl.href)
 
 const server = createServer(async (req, res) => {
@@ -23,6 +28,12 @@ const server = createServer(async (req, res) => {
   if (requestUrl?.pathname === '/oauth/callback') {
     const code = requestUrl.searchParams.get('code')!
     const state = requestUrl.searchParams.get('state')
+
+    if (!state) {
+      res.statusCode = 400
+      res.end('Missing state parameter')
+      return
+    }
 
     try {
       // 5. Exchange Code for Tokens

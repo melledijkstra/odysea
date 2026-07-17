@@ -8,17 +8,16 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "start": "turbo run start",
     "test": "vitest",
     "test:e2e": "turbo run test:e2e",
     "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
     "extension": "pnpm --filter=@odysea/extension run",
     "server": "pnpm --filter=@odysea/server run",
     "serverless": "pnpm --filter=@odysea/serverless run",
     "packages": "pnpm --filter=@melledijkstra/* run",
     "cli": "pnpm --filter=@odysea/cli run",
     "storybook:build": "pnpm --filter=@odysea/extension run storybook:build",
-    "typecheck": "tsc --noEmit",
     "local:ci": "pnpm build && pnpm lint && CI=true pnpm test && pnpm test:e2e",
     "cleanup": "rm -rf .turbo node_modules && rm -fr apps/*/node_modules && pnpm cache delete"
   },

@@ -10,7 +10,8 @@
     "./*": "./*"
   },
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "globals": "^17.7.0"

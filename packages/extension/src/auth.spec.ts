@@ -11,6 +11,7 @@ describe('Extension AuthClient', () => {
       clientId: 'test-client-id',
       tokenEndpoint: 'https://oauth2.googleapis.com/token',
       scopes: ['openid', 'profile', 'email'],
+      clientSecret: 'test-client-secret',
     }
     const authClient = new AuthClient(provider)
     expect(authClient).toBeInstanceOf(AuthClient)

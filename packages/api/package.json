@@ -20,6 +20,7 @@
     "dev": "tsdown --watch",
     "build": "tsdown",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "example": "cd examples && tsx"
   },
   "dependencies": {

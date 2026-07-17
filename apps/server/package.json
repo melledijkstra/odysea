@@ -9,6 +9,7 @@
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "migrate": "tsx scripts/migrate --knexfile ./knexfile.ts migrate:latest"
   },
   "dependencies": {

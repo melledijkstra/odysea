@@ -3,8 +3,9 @@
   import Input from '@/components/atoms/Input.svelte'
   import Button from '@/components/atoms/Button.svelte'
   import type { Habit } from '@/db/habits'
+  import type { Insertable } from '@melledijkstra/storage'
 
-  const newHabit = $state<Habit & { id?: string }>({
+  const newHabit = $state<Insertable<Habit> & { id?: string }>({
     name: '',
     color: '#000000',
     goal: 0,
@@ -61,7 +62,7 @@
 <form onsubmit={(event) => {
   event.preventDefault()
   if (newHabit?.id) {
-    habits.update(newHabit as Habit & { id: string })
+    habits.update(newHabit as Habit)
   }
   else {
     habits.add(newHabit)

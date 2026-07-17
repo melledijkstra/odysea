@@ -1,5 +1,5 @@
 import { storeInDB, getAllItems, updateInDB, deleteInDB } from '@/db'
-import { type IRepositoryAdapter } from '@melledijkstra/storage'
+import { type IRepositoryAdapter, type Insertable } from '@melledijkstra/storage'
 
 export const DB_NAME = 'notes' as const
 
@@ -16,7 +16,7 @@ class NotesRepository implements IRepositoryAdapter<Note> {
     return await getAllItems(DB_NAME)
   }
 
-  async add(note: Omit<Note, 'id'>): Promise<Note> {
+  async add(note: Insertable<Note>): Promise<Note> {
     const noteWithMeta = {
       ...note,
       createdAt: new Date(),

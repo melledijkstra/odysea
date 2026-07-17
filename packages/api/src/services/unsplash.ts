@@ -1,9 +1,9 @@
-import { Logger, ILogger } from '@melledijkstra/toolbox'
+import { Logger } from '@melledijkstra/toolbox'
 import type { UnsplashResponse } from '../definitions/unsplash'
 
 const ENDPOINT = '/api/daily-image'
 
-export class UnsplashClient implements ILogger {
+export class UnsplashClient {
   public logger: Logger = new Logger('UnsplashClient')
   private HOST: string
   public query?: string
