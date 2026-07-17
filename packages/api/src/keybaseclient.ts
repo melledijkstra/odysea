@@ -1,12 +1,12 @@
 import { BaseClient } from './baseclient'
 
 export class ApiKeyBaseClient extends BaseClient {
-  protected apiKey: string | (() => string)
+  protected apiKey: string | (() => string | undefined) | undefined
   protected urlQueryKeyName = 'key'
 
   constructor(
     baseUrl: string,
-    apiKey: string | (() => string),
+    apiKey: string | (() => string | undefined) | undefined,
   ) {
     super(baseUrl)
 
@@ -34,11 +34,11 @@ export class ApiKeyBaseClient extends BaseClient {
     return super.request(endpoint, config, searchParams)
   }
 
-  getApiKey(): string {
+  getApiKey(): string | undefined {
     return typeof this.apiKey === 'function' ? this.apiKey() : this.apiKey
   }
 
-  setApiKey(token: string | (() => string)) {
+  setApiKey(token: string | (() => string | undefined)) {
     this.apiKey = token
   }
 }

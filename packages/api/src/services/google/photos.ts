@@ -56,7 +56,8 @@ export class GooglePhotosApiClient extends TokenBaseClient {
     super('https://photoslibrary.googleapis.com', () => auth.getAuthToken())
   }
 
-  async fetchPhotos(): Promise<Array<MediaItem> | undefined> {
-    return this.request('/v1/mediaItems')
+  async fetchPhotos(): Promise<MediaItem[] | undefined> {
+    const response = await this.request<{ mediaItems: MediaItem[] }>('/v1/mediaItems')
+    return response?.mediaItems
   }
 }
