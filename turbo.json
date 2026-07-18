@@ -32,6 +32,10 @@
     "typecheck": {
       "dependsOn": ["^build", "^typecheck"]
     },
+    "//#format": {},
+    "//#format:fix": {
+      "cache": false
+    },
     "test": {
       "dependsOn": [],
       "outputs": ["coverage/**"]

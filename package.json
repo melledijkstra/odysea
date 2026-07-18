@@ -5,12 +5,15 @@
   "description": "A personal ecosystem",
   "author": "Melle Dijkstra",
   "license": "GPL-3.0-only",
+  "type": "module",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
     "test": "vitest",
     "test:e2e": "turbo run test:e2e",
     "lint": "turbo run lint",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
     "typecheck": "turbo run typecheck",
     "extension": "pnpm --filter=@odysea/extension run",
     "server": "pnpm --filter=@odysea/server run",
@@ -18,7 +21,7 @@
     "packages": "pnpm --filter=@melledijkstra/* run",
     "cli": "pnpm --filter=@odysea/cli run",
     "storybook:build": "pnpm --filter=@odysea/extension run storybook:build",
-    "local:ci": "pnpm build && pnpm lint && CI=true pnpm test && pnpm test:e2e",
+    "local:ci": "pnpm build && pnpm lint && pnpm format:check && CI=true pnpm test && pnpm test:e2e",
     "cleanup": "rm -rf .turbo node_modules && rm -fr apps/*/node_modules && pnpm cache delete"
   },
   "engines": {
@@ -28,7 +31,10 @@
     "tsdown": "^0.22.8",
     "turbo": "^2.10.5",
     "vitest": "^4.1.10",
-    "@melledijkstra/config": "workspace:*"
+    "@melledijkstra/config": "workspace:*",
+    "prettier": "catalog:",
+    "prettier-plugin-tailwindcss": "catalog:",
+    "prettier-plugin-svelte": "catalog:"
   },
   "repository": {
     "type": "git",

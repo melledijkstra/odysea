@@ -14,13 +14,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "globals": "^17.7.0"
+    "globals": "^17.7.0",
+    "eslint-config-prettier": "catalog:"
   },
   "devDependencies": {
     "@eslint/css": "^1.4.0",
     "@eslint/js": "^9.39.4",
     "@eslint/json": "^2.0.1",
-    "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "catalog:",
     "@typescript-eslint/parser": "^8.63.0",
     "eslint": "catalog:",
@@ -30,5 +30,10 @@
     "svelte-eslint-parser": "^1.8.0",
     "typescript": "catalog:",
     "typescript-eslint": "^8.63.0"
+  },
+  "peerDependencies": {
+    "prettier": "catalog:",
+    "prettier-plugin-svelte": "catalog:",
+    "prettier-plugin-tailwindcss": "catalog:"
   }
 }
