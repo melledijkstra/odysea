@@ -1,5 +1,9 @@
 import * as browser from 'webextension-polyfill'
-import { AuthConfig, AuthClient as BaseAuthClient, AuthFlowHandler } from '@melledijkstra/auth'
+import {
+  AuthConfig,
+  AuthClient as BaseAuthClient,
+  AuthFlowHandler,
+} from '@melledijkstra/auth'
 import { ExtensionStorage } from './storage'
 
 class ExtensionAuthFlowHandler implements AuthFlowHandler {
@@ -30,17 +34,18 @@ export class AuthClient extends BaseAuthClient {
     const token = await this.getAuthTokenChrome(false)
     if (token) {
       try {
-        const response = await fetch(`https://oauth2.googleapis.com/revoke?token=${token}`, {
-          method: 'POST',
-        })
+        const response = await fetch(
+          `https://oauth2.googleapis.com/revoke?token=${token}`,
+          {
+            method: 'POST',
+          }
+        )
         if (response.ok) {
           this._logger.log('revoked token')
-        }
-        else {
+        } else {
           this._logger.error('failed to revoke token', response)
         }
-      }
-      catch (error) {
+      } catch (error) {
         this._logger.error('failed to revoke token', error)
       }
     }
@@ -50,14 +55,22 @@ export class AuthClient extends BaseAuthClient {
   }
 
   async getAuthToken(interactive = false): Promise<string | undefined> {
-    if (this.provider.name === 'google' && typeof chrome !== 'undefined' && chrome.identity) {
+    if (
+      this.provider.name === 'google' &&
+      typeof chrome !== 'undefined' &&
+      chrome.identity
+    ) {
       try {
-        this._logger.debug('trying to retrieve oauth token using build in functionality')
+        this._logger.debug(
+          'trying to retrieve oauth token using build in functionality'
+        )
         const token = await this.getAuthTokenChrome(interactive)
         if (token) return token
-      }
-      catch (error) {
-        this._logger.warn(`${this.provider.name}: No luck retrieving oauth token using build in functionality, trying manually`, error)
+      } catch (error) {
+        this._logger.warn(
+          `${this.provider.name}: No luck retrieving oauth token using build in functionality, trying manually`,
+          error
+        )
       }
     }
 
@@ -66,7 +79,11 @@ export class AuthClient extends BaseAuthClient {
 
   async deauthenticate(): Promise<boolean> {
     this._logger.log('deauthenticating')
-    if (this.provider.name === 'google' && typeof chrome !== 'undefined' && chrome.identity) {
+    if (
+      this.provider.name === 'google' &&
+      typeof chrome !== 'undefined' &&
+      chrome.identity
+    ) {
       return await this.deauthenticateChrome()
     }
     return super.deauthenticate()

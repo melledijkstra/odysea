@@ -1,4 +1,14 @@
-import { calculateRemainingDays, formatSeconds, getBrowserLocale, getTime, getTimePercentage, millisecondsToTime, playbackLoop, renderTimezone, repeatEvery } from './utils'
+import {
+  calculateRemainingDays,
+  formatSeconds,
+  getBrowserLocale,
+  getTime,
+  getTimePercentage,
+  millisecondsToTime,
+  playbackLoop,
+  renderTimezone,
+  repeatEvery,
+} from './utils'
 
 class FakeNavigator {
   language = 'nl-NL'
@@ -47,8 +57,7 @@ describe('Time Utilities', () => {
       expect(callback).toHaveBeenCalledTimes(1)
 
       // run 2 more times
-      vi.advanceTimersToNextTimer()
-        .advanceTimersToNextTimer()
+      vi.advanceTimersToNextTimer().advanceTimersToNextTimer()
 
       expect(callback).toHaveBeenCalledTimes(3)
 

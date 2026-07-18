@@ -49,6 +49,9 @@
 
 <Story name="Default" />
 
-<Story name="No notes" args={{
-  notes: [],
-}} />
+<Story
+  name="No notes"
+  args={{
+    notes: [],
+  }}
+/>

@@ -16,14 +16,20 @@
 
 <Story name="Default" />
 
-<Story name="Fahrenheit" args={{
-  temperatureF: 59,
-  displayUnit: 'F',
-}} />
+<Story
+  name="Fahrenheit"
+  args={{
+    temperatureF: 59,
+    displayUnit: 'F',
+  }}
+/>
 
-<Story name="Long city name" args={{
-  iconId: '01d',
-  location: 'Winchester-on-the-Severn, Maryland',
-  temperatureF: 79,
-  displayUnit: 'F',
-}} />
+<Story
+  name="Long city name"
+  args={{
+    iconId: '01d',
+    location: 'Winchester-on-the-Severn, Maryland',
+    temperatureF: 79,
+    displayUnit: 'F',
+  }}
+/>

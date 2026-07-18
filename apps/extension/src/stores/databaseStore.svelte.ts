@@ -1,4 +1,8 @@
-import { type IRepositoryAdapter, type Identifiable, type Insertable } from '@melledijkstra/storage'
+import {
+  type IRepositoryAdapter,
+  type Identifiable,
+  type Insertable,
+} from '@melledijkstra/storage'
 
 export class DbStore<T extends Identifiable> {
   private readonly adapter: IRepositoryAdapter<T>
@@ -24,7 +28,7 @@ export class DbStore<T extends Identifiable> {
 
   async remove(id: string) {
     await this.adapter.delete(id)
-    const index = this._items.findIndex(item => item.id === id)
+    const index = this._items.findIndex((item) => item.id === id)
     if (index !== -1) {
       this._items.splice(index, 1)
     }
@@ -32,7 +36,7 @@ export class DbStore<T extends Identifiable> {
 
   async update(updatedItem: T) {
     await this.adapter.update(updatedItem)
-    const index = this._items.findIndex(item => item.id === updatedItem.id)
+    const index = this._items.findIndex((item) => item.id === updatedItem.id)
     if (index !== -1) {
       this._items[index] = updatedItem
     }

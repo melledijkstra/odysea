@@ -82,9 +82,7 @@ export type Track = {
     artists: Artist[]
   }
   artists: Artist[]
-  available_markets: [
-    string,
-  ]
+  available_markets: [string]
   disc_number: number
   duration_ms: number
   explicit: boolean

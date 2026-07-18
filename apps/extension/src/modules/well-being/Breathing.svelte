@@ -15,7 +15,7 @@
   const timer = $state(
     new Timer({
       duration: DURATION,
-    }),
+    })
   )
   let timeLeft = $state(millisecondsToTime(DURATION))
   let counter = $state(1)
@@ -27,13 +27,12 @@
     })
 
     if (
-      (exhaling && counter >= 7) // exhale for 7 ticks (seconds)
-      || (inhaling && counter >= 6) // inhale for 5 ticks (seconds)
+      (exhaling && counter >= 7) || // exhale for 7 ticks (seconds)
+      (inhaling && counter >= 6) // inhale for 5 ticks (seconds)
     ) {
       breatheState = !breatheState
       counter = 1
-    }
-    else {
+    } else {
       counter++
     }
 
@@ -62,18 +61,6 @@
   })
 </script>
 
-<style>
-  .inhaling {
-    scale: 150%;
-    transition-duration: 6s;
-  }
-
-  .exhaling {
-    scale: 100%;
-    transition-duration: 7s;
-  }
-</style>
-
 <div class="flex flex-col gap justify-center items-center">
   <button
     onclick={!active ? start : stop}
@@ -94,3 +81,15 @@
     <span>{timeLeft}</span>
   </button>
 </div>
+
+<style>
+  .inhaling {
+    scale: 150%;
+    transition-duration: 6s;
+  }
+
+  .exhaling {
+    scale: 100%;
+    transition-duration: 7s;
+  }
+</style>

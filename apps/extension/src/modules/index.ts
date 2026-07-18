@@ -66,7 +66,7 @@ function isValidModule(module: unknown): module is Module {
 const loadedModules = new Map<ModuleID, Module>()
 
 export async function loadModule(id: ModuleID): Promise<Module> {
-  const module = MODULE_CONFIG.find(m => m.id === id)
+  const module = MODULE_CONFIG.find((m) => m.id === id)
 
   if (!module) {
     throw new Error(`Module ${id} not found`)
@@ -82,7 +82,7 @@ export async function loadModule(id: ModuleID): Promise<Module> {
 
   if (!isValidModule(loadedModule.default)) {
     throw new Error(
-      `Loaded module "${id}" does not conform to the Module interface`,
+      `Loaded module "${id}" does not conform to the Module interface`
     )
   }
 

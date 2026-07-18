@@ -25,7 +25,7 @@ export default defineConfig([
           ts: tsParser,
         },
         // Automatically searches for the nearest tsconfig.json
-        // !NOTICE: Set to false to disable type checked linting 
+        // !NOTICE: Set to false to disable type checked linting
         // which slows down significantly
         projectService: false,
         // orient from where the ESLint command is run, not where this config file is located

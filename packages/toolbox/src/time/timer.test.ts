@@ -145,7 +145,12 @@ describe('Timer', () => {
     it('should stop the timer', () => {
       const onTick = vi.fn()
       const onStop = vi.fn()
-      const timer = new Timer({ duration: 5000, onTick, onStop, interval: 1000 })
+      const timer = new Timer({
+        duration: 5000,
+        onTick,
+        onStop,
+        interval: 1000,
+      })
 
       timer.start()
       vi.advanceTimersToNextTimer()

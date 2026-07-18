@@ -36,7 +36,9 @@ describe('sha256', () => {
 describe('base64encode', () => {
   it('should base64url encode an ArrayBuffer', () => {
     // 'hello world' in ascii
-    const input = new Uint8Array([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100])
+    const input = new Uint8Array([
+      104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100,
+    ])
     const result = base64encode(input.buffer)
     // base64 for 'hello world' is 'aGVsbG8gd29ybGQ='
     // base64url should strip '=' and replace +/

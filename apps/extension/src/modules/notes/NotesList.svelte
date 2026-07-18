@@ -23,9 +23,14 @@
     <ul class="dark:text-white h-full overflow-y-auto">
       {#each notes as note (note.id)}
         <li class="flex flex-col gap-2">
-          <button onclick={() => onSelectNote(note)} class="cursor-pointer text-left">
+          <button
+            onclick={() => onSelectNote(note)}
+            class="cursor-pointer text-left"
+          >
             <p class="text-base">{note.title}</p>
-            <span class="text-xs text-gray-500">{formatDate(note.createdAt)}</span>
+            <span class="text-xs text-gray-500"
+              >{formatDate(note.createdAt)}</span
+            >
           </button>
         </li>
       {/each}

@@ -20,12 +20,18 @@
 
 <Story name="Default" />
 
-<Story name="Without active device" args={{
-  devices: devices.map(device => ({ ...device, is_active: false })),
-}}/>
+<Story
+  name="Without active device"
+  args={{
+    devices: devices.map((device) => ({ ...device, is_active: false })),
+  }}
+/>
 
-<Story name="With SDK Version" args={{
-  devices,
-  playerDeviceId: devices[0]?.id,
-  sdkVersion: '4.32.2-fake23',
-}}/>
+<Story
+  name="With SDK Version"
+  args={{
+    devices,
+    playerDeviceId: devices[0]?.id,
+    sdkVersion: '4.32.2-fake23',
+  }}
+/>

@@ -15,11 +15,11 @@
   --shadow-center: 0 0 40px current-color;
 
   /* COLORS */
-  --color-primary: #4285F4;
+  --color-primary: #4285f4;
   /* - Brands - */
-  --color-spotify: #1DB954;
-  --color-google: #4285F4;
-  --color-fitbit: #3DB6B8;
+  --color-spotify: #1db954;
+  --color-google: #4285f4;
+  --color-fitbit: #3db6b8;
 
   --animate-fade-in: fadeIn 0.5s ease-in;
   @keyframes fadeIn {
@@ -49,12 +49,12 @@ body {
 @layer components {
   /* these styles are shared between the context menu and the dropdown menu */
   .menu {
-    @apply dark:bg-black/90 rounded-lg z-50 py-2;
+    @apply z-50 rounded-lg py-2 dark:bg-black/90;
   }
   .menu-group-heading {
-    @apply dark:text-gray-400 text-xs font-bold px-2;
+    @apply px-2 text-xs font-bold dark:text-gray-400;
   }
   .menu-item {
-    @apply dark:text-white cursor-pointer focus:bg-gray-800 px-2 py-1 text-xs select-none;
+    @apply cursor-pointer px-2 py-1 text-xs select-none focus:bg-gray-800 dark:text-white;
   }
 }

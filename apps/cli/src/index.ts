@@ -5,10 +5,7 @@ import { startInteractive } from './interactive'
 
 const program = new Commander()
 
-program
-  .name('odysea')
-  .description('Odysea CLI tool')
-  .version('0.0.1')
+program.name('odysea').description('Odysea CLI tool').version('0.0.1')
 
 // Register all commands to commander
 for (const cmd of commands) {
@@ -27,7 +24,6 @@ for (const cmd of commands) {
 if (process.argv.length <= 2) {
   // If run with no arguments, default to interactive mode
   await startInteractive()
-}
-else {
+} else {
   program.parse(process.argv)
 }

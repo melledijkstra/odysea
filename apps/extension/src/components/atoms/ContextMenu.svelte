@@ -33,7 +33,8 @@
     <ContextMenu.Content {...contentProps} class="menu">
       <ContextMenu.Group class="flex flex-col gap-1">
         {#if heading}
-          <ContextMenu.GroupHeading class="dark:text-gray-400 text-xs font-bold px-2"
+          <ContextMenu.GroupHeading
+            class="dark:text-gray-400 text-xs font-bold px-2"
             >{heading}</ContextMenu.GroupHeading
           >
         {/if}

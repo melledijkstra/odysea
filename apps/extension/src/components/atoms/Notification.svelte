@@ -13,7 +13,8 @@
     onDismiss?: () => void
   }
 
-  const { message, type, title, icon, onDismiss, duration }: NotiticationProps = $props()
+  const { message, type, title, icon, onDismiss, duration }: NotiticationProps =
+    $props()
 
   const finalIcon = $derived.by(() => {
     if (icon) return icon
@@ -40,9 +41,13 @@
     />
     <div class="flex-1">
       {#if title}
-        <strong class="font-medium text-gray-900 dark:text-white">{title}</strong>
+        <strong class="font-medium text-gray-900 dark:text-white"
+          >{title}</strong
+        >
       {/if}
-      <p class="mt-0.5 text-sm text-gray-700 dark:text-gray-200 break-words">{message}</p>
+      <p class="mt-0.5 text-sm text-gray-700 dark:text-gray-200 break-words">
+        {message}
+      </p>
     </div>
 
     <button
@@ -59,13 +64,18 @@
     </button>
 
     {#if duration}
-      <hr class={[
-        'h-1 duration-indicator border-none p-0 m-0 outline-none',
-        'absolute bottom-0 left-0',
-        type === 'success'
-          ? 'bg-green-600'
-          : type === 'error' ? 'bg-red-600' : 'bg-blue-600',
-      ]} style="--progress-duration: {duration}ms" />
+      <hr
+        class={[
+          'h-1 duration-indicator border-none p-0 m-0 outline-none',
+          'absolute bottom-0 left-0',
+          type === 'success'
+            ? 'bg-green-600'
+            : type === 'error'
+              ? 'bg-red-600'
+              : 'bg-blue-600',
+        ]}
+        style="--progress-duration: {duration}ms"
+      />
     {/if}
   </div>
 </div>

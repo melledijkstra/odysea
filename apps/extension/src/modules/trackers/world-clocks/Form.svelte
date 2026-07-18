@@ -34,7 +34,7 @@
       id="timezone-select"
       required
       bind:value={inputTimezone}
-      options={Intl.supportedValuesOf('timeZone').map(tz => ({
+      options={Intl.supportedValuesOf('timeZone').map((tz) => ({
         value: tz,
         label: tz.replace(/_/g, ' '),
       }))}
@@ -51,10 +51,7 @@
     />
     <Toggle bind:checked={inputPinned} label="Pin to Top Bar" />
   </div>
-  <Button
-    class="w-full justify-center mt-2"
-    type="submit"
-  >
+  <Button class="w-full justify-center mt-2" type="submit">
     <Icon size={18} path={mdiClockPlusOutline} class="mr-2" /> Add Clock
   </Button>
 </form>

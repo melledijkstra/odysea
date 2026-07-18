@@ -29,4 +29,7 @@
 
 <Story name="Google (disabled)" args={{ provider: 'google', disabled: true }} />
 <Story name="Fitbit (disabled)" args={{ provider: 'fitbit', disabled: true }} />
-<Story name="Spotify (disabled)" args={{ provider: 'spotify', disabled: true }} />
+<Story
+  name="Spotify (disabled)"
+  args={{ provider: 'spotify', disabled: true }}
+/>

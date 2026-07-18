@@ -1,27 +1,26 @@
 import { BaseClient } from './baseclient'
 
-export type TokenProvider = string | (() => string | Promise<string | undefined>)
+export type TokenProvider =
+  string | (() => string | Promise<string | undefined>)
 
 export class TokenBaseClient extends BaseClient {
   protected token: TokenProvider
 
-  constructor(
-    baseUrl: string,
-    token: TokenProvider,
-  ) {
+  constructor(baseUrl: string, token: TokenProvider) {
     super(baseUrl)
 
     this.token = token
 
     if (this.constructor === TokenBaseClient) {
       throw new Error(
-        'TokenBaseClient is abstract and cannot be instantiated directly.',
+        'TokenBaseClient is abstract and cannot be instantiated directly.'
       )
     }
   }
 
   async _getHeaders(): Promise<HeadersInit> {
-    const token = typeof this.token === 'function' ? await this.token() : this.token
+    const token =
+      typeof this.token === 'function' ? await this.token() : this.token
     const baseHeaders = await super._getHeaders()
 
     if (!token) {

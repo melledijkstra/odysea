@@ -14,7 +14,9 @@
       return classProp.includes('text-') || classProp.includes('bg-')
     }
     if (Array.isArray(classProp)) {
-      return classProp.some(cls => cls.includes('text-') || cls.includes('bg-'))
+      return classProp.some(
+        (cls) => cls.includes('text-') || cls.includes('bg-')
+      )
     }
     return false
   }
@@ -26,10 +28,11 @@
   {...props}
   class={[
     props.class,
-    !hasColor && 'dark:text-white/70 dark:hover:text-white text-zinc-500 hover:text-zinc-700',
+    !hasColor &&
+      'dark:text-white/70 dark:hover:text-white text-zinc-500 hover:text-zinc-700',
     'disabled:opacity-50 disabled:cursor-not-allowed',
     'block cursor-pointer transition-colors',
   ]}
 >
-  <Icon path={icon} size={size} />
+  <Icon path={icon} {size} />
 </button>

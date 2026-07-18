@@ -1,10 +1,7 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements'
 
-  const {
-    children,
-    ...props
-  }: HTMLButtonAttributes = $props()
+  const { children, ...props }: HTMLButtonAttributes = $props()
 </script>
 
 <button

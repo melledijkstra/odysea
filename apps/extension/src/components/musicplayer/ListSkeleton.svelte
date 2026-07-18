@@ -3,10 +3,7 @@
   const items = $derived(new Array(amount).fill(0))
 </script>
 
-<div
-  role="status"
-  class="max-w-md"
->
+<div role="status" class="max-w-md">
   <!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
   {#each items as _, i (i)}
     <div class="flex flex-row w-full items-center p-2 rounded-sm">
@@ -25,6 +22,6 @@
   @reference '../../app.css';
 
   .mask {
-    @apply animate-pulse bg-gray-300 dark:bg-gray-600 rounded;
+    @apply animate-pulse rounded bg-gray-300 dark:bg-gray-600;
   }
 </style>

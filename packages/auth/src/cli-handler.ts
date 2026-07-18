@@ -15,8 +15,7 @@ export class CliAuthFlowHandler implements AuthFlowHandler {
     try {
       const answer = await rl.question('\nPaste the redirect URL here: ')
       return new URL(answer.trim())
-    }
-    finally {
+    } finally {
       rl.close()
     }
   }

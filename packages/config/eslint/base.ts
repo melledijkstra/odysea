@@ -3,8 +3,8 @@ import { globalIgnores, defineConfig } from 'eslint/config'
 import ts from 'typescript-eslint'
 // import json from '@eslint/json'
 // import css from '@eslint/css'
-// import stylistic from '@stylistic/eslint-plugin'
 import turboPlugin from 'eslint-plugin-turbo'
+import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default defineConfig([
   globalIgnores([
@@ -18,7 +18,7 @@ export default defineConfig([
   ]),
   js.configs.recommended,
   ts.configs.recommended,
-  // stylistic.configs.recommended,
+  eslintConfigPrettier,
   {
     name: 'TypeScript Project Configuration',
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],

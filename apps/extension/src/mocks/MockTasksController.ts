@@ -24,11 +24,11 @@ export class MockTasksController implements TaskControllerInterface {
   }
 
   getTask(taskId: string): Task | undefined {
-    return this.state.tasks.find(task => task.id === taskId)
+    return this.state.tasks.find((task) => task.id === taskId)
   }
 
   async setTaskStatus(taskId: string, status: boolean): Promise<boolean> {
-    const idx = this.state.tasks.findIndex(task => task.id === taskId)
+    const idx = this.state.tasks.findIndex((task) => task.id === taskId)
     const updatedTask: Task = {
       ...this.state.tasks[idx],
       status: status ? 'completed' : 'needsAction',
@@ -40,7 +40,7 @@ export class MockTasksController implements TaskControllerInterface {
   }
 
   async deleteTask(taskId: string): Promise<boolean> {
-    const idx = this.state.tasks.findIndex(task => task.id === taskId)
+    const idx = this.state.tasks.findIndex((task) => task.id === taskId)
     if (idx !== -1) {
       this.state.tasks.splice(idx, 1)
     }
@@ -48,7 +48,7 @@ export class MockTasksController implements TaskControllerInterface {
   }
 
   async updateTask(editedTask: Task): Promise<boolean> {
-    const idx = this.state.tasks.findIndex(task => task.id === editedTask.id)
+    const idx = this.state.tasks.findIndex((task) => task.id === editedTask.id)
     if (idx !== -1) {
       this.state.tasks[idx] = editedTask
     }

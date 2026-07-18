@@ -18,7 +18,7 @@ describe('WebLocalStorage', () => {
     key: vi.fn((index: number) => Object.keys(store)[index] ?? null),
     get length() {
       return Object.keys(store).length
-    }
+    },
   }
 
   beforeEach(() => {
@@ -31,7 +31,7 @@ describe('WebLocalStorage', () => {
   it('should set and get values wrapped with TTL', async () => {
     const storage = new WebLocalStorage()
     await storage.set('foo', { a: 1 })
-    
+
     // Check it's storing in localStorage as a stringified CacheItem
     const rawStored = JSON.parse(store['foo'])
     expect(rawStored).toHaveProperty('data', { a: 1 })
@@ -53,12 +53,12 @@ describe('WebLocalStorage', () => {
     vi.useFakeTimers()
     const storage = new WebLocalStorage()
     await storage.set('foo', 'bar', 1000) // TTL 1 second
-    
+
     vi.advanceTimersByTime(2000)
-    
+
     expect(await storage.get('foo')).toBeUndefined()
     expect(localStorageMock.removeItem).toHaveBeenCalledWith('foo')
-    
+
     vi.useRealTimers()
   })
 
@@ -77,12 +77,12 @@ describe('WebLocalStorage', () => {
     expect(await storage.get('foo')).toBeUndefined()
     expect(localStorageMock.clear).toHaveBeenCalled()
   })
-  
+
   it('should report keys and size correctly', async () => {
     const storage = new WebLocalStorage()
     await storage.set('a', 1)
     await storage.set('b', 2)
-    
+
     expect(await storage.has('a')).toBe(true)
     expect(await storage.keys()).toEqual(['a', 'b'])
     expect(await storage.size()).toBe(2)

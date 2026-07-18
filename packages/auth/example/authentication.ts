@@ -42,17 +42,17 @@ const server = createServer(async (req, res) => {
       console.log('\nSUCCESS! Save these credentials safely:')
       console.log('-----------------------------------------')
       console.log(`ACCESS_TOKEN: ${tokens.accessToken()}`)
-      console.log(`REFRESH_TOKEN: ${tokens.hasRefreshToken() ? tokens.refreshToken() : 'N/A'}`)
+      console.log(
+        `REFRESH_TOKEN: ${tokens.hasRefreshToken() ? tokens.refreshToken() : 'N/A'}`
+      )
       console.log('-----------------------------------------')
       console.log('data: ', tokens.data)
 
       res.end('Authentication successful! You can close this tab.')
-    }
-    catch (e) {
+    } catch (e) {
       console.error(e)
       res.end('Authentication failed.')
-    }
-    finally {
+    } finally {
       server.close()
       process.exit(0)
     }

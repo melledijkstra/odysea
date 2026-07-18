@@ -13,10 +13,12 @@
 
 <Tooltip disabled={!tooltip} triggerProps={props}>
   {#snippet trigger()}
-    <button class={[
-      'text-white/70 hover:text-white',
-      'block cursor-pointer transition-colors',
-    ]}>
+    <button
+      class={[
+        'text-white/70 hover:text-white',
+        'block cursor-pointer transition-colors',
+      ]}
+    >
       <Icon path={mdiIcon} size={36} />
     </button>
   {/snippet}

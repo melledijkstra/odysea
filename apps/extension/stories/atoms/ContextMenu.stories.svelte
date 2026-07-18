@@ -1,16 +1,16 @@
 <script module lang="ts">
-  import { defineMeta } from "@storybook/addon-svelte-csf";
-  import ContextMenu from "@/components/atoms/ContextMenu.svelte";
+  import { defineMeta } from '@storybook/addon-svelte-csf'
+  import ContextMenu from '@/components/atoms/ContextMenu.svelte'
 
   // set this to true to keep the menu open during development
-  const keepOpen = true;
+  const keepOpen = true
 
   const onSelect = (label: string) => {
-    console.log("onSelect", label);
-  };
+    console.log('onSelect', label)
+  }
 
   const { Story } = defineMeta({
-    title: "Atoms/ContextMenu",
+    title: 'Atoms/ContextMenu',
     component: ContextMenu,
     args: {
       contentProps: {
@@ -18,20 +18,20 @@
       },
       items: [
         {
-          label: "Open File",
+          label: 'Open File',
           onSelect,
         },
         {
-          label: "Open Folder",
+          label: 'Open Folder',
           onSelect,
         },
         {
-          label: "Open Project",
+          label: 'Open Project',
           onSelect,
         },
       ],
     },
-  });
+  })
 </script>
 
 {#snippet contextArea()}
@@ -46,6 +46,6 @@
   {@render contextArea()}
 </Story>
 
-<Story name="With Heading" args={{ heading: "Open..." }}>
+<Story name="With Heading" args={{ heading: 'Open...' }}>
   {@render contextArea()}
 </Story>

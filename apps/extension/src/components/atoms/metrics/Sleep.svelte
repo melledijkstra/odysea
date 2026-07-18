@@ -3,7 +3,10 @@
   import type { HTMLAttributes } from 'svelte/elements'
   import { fade } from 'svelte/transition'
 
-  const { minutes, ...props }: { minutes: number } & HTMLAttributes<HTMLDivElement> = $props()
+  const {
+    minutes,
+    ...props
+  }: { minutes: number } & HTMLAttributes<HTMLDivElement> = $props()
 
   const hours = $derived(Math.floor(minutes / 60))
   const remainingMins = $derived(minutes % 60)
@@ -18,8 +21,7 @@
 
     if (hours > 0) {
       return `${hours}h ${remainingMins}m`
-    }
-    else {
+    } else {
       return `${remainingMins}m`
     }
   })
@@ -28,10 +30,10 @@
 <div
   transition:fade
   {...props}
-  class={[
-    'text-white rounded-lg text-right',
-    props.class,
-  ]}>
+  class={['text-white rounded-lg text-right', props.class]}
+>
   <p class="text-base">{formatted}</p>
-  <p class="text-xs flex justify-end gap-1 items-center"><IconFitbit /> Sleep</p>
+  <p class="text-xs flex justify-end gap-1 items-center">
+    <IconFitbit /> Sleep
+  </p>
 </div>

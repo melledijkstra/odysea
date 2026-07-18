@@ -1,5 +1,8 @@
 import { storeInDB, getAllItems, updateInDB, deleteInDB } from '@/db'
-import { type IRepositoryAdapter, type Insertable } from '@melledijkstra/storage'
+import {
+  type IRepositoryAdapter,
+  type Insertable,
+} from '@melledijkstra/storage'
 
 const DB_NAME = 'habits' as const
 

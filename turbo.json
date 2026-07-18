@@ -18,7 +18,7 @@
     "dev": {
       "dependsOn": ["^build"],
       "persistent": true,
-      "cache": false,
+      "cache": false
     },
     "start": {
       "persistent": true,
@@ -32,15 +32,16 @@
     "typecheck": {
       "dependsOn": ["^build", "^typecheck"]
     },
+    "//#format": {},
+    "//#format:fix": {
+      "cache": false
+    },
     "test": {
       "dependsOn": [],
       "outputs": ["coverage/**"]
     },
     "test:e2e": {
-      "outputs": [
-        "playwright-report/**",
-        "test-results/**"
-      ]
+      "outputs": ["playwright-report/**", "test-results/**"]
     },
     "storybook:build": {
       "outputs": ["storybook-static/**"]

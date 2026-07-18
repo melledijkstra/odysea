@@ -3,7 +3,15 @@
   import Icon from '@/components/atoms/Icon.svelte'
   import Status from '@/components/atoms/Status.svelte'
   import Toggle from '@/components/atoms/Toggle.svelte'
-  import { mdiPlay, mdiRepeat, mdiShuffle, mdiSkipNext, mdiSkipPrevious, mdiSpotify, mdiWifi } from '@mdi/js'
+  import {
+    mdiPlay,
+    mdiRepeat,
+    mdiShuffle,
+    mdiSkipNext,
+    mdiSkipPrevious,
+    mdiSpotify,
+    mdiWifi,
+  } from '@mdi/js'
   import { defineMeta } from '@storybook/addon-svelte-csf'
 
   type Args = {
@@ -35,7 +43,9 @@
 <Story name="Default">
   {#snippet template(args)}
     <div class="container mx-auto">
-      <div class="grid grid-flow-dense grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center auto-rows-[250px]">
+      <div
+        class="grid grid-flow-dense grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center auto-rows-[250px]"
+      >
         <Card variant="auto">
           <div class="flex flex-col gap-2 h-full">
             <div class="flex flex-row gap-2 justify-between items-center">
@@ -92,7 +102,9 @@
             <div class="flex flex-row gap-2 items-center justify-evenly">
               <Icon path={mdiShuffle} size={20} class="text-gray-300" />
               <Icon path={mdiSkipPrevious} size={20} class="text-gray-300" />
-              <div class="text-gray-300 bg-gray-500 rounded-full p-2 cursor-pointer">
+              <div
+                class="text-gray-300 bg-gray-500 rounded-full p-2 cursor-pointer"
+              >
                 <Icon path={mdiPlay} size={20} />
               </div>
               <Icon path={mdiSkipNext} size={20} class="text-gray-300" />
@@ -102,7 +114,7 @@
         </Card>
         <!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
         {#each Array(args.items) as _, i (i)}
-          <Card variant="auto" class={spanning[i % 7 + 1]}>
+          <Card variant="auto" class={spanning[(i % 7) + 1]}>
             <p>Generated Item {i + 1}</p>
           </Card>
         {/each}

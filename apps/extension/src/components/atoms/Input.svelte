@@ -1,7 +1,15 @@
 <script lang="ts">
-  import type { HTMLLabelAttributes, HTMLInputAttributes } from 'svelte/elements'
+  import type {
+    HTMLLabelAttributes,
+    HTMLInputAttributes,
+  } from 'svelte/elements'
 
-  let { value = $bindable<string | number>(), label = null, labelProps = {}, ...props }: {
+  let {
+    value = $bindable<string | number>(),
+    label = null,
+    labelProps = {},
+    ...props
+  }: {
     value?: string | number
     label?: string | null
     labelProps?: HTMLLabelAttributes
@@ -9,7 +17,11 @@
 </script>
 
 {#if label}
-  <label for={props?.id} class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" {...labelProps}>{label}</label>
+  <label
+    for={props?.id}
+    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+    {...labelProps}>{label}</label
+  >
 {/if}
 <input
   {...props}

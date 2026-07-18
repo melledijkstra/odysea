@@ -8,7 +8,13 @@
     variant?: 'square' | 'rectangular' | 'auto'
   } & HTMLAttributes<HTMLElement>
 
-  const { children, nopadding, variant = 'square', class: className, ...props }: CardProps = $props()
+  const {
+    children,
+    nopadding,
+    variant = 'square',
+    class: className,
+    ...props
+  }: CardProps = $props()
 </script>
 
 <div

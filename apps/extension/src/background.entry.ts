@@ -43,10 +43,10 @@ self.addEventListener('activate', (e) => {
 
 logger.log('Service worker activated')
 logger.log('Initializing services...')
-services.push(
-  new FocusService(),
+services.push(new FocusService())
+logger.log(
+  `Services initialized: ${services.map((s) => s.constructor.name).join(', ')}`
 )
-logger.log(`Services initialized: ${services.map(s => s.constructor.name).join(', ')}`)
 
 if (import.meta.env.DEV) {
   // add global r() function to make development easier reloading

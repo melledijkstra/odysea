@@ -1,7 +1,5 @@
 <script lang="ts">
-  import {
-    mdiCalendarOutline,
-  } from '@mdi/js'
+  import { mdiCalendarOutline } from '@mdi/js'
   import IconButton from '@/components/atoms/IconButton.svelte'
   import Form from './Form.svelte'
 
@@ -15,10 +13,7 @@
 </script>
 
 <div class="relative {props.class}">
-  <IconButton
-    onclick={toggleDisplay}
-    icon={mdiCalendarOutline}
-  />
+  <IconButton onclick={toggleDisplay} icon={mdiCalendarOutline} />
   {#if open}
     <Form />
   {/if}

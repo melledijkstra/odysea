@@ -7,7 +7,8 @@ export default defineConfig([
   ...baseConfig,
   ...webConfig,
   ...svelteConfig,
-  globalIgnores([
-    './public/spotify-sdk.min.js',
-  ], 'Ignore minified Spotify SDK file'),
+  globalIgnores(
+    ['./public/spotify-sdk.min.js'],
+    'Ignore minified Spotify SDK file'
+  ),
 ])

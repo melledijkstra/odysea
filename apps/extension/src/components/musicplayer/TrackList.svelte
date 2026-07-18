@@ -2,16 +2,25 @@
   import type { Track } from 'MusicPlayer'
   import { millisecondsToTime } from '@melledijkstra/toolbox'
 
-  const { tracks, onTrackSelected }: {
+  const {
+    tracks,
+    onTrackSelected,
+  }: {
     tracks: Track[]
     onTrackSelected: (track: Track) => void
   } = $props()
 </script>
 
 {#snippet trackItem(track: Track)}
-  <button class="flex flex-row w-full text-left items-center p-2 hover:bg-neutral-400 cursor-pointer rounded-sm transition text-white"
-       onclick={() => onTrackSelected(track)}>
-    <img class="size-10 aspect-square" src={track.coverArtUrl ?? '/icons/album-cover-placeholder.png'} alt="Track cover" />
+  <button
+    class="flex flex-row w-full text-left items-center p-2 hover:bg-neutral-400 cursor-pointer rounded-sm transition text-white"
+    onclick={() => onTrackSelected(track)}
+  >
+    <img
+      class="size-10 aspect-square"
+      src={track.coverArtUrl ?? '/icons/album-cover-placeholder.png'}
+      alt="Track cover"
+    />
     <div class="ml-2 overflow-hidden flex-1">
       <p class="truncate text-sm font-bold">{track.title}</p>
       <p class="truncate text-xs">{track.artist.name}</p>

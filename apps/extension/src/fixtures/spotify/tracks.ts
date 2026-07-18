@@ -52,9 +52,7 @@ export const singleTrack: Track = {
     artists: [],
   },
   is_playable: true,
-  available_markets: [
-    'ES',
-  ],
+  available_markets: ['ES'],
   disc_number: 0,
   explicit: false,
   external_ids: {
@@ -177,9 +175,7 @@ export const track_NocturneChopin: Track = {
         uri: 'spotify:artist:2YdRnOqBXCl9g8xCLcGh8C',
       },
     ],
-    available_markets: [
-      'AR',
-    ],
+    available_markets: ['AR'],
     external_urls: {
       spotify: 'https://open.spotify.com/album/3hW1TEeZRJ01XycQFABjj9',
     },
@@ -231,9 +227,7 @@ export const track_NocturneChopin: Track = {
       uri: 'spotify:artist:2YdRnOqBXCl9g8xCLcGh8C',
     },
   ],
-  available_markets: [
-    'ES',
-  ],
+  available_markets: ['ES'],
   disc_number: 1,
   duration_ms: 266200,
   explicit: false,

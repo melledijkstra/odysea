@@ -33,13 +33,13 @@
 
   const metrics: Metric[] = $derived.by(() => {
     if (props.metrics?.length) {
-      return props.metrics.filter(metric => metric.pinned)
+      return props.metrics.filter((metric) => metric.pinned)
     }
 
-    const pinnedCounters = trackers.counters.filter(counter => counter.pinned)
-    const pinnedClocks = trackers.worldClocks.filter(clock => clock.pinned)
+    const pinnedCounters = trackers.counters.filter((counter) => counter.pinned)
+    const pinnedClocks = trackers.worldClocks.filter((clock) => clock.pinned)
     const pinnedCountdowns = trackers.countdowns.filter(
-      countdown => countdown.pinned,
+      (countdown) => countdown.pinned
     )
     return [...pinnedClocks, ...pinnedCountdowns, ...pinnedCounters]
   })
@@ -95,9 +95,9 @@
   <div class="flex flex-row gap-5 items-center">
     {#each metrics as metric, i (i)}
       {#if isClock(metric)}
-        <Clock metric={metric} />
+        <Clock {metric} />
       {:else if isCounter(metric)}
-        <Countdown metric={metric} />
+        <Countdown {metric} />
       {:else}
         <div class="dark:text-white text-black rounded-lg text-right">
           <p class="text-base leading-none">{metric.value}</p>
@@ -113,7 +113,8 @@
           e.preventDefault()
           authenticate()
         }}
-        minutes={sleepMinutes} />
+        minutes={sleepMinutes}
+      />
     {/if}
   </div>
 {/if}

@@ -23,11 +23,14 @@ export class SpotifyController extends BaseMusicController implements ILogger {
   constructor(state: { playback: PlaybackState }) {
     super(state)
     this.apiService = new SpotifyApiService(this.authClient)
-    this.playerService = new SpotifyPlayerService(this.authClient, this.state.playback.volume)
+    this.playerService = new SpotifyPlayerService(
+      this.authClient,
+      this.state.playback.volume
+    )
 
     this.playerService.setCallbacks({
-      onStateChanged: state => this.playerStateChanged(state),
-      onReady: deviceId => this.handlePlayerReady(deviceId),
+      onStateChanged: (state) => this.playerStateChanged(state),
+      onReady: (deviceId) => this.handlePlayerReady(deviceId),
       onNotReady: () => this.handlePlayerNotReady(),
     })
   }
@@ -71,23 +74,29 @@ export class SpotifyController extends BaseMusicController implements ILogger {
     this.playerService.disconnect()
   }
 
-  private readonly handleStorageChange = async (changes: Record<string, browser.Storage.StorageChange>) => {
+  private readonly handleStorageChange = async (
+    changes: Record<string, browser.Storage.StorageChange>
+  ) => {
     const key = this.authClient.storageKey
     if (changes[key]) {
       const isAuthenticated = changes[key].newValue
       spotifyState.isAuthenticated = !!isAuthenticated
-      this.logger.log('Spotify auth state changed reactively:', spotifyState.isAuthenticated)
+      this.logger.log(
+        'Spotify auth state changed reactively:',
+        spotifyState.isAuthenticated
+      )
       if (isAuthenticated) {
         if (!this.playerService.hasPlayer()) {
           try {
             await this.playerService.initialize()
-          }
-          catch (err) {
-            this.logger.error('Failed to initialize Spotify player after re-auth:', err)
+          } catch (err) {
+            this.logger.error(
+              'Failed to initialize Spotify player after re-auth:',
+              err
+            )
           }
         }
-      }
-      else {
+      } else {
         this.isPlayerActive = false
         this.playerService.disconnect()
         delete spotifyState.deviceId
@@ -124,24 +133,23 @@ export class SpotifyController extends BaseMusicController implements ILogger {
 
     if (state.paused) {
       this.cancelPlaybackLoop?.()
-    }
-    else {
+    } else {
       this.setupPlaybackLoop(state.position)
     }
   }
 
   async activateDevice(deviceIdToActivate: string) {
-    const result = await this.apiService.transferPlaybackDevice(deviceIdToActivate)
+    const result =
+      await this.apiService.transferPlaybackDevice(deviceIdToActivate)
     if (result) {
       this.logger.log(`Playback device transferred to ${deviceIdToActivate}`)
       if (spotifyState.deviceId === deviceIdToActivate) {
         this.isPlayerActive = true
-      }
-      else {
+      } else {
         this.isPlayerActive = false
         await this.syncState()
       }
-      spotifyState.devices = spotifyState.devices.map(device => ({
+      spotifyState.devices = spotifyState.devices.map((device) => ({
         ...device,
         is_active: device.id === deviceIdToActivate,
       }))
@@ -154,11 +162,12 @@ export class SpotifyController extends BaseMusicController implements ILogger {
   }
 
   async play() {
-    this.logger.log('Resuming playback', { isPlayerActive: this.isPlayerActive })
+    this.logger.log('Resuming playback', {
+      isPlayerActive: this.isPlayerActive,
+    })
     if (this.isPlayerActive) {
       await this.playerService.resume()
-    }
-    else {
+    } else {
       await this.apiService.play()
     }
     super.play()
@@ -168,8 +177,7 @@ export class SpotifyController extends BaseMusicController implements ILogger {
     this.logger.log('Pausing playback', { isPlayerActive: this.isPlayerActive })
     if (this.isPlayerActive) {
       await this.playerService.pause()
-    }
-    else {
+    } else {
       await this.apiService.pause()
     }
     super.pause()
@@ -178,8 +186,7 @@ export class SpotifyController extends BaseMusicController implements ILogger {
   async next() {
     if (this.isPlayerActive) {
       await this.playerService.nextTrack()
-    }
-    else {
+    } else {
       await this.apiService.nextTrack()
       await this.syncState()
     }
@@ -188,8 +195,7 @@ export class SpotifyController extends BaseMusicController implements ILogger {
   async previous() {
     if (this.isPlayerActive) {
       await this.playerService.previousTrack()
-    }
-    else {
+    } else {
       await this.apiService.previousTrack()
       await this.syncState()
     }
@@ -199,8 +205,7 @@ export class SpotifyController extends BaseMusicController implements ILogger {
     this.logger.log('Setting volume', volume)
     if (this.isPlayerActive) {
       await this.playerService.setVolume(volume)
-    }
-    else {
+    } else {
       await this.apiService.setVolume(volume)
     }
     super.setVolume(volume)
@@ -210,8 +215,7 @@ export class SpotifyController extends BaseMusicController implements ILogger {
     this.logger.log('Seeking to position:', position, this.isPlayerActive)
     if (this.isPlayerActive) {
       await this.playerService.seek(position)
-    }
-    else {
+    } else {
       await this.apiService.seek(position)
       // manually update state since we won't get a state change event
       this.state.playback.position_ms = position
@@ -235,13 +239,14 @@ export class SpotifyController extends BaseMusicController implements ILogger {
       }
     }
 
-    this.logger.log('User is not playing music through the Web SDK, trying to retrieve from Web API')
+    this.logger.log(
+      'User is not playing music through the Web SDK, trying to retrieve from Web API'
+    )
     const playbackState = await this.apiService.getPlaybackState()
     if (playbackState) {
       this.logger.log('Playback state retrieved from Web API', playbackState)
       return playbackState
-    }
-    else {
+    } else {
       throw new Error('No playback state available from Web API')
     }
   }
@@ -253,20 +258,19 @@ export class SpotifyController extends BaseMusicController implements ILogger {
       this.state.playback = playbackState
       if (playbackState.isPlaying) {
         this.setupPlaybackLoop()
-      }
-      else {
+      } else {
         this.cancelPlaybackLoop?.()
       }
-    }
-    catch (error) {
+    } catch (error) {
       this.logger.warn('Failed to sync Spotify state', error)
     }
   }
 
   async toggleShuffle(forceState?: boolean): Promise<void> {
-    const newState = typeof forceState === 'boolean'
-      ? forceState
-      : !this.state.playback.shuffle
+    const newState =
+      typeof forceState === 'boolean'
+        ? forceState
+        : !this.state.playback.shuffle
     this.logger.log('Toggling shuffle mode', { newState })
     await this.apiService.toggleShuffle(newState)
     await this.syncState()

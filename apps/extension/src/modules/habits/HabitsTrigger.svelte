@@ -25,24 +25,13 @@
 
 <Popover.Root>
   <Popover.Trigger>
-    <IconButton
-      icon={mdiProgressCheck}
-    />
+    <IconButton icon={mdiProgressCheck} />
   </Popover.Trigger>
   <PopPanel>
     <h1 class="text-xl font-bold">Habit Tracker</h1>
     <div class="mt-4">
-      <Input
-        type="text"
-        bind:value={newHabit}
-        placeholder="Enter new habit"
-      />
-      <Button
-        onclick={handleAddHabit}
-        class="mt-2"
-      >
-        Add Habit
-      </Button>
+      <Input type="text" bind:value={newHabit} placeholder="Enter new habit" />
+      <Button onclick={handleAddHabit} class="mt-2">Add Habit</Button>
     </div>
     <ul class="mt-4">
       {#each habits.items as habit, i (i)}

@@ -49,10 +49,7 @@
     />
     <Toggle bind:checked={inputPinned} label="Pin to Top Bar" />
   </div>
-  <Button
-    class="w-full justify-center mt-2"
-    type="submit"
-  >
+  <Button class="w-full justify-center mt-2" type="submit">
     <Icon size={18} path={mdiCalendarPlusOutline} class="mr-2" /> Add Countdown
   </Button>
 </form>

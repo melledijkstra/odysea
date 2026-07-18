@@ -31,7 +31,11 @@ describe('Logger', () => {
   describe('log method', () => {
     it('should log messages with the logger name prefix', () => {
       logger.log('Hello', 'World')
-      expect(consoleLogSpy).toHaveBeenCalledWith('[TestLogger]', 'Hello', 'World')
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        '[TestLogger]',
+        'Hello',
+        'World'
+      )
     })
 
     it('should not log if the logger is disabled', () => {
@@ -44,7 +48,10 @@ describe('Logger', () => {
   describe('error method', () => {
     it('should log errors with the logger name prefix', () => {
       logger.error('Error occurred')
-      expect(consoleErrorSpy).toHaveBeenCalledWith('[TestLogger]', 'Error occurred')
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[TestLogger]',
+        'Error occurred'
+      )
     })
 
     it('should not log errors if the logger is disabled', () => {
@@ -57,7 +64,10 @@ describe('Logger', () => {
   describe('warn method', () => {
     it('should log warnings with the logger name prefix', () => {
       logger.warn('Warning occurred')
-      expect(consoleWarnSpy).toHaveBeenCalledWith('[TestLogger]', 'Warning occurred')
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[TestLogger]',
+        'Warning occurred'
+      )
     })
 
     it('should not log warnings if the logger is disabled', () => {
@@ -73,7 +83,9 @@ describe('Logger', () => {
 
     beforeEach(() => {
       consoleTimeSpy = vi.spyOn(console, 'time').mockImplementation(() => {})
-      consoleTimeEndSpy = vi.spyOn(console, 'timeEnd').mockImplementation(() => {})
+      consoleTimeEndSpy = vi
+        .spyOn(console, 'timeEnd')
+        .mockImplementation(() => {})
     })
 
     it('should start and end a timer with the logger name prefix', () => {

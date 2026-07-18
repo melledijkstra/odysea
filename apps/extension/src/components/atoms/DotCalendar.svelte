@@ -12,7 +12,7 @@
       if (r < 0.9) return 2
       if (r < 0.96) return 3
       return 4
-    })(),
+    })()
   )
 
   // Tailwind color scale classes (adjust to your palette)

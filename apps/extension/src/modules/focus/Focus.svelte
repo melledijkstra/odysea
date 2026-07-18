@@ -50,5 +50,10 @@
   {/if}
 
   <label for="focusItem">What are you focussing on?</label>
-  <Input id="focusItem" class="bg-black/50 text-white" type="text" bind:value={focusItem} />
+  <Input
+    id="focusItem"
+    class="bg-black/50 text-white"
+    type="text"
+    bind:value={focusItem}
+  />
 </div>

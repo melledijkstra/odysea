@@ -7,7 +7,10 @@ const logger = new Logger('WebLocalStorage')
 
 export class WebLocalStorage implements IStorage {
   private isAvailable(): boolean {
-    return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+    return (
+      typeof window !== 'undefined' &&
+      typeof window.localStorage !== 'undefined'
+    )
   }
 
   async get<T>(key: string): Promise<T | undefined> {
@@ -21,7 +24,7 @@ export class WebLocalStorage implements IStorage {
 
       // Basic validation of the cache item structure
       if (!isCacheItem(item)) {
-         return undefined
+        return undefined
       }
 
       if (isExpired(item)) {
@@ -70,7 +73,7 @@ export class WebLocalStorage implements IStorage {
   async keys(): Promise<string[]> {
     if (!this.isAvailable()) return []
     const activeKeys: string[] = []
-    
+
     const allKeys: string[] = []
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)

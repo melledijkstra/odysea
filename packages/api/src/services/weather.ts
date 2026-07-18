@@ -22,7 +22,11 @@ export class WeatherClient extends ApiKeyBaseClient {
   protected urlQueryKeyName: string = 'appid'
 
   constructor(apiKey?: string | (() => string)) {
-    const key = apiKey ?? (typeof process !== 'undefined' ? process.env.VITE_WEATHER_API_KEY : undefined)
+    const key =
+      apiKey ??
+      (typeof process !== 'undefined'
+        ? process.env.VITE_WEATHER_API_KEY
+        : undefined)
     super(BASE_URL, key)
   }
 
@@ -38,7 +42,7 @@ export class WeatherClient extends ApiKeyBaseClient {
     }
 
     const response = await this.request<WeatherResponse>(
-      `/weather?lat=${lat}&lon=${lon}&appid=${this.getApiKey()}`,
+      `/weather?lat=${lat}&lon=${lon}&appid=${this.getApiKey()}`
     )
 
     if (response) {

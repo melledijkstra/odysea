@@ -12,7 +12,7 @@
     new Timer({
       duration: Infinity,
       interval: 1000,
-    }),
+    })
   )
 
   function start() {

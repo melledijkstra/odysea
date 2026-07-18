@@ -7,7 +7,10 @@
   import type { PlaybackState } from 'MusicPlayer'
   import AuthButton from '@/components/AuthButton.svelte'
 
-  const { playbackState, controller }: {
+  const {
+    playbackState,
+    controller,
+  }: {
     playbackState: PlaybackState
     controller: SpotifyController
   } = $props()
@@ -39,27 +42,35 @@
   onDestroy(cleanup)
 </script>
 
-<PopPanel panelProps={{
-  size: 'large',
-  nopadding: true,
-}} class="flex flex-col">
+<PopPanel
+  panelProps={{
+    size: 'large',
+    nopadding: true,
+  }}
+  class="flex flex-col"
+>
   {#if !hasTabLock}
     <div class="flex flex-col gap-4 items-center justify-center h-full">
-      <p class="text-center text-lg">The Spotify Music Player is already initialized in another tab</p>
+      <p class="text-center text-lg">
+        The Spotify Music Player is already initialized in another tab
+      </p>
       <p class="text-center text-sm">
-        If you want to use the player here, close the other tab or reload this one.
+        If you want to use the player here, close the other tab or reload this
+        one.
       </p>
     </div>
   {:else}
     {#if !spotifyState.isAuthenticated}
       <div class="flex flex-col gap-4 items-center justify-center h-full">
-        <p class="text-center text-lg">You are not authenticated with Spotify</p>
+        <p class="text-center text-lg">
+          You are not authenticated with Spotify
+        </p>
         <AuthButton provider="spotify" onclick={authenticate} />
       </div>
     {:else}
       <MusicPlayer
         state={playbackState}
-        controller={controller}
+        {controller}
         deviceId={spotifyState.deviceId}
         devices={spotifyState.devices}
       />

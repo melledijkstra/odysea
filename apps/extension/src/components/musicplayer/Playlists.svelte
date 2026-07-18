@@ -2,7 +2,11 @@
   import type { Playlist } from 'MusicPlayer'
   import PlaylistItem from './PlaylistItem.svelte'
 
-  const { playlists, onPlaylistSelected, onPlaylistPlay }: {
+  const {
+    playlists,
+    onPlaylistSelected,
+    onPlaylistPlay,
+  }: {
     playlists: Playlist[]
     onPlaylistSelected: (playlist: Playlist) => void
     onPlaylistPlay: (playlist: Playlist) => void
@@ -13,11 +17,7 @@
   <ul>
     {#each playlists as playlist (playlist.id)}
       <li>
-        <PlaylistItem
-          playlist={playlist}
-          onPlaylistPlay={onPlaylistPlay}
-          onPlaylistSelected={onPlaylistSelected}
-        />
+        <PlaylistItem {playlist} {onPlaylistPlay} {onPlaylistSelected} />
       </li>
     {/each}
   </ul>

@@ -1,8 +1,14 @@
 <script lang="ts">
-  import { notifications, removeNotification } from '@/stores/notifications.svelte'
+  import {
+    notifications,
+    removeNotification,
+  } from '@/stores/notifications.svelte'
   import Notification from './atoms/Notification.svelte'
 
-  const { position }: { position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' } = $props()
+  const {
+    position,
+  }: { position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' } =
+    $props()
 </script>
 
 <div
@@ -15,6 +21,9 @@
   ]}
 >
   {#each notifications as notification (notification.id)}
-    <Notification {...notification} onDismiss={() => removeNotification(notification.id)} />
+    <Notification
+      {...notification}
+      onDismiss={() => removeNotification(notification.id)}
+    />
   {/each}
 </div>

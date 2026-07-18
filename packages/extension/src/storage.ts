@@ -1,5 +1,10 @@
 import * as browser from 'webextension-polyfill'
-import { IStorage, CacheItem, isCacheItem, isExpired } from '@melledijkstra/storage'
+import {
+  IStorage,
+  CacheItem,
+  isCacheItem,
+  isExpired,
+} from '@melledijkstra/storage'
 
 export class ExtensionStorage implements IStorage {
   storageArea: browser.Storage.StorageArea
@@ -15,10 +20,10 @@ export class ExtensionStorage implements IStorage {
 
     try {
       const item = raw as CacheItem<T>
-      
+
       // Basic validation of the cache item structure
       if (!isCacheItem(item)) {
-         return undefined
+        return undefined
       }
 
       if (isExpired(item)) {
@@ -57,10 +62,10 @@ export class ExtensionStorage implements IStorage {
   async keys(): Promise<string[]> {
     const allItems = await this.storageArea.get(null)
     const activeKeys: string[] = []
-    
+
     for (const [key, raw] of Object.entries(allItems)) {
       if (raw === undefined || raw === null) continue
-    
+
       try {
         if (isCacheItem(raw) && isExpired(raw)) {
           await this.delete(key)

@@ -8,18 +8,14 @@
   function toggleDisplay() {
     if (open) {
       open = false
-    }
-    else {
+    } else {
       open = true
     }
   }
 </script>
 
 <div class="relative">
-  <IconButton
-    onclick={toggleDisplay}
-    icon={mdiWebClock}
-  />
+  <IconButton onclick={toggleDisplay} icon={mdiWebClock} />
   {#if open}
     <Form />
   {/if}

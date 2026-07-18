@@ -19,8 +19,9 @@ To use this component, ensure that your music source implements the required int
 2. Ensure your music source follows the interface defined in `types.ts`.
 
 3. Pass the music source data to the component:
-  ```tsx
-  const musicData: MusicSource[] = ...;
 
-  <MusicPlayer tracks={musicData} />;
-  ```
+```tsx
+const musicData: MusicSource[] = ...;
+
+<MusicPlayer tracks={musicData} />;
+```

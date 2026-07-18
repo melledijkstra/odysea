@@ -6,22 +6,25 @@ describe('background store', () => {
 
   beforeEach(() => {
     originalImage = globalThis.Image
-    vi.stubGlobal('Image', class {
-      _src: string = ''
-      get src() {
-        return this._src
-      }
+    vi.stubGlobal(
+      'Image',
+      class {
+        _src: string = ''
+        get src() {
+          return this._src
+        }
 
-      set src(value: string) {
-        this._src = value
-        setTimeout(() => {
-          this.onload?.()
-        }, 0)
-      }
+        set src(value: string) {
+          this._src = value
+          setTimeout(() => {
+            this.onload?.()
+          }, 0)
+        }
 
-      onload: (() => void) | null = null
-      onerror: ((error: Event) => void) | null = null
-    })
+        onload: (() => void) | null = null
+        onerror: ((error: Event) => void) | null = null
+      }
+    )
   })
 
   afterEach(() => {

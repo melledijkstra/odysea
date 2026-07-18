@@ -33,11 +33,15 @@
   } & HTMLButtonAttributes = $props()
 </script>
 
-<Button {...props} class={[
-  'flex flex-row items-center justify-center gap-2',
-  'disabled:bg-gray-400 disabled:focus:ring-gray-300 disabled:cursor-auto',
-  classes[provider], props.class,
-]}>
+<Button
+  {...props}
+  class={[
+    'flex flex-row items-center justify-center gap-2',
+    'disabled:bg-gray-400 disabled:focus:ring-gray-300 disabled:cursor-auto',
+    classes[provider],
+    props.class,
+  ]}
+>
   {#if provider === 'google'}
     <IconGoogle />
   {:else if provider === 'spotify'}

@@ -26,16 +26,6 @@
   const r = $derived(isNaN(rotate) ? rotate : rotate + 'deg')
 </script>
 
-<style>
-  svg {
-    transform: rotate(var(--r, 0deg)) scale(var(--sx, 1), var(--sy, 1));
-  }
-
-  path {
-    fill: currentColor;
-  }
-</style>
-
 <svg
   width={sizeValue}
   height={sizeValue}
@@ -45,3 +35,13 @@
 >
   <path d={path} />
 </svg>
+
+<style>
+  svg {
+    transform: rotate(var(--r, 0deg)) scale(var(--sx, 1), var(--sy, 1));
+  }
+
+  path {
+    fill: currentColor;
+  }
+</style>

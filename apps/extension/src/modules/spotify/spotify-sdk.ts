@@ -22,7 +22,10 @@ function loadSpotifySDK(): Promise<void> {
     const script = document.createElement('script')
     script.src = sdkFile
     script.onload = () => {
-      logger.log(`Spotify SDK loaded: %c${Spotify.Player.version}`, 'font-style: italic; color: lightgreen;')
+      logger.log(
+        `Spotify SDK loaded: %c${Spotify.Player.version}`,
+        'font-style: italic; color: lightgreen;'
+      )
       resolve()
     }
     script.onerror = () => {
@@ -37,7 +40,10 @@ function isSpotifySDKLoaded(): boolean {
   return window?.Spotify?.Player !== undefined
 }
 
-function createPlayer(authClient: AuthClient, initialVolume: number): Spotify.Player {
+function createPlayer(
+  authClient: AuthClient,
+  initialVolume: number
+): Spotify.Player {
   return new window.Spotify.Player({
     name: 'Mizu Player',
     getOAuthToken: async (callback) => {
@@ -52,7 +58,7 @@ function createPlayer(authClient: AuthClient, initialVolume: number): Spotify.Pl
 
 export async function initializeSpotifyPlayer(
   authClient: AuthClient,
-  initialVolume: number = 0.5,
+  initialVolume: number = 0.5
 ): Promise<Spotify.Player> {
   return new Promise((resolve, reject) => {
     try {
@@ -64,13 +70,14 @@ export async function initializeSpotifyPlayer(
       }
 
       window.onSpotifyWebPlaybackSDKReady = () => {
-        logger.log('Spotify Web Playback SDK is ready, setting up player', { initialVolume })
+        logger.log('Spotify Web Playback SDK is ready, setting up player', {
+          initialVolume,
+        })
         const player = createPlayer(authClient, initialVolume)
         resolve(player)
       }
       loadSpotifySDK()
-    }
-    catch (error) {
+    } catch (error) {
       reject(error)
     }
   })

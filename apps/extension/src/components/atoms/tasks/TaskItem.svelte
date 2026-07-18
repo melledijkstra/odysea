@@ -37,21 +37,20 @@
     <input
       type="checkbox"
       class="mr-1 self-start translate-y-1"
-      onchange={e =>
+      onchange={(e) =>
         onToggleTask(task.id, (e.target as HTMLInputElement).checked)}
       checked={task.status === 'completed'}
     />
     {#if editMode}
       <input
-        {@attach node => node.focus()}
+        {@attach (node) => node.focus()}
         class="flex-1 bg-transparent border-b text-white"
         bind:value={editingTitle}
         onkeydown={(e) => {
           if (e.key === 'Enter') {
             onSaveEdit({ ...task, title: editingTitle })
             editMode = false
-          }
-          else if (e.key === 'Escape') {
+          } else if (e.key === 'Escape') {
             editMode = false
             e.stopPropagation()
           }

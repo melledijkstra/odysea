@@ -44,8 +44,11 @@
 </script>
 
 <!-- More on writing stories with args: https://storybook.js.org/docs/writing-stories/args -->
-<Story name="Default" args={{
-  metrics: metricMock,
-}} />
+<Story
+  name="Default"
+  args={{
+    metrics: metricMock,
+  }}
+/>
 
 <Story name="Empty" args={{ metrics: [] }} />

@@ -1,7 +1,7 @@
 {
   "extends": "@melledijkstra/config/tsconfig/base.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
+    "jsx": "react-jsx"
   },
   "include": ["."],
   "exclude": ["dist", "node_modules", ".turbo"]

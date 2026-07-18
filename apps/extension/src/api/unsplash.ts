@@ -1,4 +1,7 @@
-import { UnsplashClient as BaseUnsplashClient, type UnsplashResponse } from '@melledijkstra/api'
+import {
+  UnsplashClient as BaseUnsplashClient,
+  type UnsplashResponse,
+} from '@melledijkstra/api'
 import { SERVERLESS_HOST_URL } from '@/constants'
 import browser from 'webextension-polyfill'
 import { addDays, formatDate } from '@melledijkstra/toolbox'
@@ -54,8 +57,7 @@ export class UnsplashClient extends BaseUnsplashClient {
       if (fetchResponse.ok) {
         await imageCache.put(next.url, fetchResponse)
       }
-    }
-    catch (e) {
+    } catch (e) {
       this.logger.error('Failed to pre-cache next image:', e)
     }
 
@@ -80,8 +82,7 @@ export class UnsplashClient extends BaseUnsplashClient {
         const blob = await response.blob()
         return URL.createObjectURL(blob)
       }
-    }
-    catch (error) {
+    } catch (error) {
       this.logger.error('Failed to get image from cache or fetch:', error)
     }
     return url
@@ -96,8 +97,7 @@ export class UnsplashClient extends BaseUnsplashClient {
     if (cached?.date === today) {
       this.logger.log('retrieved daily image from cache')
       imageUrl = cached.url
-    }
-    else {
+    } else {
       const next = await this.cache.getNextImageInfo()
       let dailyImageInfo: ImageInfo
 
@@ -105,8 +105,7 @@ export class UnsplashClient extends BaseUnsplashClient {
         this.logger.log('next image exists, use that one instead')
         dailyImageInfo = { ...next, date: today }
         await this.cache.clearNextImage()
-      }
-      else {
+      } else {
         this.logger.log('no cached image found, fetching new one')
         const data = await this.fetchUnsplashImage()
         dailyImageInfo = { id: data.id, url: data.urls.full, date: today }

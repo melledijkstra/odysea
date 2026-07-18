@@ -22,7 +22,10 @@
 
     if (fetchedAccountInfo) {
       accountInfo = fetchedAccountInfo
-      localStorage.setItem(ACCOUNT_CACHE_KEY, JSON.stringify(fetchedAccountInfo))
+      localStorage.setItem(
+        ACCOUNT_CACHE_KEY,
+        JSON.stringify(fetchedAccountInfo)
+      )
     }
   }
 
