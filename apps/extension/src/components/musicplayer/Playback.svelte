@@ -62,7 +62,7 @@
   // let remaining = $derived(mediaItem ? mediaItem.duration_ms - position_ms : 0)
   // let timeLeft = $derived<string>(millisecondsToTime(remaining))
   const duration = $derived(
-    mediaItem?.duration_ms ? millisecondsToTime(mediaItem.duration_ms) : 0
+    mediaItem?.duration_ms ? millisecondsToTime(mediaItem.duration_ms) : '0:00'
   )
   const currentTime = $derived<string>(millisecondsToTime(position_ms))
 
