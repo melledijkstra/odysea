@@ -1,14 +1,16 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import * as os from 'node:os'
-import { IStorage } from './storage.interface'
 import { CacheItem } from './types'
 import { isExpired } from './utils'
 
-export class FileStorage implements IStorage {
+import { BaseStorage } from './base'
+
+export class FileStorage extends BaseStorage {
   private readonly filePath: string
 
   constructor(filePath?: string) {
+    super()
     if (filePath) {
       this.filePath = filePath.startsWith('~')
         ? path.join(os.homedir(), filePath.slice(1))
@@ -87,11 +89,6 @@ export class FileStorage implements IStorage {
     this.writeStore({})
   }
 
-  async has(key: string): Promise<boolean> {
-    const val = await this.get(key)
-    return val !== undefined
-  }
-
   async keys(): Promise<string[]> {
     const store = this.readStore()
     const activeKeys: string[] = []
@@ -105,10 +102,5 @@ export class FileStorage implements IStorage {
       }
     }
     return activeKeys
-  }
-
-  async size(): Promise<number> {
-    const activeKeys = await this.keys()
-    return activeKeys.length
   }
 }

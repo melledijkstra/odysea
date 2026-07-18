@@ -66,11 +66,6 @@ export class SpotifyApiClient extends TokenBaseClient {
     }
   }
 
-  async seekToPosition(position: number) {
-    this.request(`/me/player/seek?position_ms=${position}`, {
-      method: 'PUT',
-    })
-  }
 
   async toggleShuffle(state: boolean) {
     await this.request(`/me/player/shuffle?state=${state ? 'true' : 'false'}`, {
@@ -86,27 +81,6 @@ export class SpotifyApiClient extends TokenBaseClient {
     return response?.items ?? []
   }
 
-  async startPlayback(contextUri?: string, offset?: number) {
-    const body: Record<string, unknown> = {
-      position_ms: 0,
-    }
-
-    if (contextUri) {
-      body.context_uri = contextUri
-    }
-
-    if (offset) {
-      body.offset = { position: offset }
-    }
-
-    await this.request('/me/player/play', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    })
-  }
 
   async getPlaybackState() {
     this.logger.log('Retrieving playback state from Spotify Web API')

@@ -1,11 +1,11 @@
-import { IStorage } from './storage.interface'
+import { BaseStorage } from './base'
 import type { CacheItem } from './types'
 import { Logger } from '@melledijkstra/toolbox'
 import { isCacheItem, isExpired } from './utils'
 
 const logger = new Logger('WebLocalStorage')
 
-export class WebLocalStorage implements IStorage {
+export class WebLocalStorage extends BaseStorage {
   private isAvailable(): boolean {
     return (
       typeof window !== 'undefined' &&
@@ -65,11 +65,6 @@ export class WebLocalStorage implements IStorage {
     localStorage.clear()
   }
 
-  async has(key: string): Promise<boolean> {
-    const val = await this.get(key)
-    return val !== undefined
-  }
-
   async keys(): Promise<string[]> {
     if (!this.isAvailable()) return []
     const activeKeys: string[] = []
@@ -89,10 +84,5 @@ export class WebLocalStorage implements IStorage {
       }
     }
     return activeKeys
-  }
-
-  async size(): Promise<number> {
-    const activeKeys = await this.keys()
-    return activeKeys.length
   }
 }

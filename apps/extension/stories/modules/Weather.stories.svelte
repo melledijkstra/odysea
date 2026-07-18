@@ -7,7 +7,7 @@
     component: WeatherInfo,
     args: {
       iconId: '01d',
-      temperatureF: 300,
+      temperatureKelvin: 300,
       displayUnit: 'C',
       location: 'Madrid',
     },
@@ -19,7 +19,7 @@
 <Story
   name="Fahrenheit"
   args={{
-    temperatureF: 59,
+    temperatureKelvin: 288.15,
     displayUnit: 'F',
   }}
 />
@@ -29,7 +29,7 @@
   args={{
     iconId: '01d',
     location: 'Winchester-on-the-Severn, Maryland',
-    temperatureF: 79,
+    temperatureKelvin: 299.15,
     displayUnit: 'F',
   }}
 />
