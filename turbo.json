@@ -18,7 +18,7 @@
     "dev": {
       "dependsOn": ["^build"],
       "persistent": true,
-      "cache": false,
+      "cache": false
     },
     "start": {
       "persistent": true,
@@ -41,10 +41,7 @@
       "outputs": ["coverage/**"]
     },
     "test:e2e": {
-      "outputs": [
-        "playwright-report/**",
-        "test-results/**"
-      ]
+      "outputs": ["playwright-report/**", "test-results/**"]
     },
     "storybook:build": {
       "outputs": ["storybook-static/**"]

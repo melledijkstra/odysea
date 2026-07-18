@@ -1,6 +1,18 @@
 import { IStorage, MemoryCache } from '@melledijkstra/storage'
 import { Logger } from '@melledijkstra/toolbox'
-import { ArcticFetchError, CodeChallengeMethod, generateCodeVerifier, generateState, GitHub, Google, OAuth2Client, OAuth2RequestError, OAuth2Tokens, Spotify, UnexpectedErrorResponseBodyError } from 'arctic'
+import {
+  ArcticFetchError,
+  CodeChallengeMethod,
+  generateCodeVerifier,
+  generateState,
+  GitHub,
+  Google,
+  OAuth2Client,
+  OAuth2RequestError,
+  OAuth2Tokens,
+  Spotify,
+  UnexpectedErrorResponseBodyError,
+} from 'arctic'
 import type { ArcticClient, AuthConfig } from './providers'
 export type { OauthProvider } from './providers'
 
@@ -30,30 +42,50 @@ export class AuthClient {
   protected _tokenPromise: Promise<string | undefined> | null = null
   provider: AuthConfig
 
-  constructor(provider: AuthConfig, redirectUrl: string, {
-    storage = new MemoryCache(),
-    handler,
-  }: {
-    storage?: IStorage
-    handler?: AuthFlowHandler
-  } = {}) {
+  constructor(
+    provider: AuthConfig,
+    redirectUrl: string,
+    {
+      storage = new MemoryCache(),
+      handler,
+    }: {
+      storage?: IStorage
+      handler?: AuthFlowHandler
+    } = {}
+  ) {
     this._logger = new Logger(`auth:${provider.name}`)
     this.provider = provider
     this._storage = storage
     this._handler = handler
     switch (provider.name) {
       case 'google':
-        this._arcticClient = new Google(provider.clientId, provider.clientSecret ?? '', redirectUrl)
+        this._arcticClient = new Google(
+          provider.clientId,
+          provider.clientSecret ?? '',
+          redirectUrl
+        )
         break
       case 'spotify':
-        this._arcticClient = new Spotify(provider.clientId, provider.clientSecret ?? null, redirectUrl)
+        this._arcticClient = new Spotify(
+          provider.clientId,
+          provider.clientSecret ?? null,
+          redirectUrl
+        )
         break
       case 'github':
-        this._arcticClient = new GitHub(provider.clientId, provider.clientSecret ?? '', redirectUrl)
+        this._arcticClient = new GitHub(
+          provider.clientId,
+          provider.clientSecret ?? '',
+          redirectUrl
+        )
         break
       case 'fitbit':
       default:
-        this._arcticClient = new OAuth2Client(provider.clientId, provider.clientSecret ?? null, redirectUrl)
+        this._arcticClient = new OAuth2Client(
+          provider.clientId,
+          provider.clientSecret ?? null,
+          redirectUrl
+        )
         break
     }
   }
@@ -66,8 +98,7 @@ export class AuthClient {
     try {
       const token = await this.getAuthToken()
       return !!token
-    }
-    catch {
+    } catch {
       return false
     }
   }
@@ -100,12 +131,12 @@ export class AuthClient {
     try {
       if (this._arcticClient instanceof Google) {
         await this._arcticClient.revokeToken(token)
+      } else {
+        this._logger.warn(
+          `Token revocation not implemented or supported for provider: ${this.provider.name}`
+        )
       }
-      else {
-        this._logger.warn(`Token revocation not implemented or supported for provider: ${this.provider.name}`)
-      }
-    }
-    catch (e) {
+    } catch (e) {
       if (e instanceof OAuth2RequestError) {
         // Invalid tokens, credentials, or redirect URI
         const code = e.code
@@ -113,15 +144,13 @@ export class AuthClient {
           code,
           token,
         })
-      }
-      else if (e instanceof ArcticFetchError) {
+      } else if (e instanceof ArcticFetchError) {
         // Failed to call `fetch()`
         this._logger.error('Failed to revoke token', {
           e,
           token,
         })
-      }
-      else {
+      } else {
         this._logger.error('Unknown error while revoking token', {
           e,
           token,
@@ -134,16 +163,19 @@ export class AuthClient {
     await this._storage.delete(this.storageKey)
   }
 
-  async refreshAccessToken(
-    refreshToken: string,
-  ): Promise<OAuth2Tokens | null> {
-    if (this._arcticClient instanceof Google
-      || this._arcticClient instanceof GitHub
-      || this._arcticClient instanceof Spotify
+  async refreshAccessToken(refreshToken: string): Promise<OAuth2Tokens | null> {
+    if (
+      this._arcticClient instanceof Google ||
+      this._arcticClient instanceof GitHub ||
+      this._arcticClient instanceof Spotify
     ) {
       return this._arcticClient.refreshAccessToken(refreshToken)
     }
-    return this._arcticClient.refreshAccessToken(this.provider.tokenEndpoint ?? '', refreshToken, this.provider.scopes)
+    return this._arcticClient.refreshAccessToken(
+      this.provider.tokenEndpoint ?? '',
+      refreshToken,
+      this.provider.scopes
+    )
   }
 
   protected isInvalidTokenError(error: unknown): boolean {
@@ -151,14 +183,15 @@ export class AuthClient {
       return true
     }
     if (
-      error instanceof UnexpectedErrorResponseBodyError
-      && error.data
-      && typeof error.data === 'object'
-      && 'errors' in error.data
-      && Array.isArray(error.data?.errors)
+      error instanceof UnexpectedErrorResponseBodyError &&
+      error.data &&
+      typeof error.data === 'object' &&
+      'errors' in error.data &&
+      Array.isArray(error.data?.errors)
     ) {
-      const errors: Array<{ errorType: string, message: string }> = error.data.errors
-      if (errors.some(e => e.errorType === 'invalid_grant')) {
+      const errors: Array<{ errorType: string; message: string }> =
+        error.data.errors
+      if (errors.some((e) => e.errorType === 'invalid_grant')) {
         return true
       }
     }
@@ -167,7 +200,9 @@ export class AuthClient {
 
   async getTokenFromStoreOrRefreshToken(): Promise<string | undefined> {
     if (this._tokenPromise) {
-      this._logger.log('token retrieval already in progress, returning pending promise')
+      this._logger.log(
+        'token retrieval already in progress, returning pending promise'
+      )
       return this._tokenPromise
     }
 
@@ -191,36 +226,37 @@ export class AuthClient {
 
             if (!newTokens) {
               throw new Error(
-                'Failed to refresh token - user must re-authenticate.',
+                'Failed to refresh token - user must re-authenticate.'
               )
             }
 
             const newAccessToken = newTokens.accessToken()
-            this._logger.log('refreshed new access token, storing it and continue')
+            this._logger.log(
+              'refreshed new access token, storing it and continue'
+            )
             await this.cacheAuthToken(
               newAccessToken,
               // if provider doesn't return a new refresh token, keep the old one
-              newTokens.hasRefreshToken() ? newTokens.refreshToken() : refresh_token,
-              newTokens.accessTokenExpiresInSeconds(),
+              newTokens.hasRefreshToken()
+                ? newTokens.refreshToken()
+                : refresh_token,
+              newTokens.accessTokenExpiresInSeconds()
             )
             access_token = newAccessToken
-          }
-          catch (error) {
+          } catch (error) {
             if (this.isInvalidTokenError(error)) {
               this._logger.warn('Refresh token is invalid, clearing storage')
               // remove the stored token so that the user can re-authenticate
               await this._storage.delete(this.storageKey)
               access_token = undefined
-            }
-            else {
+            } else {
               this._logger.error('Failed to refresh access token', { error })
             }
           }
         }
 
         return access_token
-      }
-      finally {
+      } finally {
         this._tokenPromise = null
       }
     })()
@@ -231,7 +267,7 @@ export class AuthClient {
   async cacheAuthToken(
     access_token: string,
     refresh_token: string | undefined,
-    expires_in_seconds: number,
+    expires_in_seconds: number
   ) {
     const tokenStore: TokenStore = {
       access_token,
@@ -259,18 +295,24 @@ export class AuthClient {
     let url: URL
     if (this._arcticClient instanceof OAuth2Client) {
       url = this._arcticClient.createAuthorizationURLWithPKCE(
-        this.provider.authEndpoint ?? '', this._state, CodeChallengeMethod.S256,
-        this._codeVerifier, scopes,
+        this.provider.authEndpoint ?? '',
+        this._state,
+        CodeChallengeMethod.S256,
+        this._codeVerifier,
+        scopes
       )
-    }
-    else if (this._arcticClient instanceof Google
-      || this._arcticClient instanceof Spotify) {
-      url = this._arcticClient.createAuthorizationURL(this._state, this._codeVerifier, scopes)
-    }
-    else if (this._arcticClient instanceof GitHub) {
+    } else if (
+      this._arcticClient instanceof Google ||
+      this._arcticClient instanceof Spotify
+    ) {
+      url = this._arcticClient.createAuthorizationURL(
+        this._state,
+        this._codeVerifier,
+        scopes
+      )
+    } else if (this._arcticClient instanceof GitHub) {
       url = this._arcticClient.createAuthorizationURL(this._state, scopes)
-    }
-    else {
+    } else {
       return undefined
     }
 
@@ -284,8 +326,12 @@ export class AuthClient {
   }
 
   async validate(code: string, state: string): Promise<OAuth2Tokens> {
-    const storedState = await this._storage.get<{ state: string, codeVerifier: string }>(this.authStateKey)
-    const { state: savedState, codeVerifier: savedCodeVerifier } = storedState ?? {}
+    const storedState = await this._storage.get<{
+      state: string
+      codeVerifier: string
+    }>(this.authStateKey)
+    const { state: savedState, codeVerifier: savedCodeVerifier } =
+      storedState ?? {}
 
     if (!code || !savedState || state !== savedState || !savedCodeVerifier) {
       throw new Error('Code or state mismatch')
@@ -298,10 +344,16 @@ export class AuthClient {
 
     let tokens: OAuth2Tokens
     if (this._arcticClient instanceof OAuth2Client) {
-      tokens = await this._arcticClient.validateAuthorizationCode(this.provider.tokenEndpoint ?? '', code, savedCodeVerifier)
-    }
-    else {
-      tokens = await this._arcticClient.validateAuthorizationCode(code, savedCodeVerifier)
+      tokens = await this._arcticClient.validateAuthorizationCode(
+        this.provider.tokenEndpoint ?? '',
+        code,
+        savedCodeVerifier
+      )
+    } else {
+      tokens = await this._arcticClient.validateAuthorizationCode(
+        code,
+        savedCodeVerifier
+      )
     }
 
     // Clean up auth state
@@ -323,16 +375,15 @@ export class AuthClient {
     if (storedToken) {
       this._logger.log('using stored token')
       return storedToken
-    }
-    else if (!interactive) {
+    } else if (!interactive) {
       this._logger.log(
-        'no token retrieved, but not interactive, so returning nothing',
+        'no token retrieved, but not interactive, so returning nothing'
       )
       return
     }
 
     this._logger.log(
-      'no token retrieved in any way, continue with normal oauth2 flow...',
+      'no token retrieved in any way, continue with normal oauth2 flow...'
     )
 
     const url = await this.createAuthUrl()
@@ -353,21 +404,23 @@ export class AuthClient {
         if (code && state) {
           const tokens = await this.validate(code, state)
           if (!tokens.hasRefreshToken()) {
-            throw new Error(`Provider '${this.provider.name}' did not return a refresh token.`)
+            throw new Error(
+              `Provider '${this.provider.name}' did not return a refresh token.`
+            )
           }
           // Store the tokens
           await this.cacheAuthToken(
             tokens.accessToken(),
             tokens.refreshToken(),
-            tokens.accessTokenExpiresInSeconds(),
+            tokens.accessTokenExpiresInSeconds()
           )
           return tokens.accessToken()
+        } else {
+          this._logger.error('Redirect URL missing code or state', {
+            href: redirectUrl.href,
+          })
         }
-        else {
-          this._logger.error('Redirect URL missing code or state', { href: redirectUrl.href })
-        }
-      }
-      catch (error) {
+      } catch (error) {
         this._logger.error('Auth flow failed', { error })
       }
     }

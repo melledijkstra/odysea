@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { HTMLSelectAttributes, HTMLLabelAttributes } from 'svelte/elements'
+  import type {
+    HTMLSelectAttributes,
+    HTMLLabelAttributes,
+  } from 'svelte/elements'
 
   export type SelectOption = {
     value: string
@@ -26,7 +29,8 @@
   <label
     for={props?.id}
     class="mb-2 text-sm font-medium text-gray-900 dark:text-white"
-  >{label}</label>
+    >{label}</label
+  >
 {/if}
 <select
   bind:value

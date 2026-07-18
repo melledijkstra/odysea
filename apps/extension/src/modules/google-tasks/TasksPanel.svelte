@@ -23,7 +23,9 @@
   {#if isAuthenticated}
     <TasksPanelContent controller={tasksController} state={tasksState} />
   {:else}
-    <p class="mb-2">In order to see your tasks, you will need to sign in with Google</p>
+    <p class="mb-2">
+      In order to see your tasks, you will need to sign in with Google
+    </p>
     <AuthButton provider="google" onclick={triggerAuthFlow} />
   {/if}
 </PopPanel>

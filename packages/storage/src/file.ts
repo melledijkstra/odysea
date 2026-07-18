@@ -13,8 +13,7 @@ export class FileStorage implements IStorage {
       this.filePath = filePath.startsWith('~')
         ? path.join(os.homedir(), filePath.slice(1))
         : path.resolve(filePath)
-    }
-    else {
+    } else {
       this.filePath = path.join(os.homedir(), '.toolbox-storage.json')
     }
   }
@@ -26,13 +25,14 @@ export class FileStorage implements IStorage {
     try {
       const data = fs.readFileSync(this.filePath, 'utf-8')
       return JSON.parse(data)
-    }
-    catch {
+    } catch {
       return {}
     }
   }
 
-  private writeStore(store: Record<string, CacheItem<unknown> | undefined>): void {
+  private writeStore(
+    store: Record<string, CacheItem<unknown> | undefined>
+  ): void {
     const dir = path.dirname(this.filePath)
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true })
@@ -44,8 +44,7 @@ export class FileStorage implements IStorage {
     if (!fileExists && os.platform() !== 'win32') {
       try {
         fs.chmodSync(this.filePath, 0o600)
-      }
-      catch {
+      } catch {
         // Ignored if permissions cannot be set (e.g. unsupported fs)
       }
     }
@@ -100,8 +99,7 @@ export class FileStorage implements IStorage {
       const item = store[key]
       if (item && !isExpired(item)) {
         activeKeys.push(key)
-      }
-      else if (item) {
+      } else if (item) {
         // clean up expired items
         await this.delete(key)
       }

@@ -13,11 +13,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "globals": "^17.7.0",
-    "eslint-config-prettier": "catalog:"
-  },
   "devDependencies": {
+    "globals": "^17.7.0",
+    "eslint-config-prettier": "catalog:",
     "@eslint/css": "^1.4.0",
     "@eslint/js": "^9.39.4",
     "@eslint/json": "^2.0.1",
@@ -26,14 +24,13 @@
     "eslint": "catalog:",
     "eslint-plugin-svelte": "^3.20.0",
     "eslint-plugin-turbo": "catalog:",
+    "prettier": "catalog:",
     "rollup-plugin-visualizer": "^6.0.11",
     "svelte-eslint-parser": "^1.8.0",
     "typescript": "catalog:",
     "typescript-eslint": "^8.63.0"
   },
   "peerDependencies": {
-    "prettier": "catalog:",
-    "prettier-plugin-svelte": "catalog:",
-    "prettier-plugin-tailwindcss": "catalog:"
+    "prettier": "catalog:"
   }
 }

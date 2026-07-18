@@ -60,8 +60,7 @@ export class Timer {
     if (this.remainingTime <= 0) {
       this.stop()
       this.onComplete?.(0)
-    }
-    else {
+    } else {
       const drift = Math.min(elapsedTime % this.interval, 200)
       const delay = this.interval - drift
       this.timerId = setTimeout(() => this.runTick(), delay)

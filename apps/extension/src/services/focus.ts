@@ -46,7 +46,7 @@ export class FocusService implements BackgroundService {
     startPomodoro.on(() => this.startPomodoro())
     stopPomodoro.on(() => this.stopPomodoro())
     getPomodoroState.on(() => this.getPomodoroState())
-    switchMode.on(mode => this.switchMode(mode))
+    switchMode.on((mode) => this.switchMode(mode))
   }
 
   destroy(): void {
@@ -58,8 +58,8 @@ export class FocusService implements BackgroundService {
     const newMin = Math.floor(remainingTime / (60 * 1000))
     // update when minutes pass, or when we are under one minute
     if (currentMin !== newMin || newMin < 1) {
-      const badgeText
-        = newMin < 1
+      const badgeText =
+        newMin < 1
           ? this.timer.formatRemainingSeconds()
           : this.timer.formatRemainingMinutes()
       browserAction.setBadgeText({ text: badgeText })

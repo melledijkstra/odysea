@@ -10,10 +10,7 @@ const ENABLE_DEBUG = process.env.NODE_ENV === 'development'
 
 function manifestTransformer(content: string, mode: string) {
   const envVars = loadEnv(mode, process.cwd())
-  content = content.replace(
-    '%CLIENT_ID%',
-    envVars.VITE_GOOGLE_CLIENT_ID,
-  )
+  content = content.replace('%CLIENT_ID%', envVars.VITE_GOOGLE_CLIENT_ID)
   content = content.replace('%VERSION%', packageJson.version)
   return content
 }
@@ -27,7 +24,7 @@ const defaultConfig = defineConfig(({ mode }) => ({
         {
           src: 'manifest.json',
           dest: '.',
-          transform: content => manifestTransformer(content, mode),
+          transform: (content) => manifestTransformer(content, mode),
         },
       ],
     }),

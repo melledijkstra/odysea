@@ -18,8 +18,7 @@ type LocationResponse = {
 
 export type LocationInfo = Omit<LocationResponse, 'status' | 'message'>
 
-const LOCATION_API_URL
-  = 'https://ipapi.co/json/'
+const LOCATION_API_URL = 'https://ipapi.co/json/'
 
 async function fetchGeolocation(): Promise<LocationResponse | undefined> {
   const response = await fetch(LOCATION_API_URL)
@@ -53,10 +52,10 @@ async function getGeolocationBrowser(): Promise<[number, number] | undefined> {
         const { latitude, longitude } = currentPosition.coords
         resolve([latitude, longitude])
       },
-      error => reject(new Error(error.message)),
+      (error) => reject(new Error(error.message)),
       {
         timeout: 3000, // allow 3 seconds to return the position
-      },
+      }
     )
   })
 }
@@ -81,9 +80,10 @@ export async function getCurrentPosition(): Promise<
     if (browserPos) {
       return { lat: browserPos[0], lon: browserPos[1] }
     }
-  }
-  catch {
-    logger.log('Failed to retrieve geolocation through browser, trying API service...')
+  } catch {
+    logger.log(
+      'Failed to retrieve geolocation through browser, trying API service...'
+    )
   }
 
   // if we can't get geolocation through browser we try through API service

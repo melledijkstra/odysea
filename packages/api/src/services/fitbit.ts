@@ -10,7 +10,9 @@ export class FitbitClient extends TokenBaseClient {
 
   async getSleep(): Promise<number> {
     const date = new Date().toISOString().split('T')[0]
-    const response = await this.request<SleepResponse>(`/1/user/-/sleep/date/${date}.json`)
+    const response = await this.request<SleepResponse>(
+      `/1/user/-/sleep/date/${date}.json`
+    )
 
     if (response) {
       if (response.summary.stages) {

@@ -16,18 +16,24 @@
 </script>
 
 <!-- More on writing stories with args: https://storybook.js.org/docs/writing-stories/args -->
-<Story name="Amsterdam" args={{
-  metric: {
-    name: 'Amsterdam',
-    pinned: true,
-    timeZone: 'Europe/Amsterdam',
-  },
-}} />
+<Story
+  name="Amsterdam"
+  args={{
+    metric: {
+      name: 'Amsterdam',
+      pinned: true,
+      timeZone: 'Europe/Amsterdam',
+    },
+  }}
+/>
 
-<Story name="Tokyo" args={{
-  metric: {
-    name: 'Tokyo',
-    pinned: true,
-    timeZone: 'Asia/Tokyo',
-  },
-}} />
+<Story
+  name="Tokyo"
+  args={{
+    metric: {
+      name: 'Tokyo',
+      pinned: true,
+      timeZone: 'Asia/Tokyo',
+    },
+  }}
+/>

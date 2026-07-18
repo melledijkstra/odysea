@@ -31,24 +31,22 @@ export async function startInteractive() {
       }
 
       // Check if command is registered
-      const command = commands.find(c => c.name === commandName)
+      const command = commands.find((c) => c.name === commandName)
       if (command) {
         try {
           await command.execute(args)
-        }
-        catch (error) {
+        } catch (error) {
           console.error(`Error executing command "${commandName}":`, error)
         }
-      }
-      else {
-        console.log(`Unknown command: "${cmd}". Type "help" for a list of commands.`)
+      } else {
+        console.log(
+          `Unknown command: "${cmd}". Type "help" for a list of commands.`
+        )
       }
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error('An error occurred in interactive mode:', error)
-  }
-  finally {
+  } finally {
     rl.close()
   }
 }

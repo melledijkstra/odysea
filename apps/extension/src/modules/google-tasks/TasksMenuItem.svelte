@@ -4,7 +4,9 @@
 </script>
 
 <Popover.Root>
-  <Popover.Trigger class='text-slate-200 hover:text-white text-lg capitalize cursor-pointer'>
+  <Popover.Trigger
+    class="text-slate-200 hover:text-white text-lg capitalize cursor-pointer"
+  >
     Tasks
   </Popover.Trigger>
   <TasksPanel />

@@ -73,6 +73,7 @@ export class MockMusicPlayerController extends BaseMusicController {
   }
 
   async switchRepeatMode(repeatMode: number | string): Promise<void> {
-    this.state.playback.repeatMode = typeof repeatMode === 'number' ? repeatMode : 0
+    this.state.playback.repeatMode =
+      typeof repeatMode === 'number' ? repeatMode : 0
   }
 }

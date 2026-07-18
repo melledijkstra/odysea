@@ -2,7 +2,11 @@ import { SpotifyApiClient } from '@melledijkstra/api'
 import { MemoryCache, minutes } from '@melledijkstra/storage'
 import type { AuthClient } from '@melledijkstra/extension'
 import type { Playlist, Track } from 'MusicPlayer'
-import { convertSpotifyPlaylist, convertSpotifyTrackToMPTrack, convertApiPlaybackState } from '@/transforms/spotify'
+import {
+  convertSpotifyPlaylist,
+  convertSpotifyTrackToMPTrack,
+  convertApiPlaybackState,
+} from '@/transforms/spotify'
 import { Logger } from '@/logger'
 
 export class SpotifyApiService {
@@ -29,8 +33,7 @@ export class SpotifyApiService {
       const converted = playlists.map(convertSpotifyPlaylist)
       await this.cache.set('playlists', converted, minutes(5))
       return converted
-    }
-    catch (error) {
+    } catch (error) {
       this.logger.error('Failed to retrieve playlists', error)
     }
     return []

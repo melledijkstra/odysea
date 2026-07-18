@@ -8,7 +8,12 @@
     size?: 'small' | 'medium' | 'large'
   } & HTMLAttributes<HTMLDivElement>
 
-  const { children, nopadding, size = 'medium', ...props }: PanelProps = $props()
+  const {
+    children,
+    nopadding,
+    size = 'medium',
+    ...props
+  }: PanelProps = $props()
 </script>
 
 <div

@@ -29,7 +29,7 @@ type StoreName = StoreNames<OdyseaExtensionDB>
 
 async function createSimpleDB(
   db: IDBPDatabase<OdyseaExtensionDB>,
-  dbName: StoreName,
+  dbName: StoreName
 ) {
   if (!db.objectStoreNames.contains(dbName)) {
     const store = db.createObjectStore(dbName, {
@@ -49,7 +49,7 @@ export const dbPromise = openDB<OdyseaExtensionDB>('OdyseaExtensionDB', 7, {
 })
 
 export async function getAllItems<DBName extends StoreNames<OdyseaExtensionDB>>(
-  dbName: DBName,
+  dbName: DBName
 ): Promise<StoreValue<OdyseaExtensionDB, DBName>[]> {
   const db = await dbPromise
   return await db.getAll(dbName)
@@ -57,7 +57,7 @@ export async function getAllItems<DBName extends StoreNames<OdyseaExtensionDB>>(
 
 export async function storeInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
   dbName: DBName,
-  value: StoreValue<OdyseaExtensionDB, DBName>,
+  value: StoreValue<OdyseaExtensionDB, DBName>
 ): Promise<string> {
   const db = await dbPromise
   const key = await db.add(dbName, value)
@@ -67,7 +67,7 @@ export async function storeInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
 export async function updateInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
   dbName: DBName,
   value: StoreValue<OdyseaExtensionDB, DBName>,
-  key?: string,
+  key?: string
 ) {
   const db = await dbPromise
   await db.put(dbName, value, key)
@@ -75,7 +75,7 @@ export async function updateInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
 
 export async function deleteInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
   dbName: DBName,
-  id: string,
+  id: string
 ) {
   const db = await dbPromise
   await db.delete(dbName, id)

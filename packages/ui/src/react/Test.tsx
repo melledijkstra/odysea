@@ -3,7 +3,5 @@ export type TestComponentProps = {
 }
 
 export const TestComponent = ({ input }: TestComponentProps) => {
-  return (
-    <strong>{input}</strong>
-  )
+  return <strong>{input}</strong>
 }

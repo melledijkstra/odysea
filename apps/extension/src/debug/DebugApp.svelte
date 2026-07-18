@@ -31,19 +31,14 @@
 </main>
 
 <div class="relative">
-  <ContextMenu
-    bind:open={isOpen}
-    items={menuItems}
-  >
+  <ContextMenu bind:open={isOpen} items={menuItems}>
     <div
       class="size-30 text-white place-items-center rounded-lg border border-dashed p-4"
     >
       Right-click me
     </div>
   </ContextMenu>
-  <DropdownMenu
-    items={menuItems}
-  >
+  <DropdownMenu items={menuItems}>
     <button onclick={() => (isOpen = true)}>Open Dropdown Menu</button>
   </DropdownMenu>
 </div>

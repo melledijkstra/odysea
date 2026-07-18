@@ -12,7 +12,7 @@ export class SpotifyPlayerService {
 
   constructor(
     private authClient: AuthClient,
-    private initialVolume: number,
+    private initialVolume: number
   ) {}
 
   setCallbacks(callbacks: {
@@ -34,7 +34,10 @@ export class SpotifyPlayerService {
       const player = await initSDKPlayer(this.authClient, initVolume)
 
       player.addListener('ready', async ({ device_id }) => {
-        this.logger.log(`Ready with Device ID: %c${device_id}`, 'font-style: italic; color: lightgreen;')
+        this.logger.log(
+          `Ready with Device ID: %c${device_id}`,
+          'font-style: italic; color: lightgreen;'
+        )
         this.onReadyCb?.(device_id)
       })
 
@@ -57,16 +60,13 @@ export class SpotifyPlayerService {
           this.logger.log('Connected to Spotify Web Playback SDK')
           if (this.initializingPromise) {
             this.player = player
-          }
-          else {
+          } else {
             player.disconnect()
           }
-        }
-        else {
+        } else {
           throw new Error('Failed to connect to Spotify Web Playback SDK')
         }
-      }
-      catch (error) {
+      } catch (error) {
         player.disconnect()
         throw error
       }
@@ -74,8 +74,7 @@ export class SpotifyPlayerService {
 
     try {
       await this.initializingPromise
-    }
-    finally {
+    } finally {
       this.initializingPromise = undefined
     }
   }

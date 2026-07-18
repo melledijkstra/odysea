@@ -11,5 +11,5 @@ const {
 } = await octokit.rest.users.getAuthenticated()
 
 console.log(
-  `Name: ${name}, Profile URL: ${html_url}, Public Repositories: ${public_repos}`,
+  `Name: ${name}, Profile URL: ${html_url}, Public Repositories: ${public_repos}`
 )

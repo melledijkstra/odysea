@@ -23,8 +23,11 @@ export const defaultTrack: Track = {
   type: 'track',
 }
 
-export const track_ClocksColdPlay: Track = convertSpotifyTrackToMPTrack(spotify_clocks)
+export const track_ClocksColdPlay: Track =
+  convertSpotifyTrackToMPTrack(spotify_clocks)
 
-export const track_NocturneChopin: Track = convertSpotifyTrackToMPTrack(spotify_nocturne_chopin)
+export const track_NocturneChopin: Track = convertSpotifyTrackToMPTrack(
+  spotify_nocturne_chopin
+)
 
 export const tracks = spotify_tracks.map(convertSpotifyTrackToMPTrack)

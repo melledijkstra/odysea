@@ -24,7 +24,9 @@ describe('ui.ts', () => {
 
       await storeUsername(mockName)
 
-      expect(fakeStorage.set).toHaveBeenCalledWith({ [NAME_STORAGE_KEY]: mockName })
+      expect(fakeStorage.set).toHaveBeenCalledWith({
+        [NAME_STORAGE_KEY]: mockName,
+      })
     })
   })
 })

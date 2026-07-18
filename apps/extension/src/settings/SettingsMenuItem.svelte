@@ -7,13 +7,15 @@
 </script>
 
 <Popover.Root>
-  <Popover.Trigger class={[
-    'dark:text-white/70 dark:hover:text-white text-zinc-500 hover:text-zinc-700',
-    'block cursor-pointer transition-colors',
-  ]}>
+  <Popover.Trigger
+    class={[
+      'dark:text-white/70 dark:hover:text-white text-zinc-500 hover:text-zinc-700',
+      'block cursor-pointer transition-colors',
+    ]}
+  >
     <Icon path={mdiTuneVertical} size={25} />
   </Popover.Trigger>
-  <PopPanel panelProps={{ nopadding: true }} class='w-[550px] h-80'>
+  <PopPanel panelProps={{ nopadding: true }} class="w-[550px] h-80">
     <SettingsMenu />
   </PopPanel>
 </Popover.Root>

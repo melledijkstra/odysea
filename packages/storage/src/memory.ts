@@ -7,7 +7,11 @@ export async function get<T>(key: string): Promise<T | undefined> {
   return globalMemoryCache.get<T>(key)
 }
 
-export async function set(key: string, value: unknown, ttl = Infinity): Promise<void> {
+export async function set(
+  key: string,
+  value: unknown,
+  ttl = Infinity
+): Promise<void> {
   await globalMemoryCache.set(key, value, ttl)
 }
 
@@ -22,7 +26,7 @@ type CacheOptions = {
  */
 export function withCache<T, A extends unknown[]>(
   originalFunc: (...args: A) => Promise<T>,
-  options: CacheOptions = {},
+  options: CacheOptions = {}
 ): (...args: A) => Promise<T> {
   const defaultTTL = 5 * 60 * 1000 // 5 minutes
 
@@ -58,8 +62,7 @@ export class MemoryCache implements IStorage {
 
     if (isExpired(cachedItem)) {
       delete this._cache[key]
-    }
-    else {
+    } else {
       return cachedItem.data as T
     }
   }
@@ -79,7 +82,6 @@ export class MemoryCache implements IStorage {
   async clear(): Promise<void> {
     this._cache = {}
   }
-
 
   async has(key: string): Promise<boolean> {
     const cachedItem = this._cache[key]

@@ -7,10 +7,12 @@
   import ModuleLoader from './ModuleLoader.svelte'
 </script>
 
-<footer class={[
-  'flex flex-row justify-between content-end items-end p-6',
-  'bg-gradient-to-t from-gray-700/50 from-10% to-transparent',
-]}>
+<footer
+  class={[
+    'flex flex-row justify-between content-end items-end p-6',
+    'bg-gradient-to-t from-gray-700/50 from-10% to-transparent',
+  ]}
+>
   <!-- BOTTOM LEFT -->
   <div class="flex flex-row gap-3">
     <SettingsMenuItem />

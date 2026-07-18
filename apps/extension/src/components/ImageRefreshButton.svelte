@@ -11,8 +11,8 @@
   const unsplashClient = $state<UnsplashClient>(
     new UnsplashClient(
       settingsStore.network.serverlessHost,
-      settingsStore.ui.dailyImageQuery,
-    ),
+      settingsStore.ui.dailyImageQuery
+    )
   )
 
   const serverlessHost = $derived(settingsStore.network.serverlessHost)

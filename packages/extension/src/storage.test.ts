@@ -5,13 +5,13 @@ const mockStorageLocal = vi.hoisted(() => ({
   get: vi.fn(),
   set: vi.fn(),
   remove: vi.fn(),
-  clear: vi.fn()
+  clear: vi.fn(),
 }))
 
 vi.mock('webextension-polyfill', () => ({
   storage: {
-    local: mockStorageLocal
-  }
+    local: mockStorageLocal,
+  },
 }))
 
 describe('ExtensionStorage', () => {
@@ -21,14 +21,14 @@ describe('ExtensionStorage', () => {
 
   it('should call browser.storage.local.set and get with TTL wrapper', async () => {
     const storage = new ExtensionStorage()
-    
+
     // Simulate what get would return
     mockStorageLocal.get.mockResolvedValue({
       foo: {
         data: 'bar',
         timestamp: Date.now(),
-        ttl: Infinity
-      }
+        ttl: Infinity,
+      },
     })
 
     const val = await storage.get('foo')
@@ -36,7 +36,7 @@ describe('ExtensionStorage', () => {
     expect(mockStorageLocal.get).toHaveBeenCalledWith('foo')
 
     await storage.set('foo', 'bar')
-    
+
     // Check that we're calling set with an object that contains the CacheItem structure
     expect(mockStorageLocal.set).toHaveBeenCalled()
     const setArgs = mockStorageLocal.set.mock.calls[0][0]
@@ -49,7 +49,7 @@ describe('ExtensionStorage', () => {
   it('should return undefined and delete key if expired', async () => {
     vi.useFakeTimers()
     const storage = new ExtensionStorage()
-    
+
     // Mock remove function if it doesn't exist on mock
     if (!mockStorageLocal.remove) {
       mockStorageLocal.remove = vi.fn(() => Promise.resolve())
@@ -59,8 +59,8 @@ describe('ExtensionStorage', () => {
       foo: {
         data: 'bar',
         timestamp: Date.now(),
-        ttl: 1000 // 1 second
-      }
+        ttl: 1000, // 1 second
+      },
     })
 
     vi.advanceTimersByTime(2000)
@@ -81,7 +81,7 @@ describe('ExtensionStorage', () => {
     await storage.delete('foo')
     expect(mockStorageLocal.remove).toHaveBeenCalledWith('foo')
   })
-  
+
   it('should clear all items', async () => {
     const storage = new ExtensionStorage()
     if (!mockStorageLocal.clear) {

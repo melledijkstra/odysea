@@ -30,10 +30,7 @@
     {@render children()}
   </DropdownMenu.Trigger>
   <DropdownMenu.Portal>
-    <DropdownMenu.Content
-      {...contentProps}
-      class="menu"
-    >
+    <DropdownMenu.Content {...contentProps} class="menu">
       <DropdownMenu.Group class="flex flex-col gap-1">
         {#if heading}
           <DropdownMenu.GroupHeading class="menu-group-heading"

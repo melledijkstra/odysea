@@ -2,7 +2,12 @@
   import Devices from './Devices.svelte'
   import Playback from './Playback.svelte'
   import Playlists from './Playlists.svelte'
-  import type { MusicPlayerInterface, Playlist, PlaybackState, Track } from 'MusicPlayer'
+  import type {
+    MusicPlayerInterface,
+    Playlist,
+    PlaybackState,
+    Track,
+  } from 'MusicPlayer'
   import type { Device } from '@melledijkstra/api'
   import ListSkeleton from './ListSkeleton.svelte'
   import ScrollArea from '../atoms/ScrollArea.svelte'
@@ -26,8 +31,7 @@
     // Use play or pause based on current playback state
     if (MPState.isPlaying) {
       controller.pause()
-    }
-    else {
+    } else {
       controller.play()
     }
   }
@@ -37,18 +41,22 @@
   }
 </script>
 
-<div class="grid grid-cols-2 grid-rows-3 music-player w-full h-full overflow-hidden">
+<div
+  class="grid grid-cols-2 grid-rows-3 music-player w-full h-full overflow-hidden"
+>
   <ScrollArea scrollbarClasses="bg-transparent" orientation="vertical">
     {#await controller.getPlaylists()}
       <ListSkeleton amount={20} />
     {:then playlists}
       <Playlists
-        playlists={playlists}
-        onPlaylistPlay={playlist => controller.playItem(playlist)}
-        onPlaylistSelected={playlist => selectPlaylist(playlist)}
+        {playlists}
+        onPlaylistPlay={(playlist) => controller.playItem(playlist)}
+        onPlaylistSelected={(playlist) => selectPlaylist(playlist)}
       />
     {:catch error}
-      <p class="text-sm text-red-500">Error loading playlists: {error.message}</p>
+      <p class="text-sm text-red-500">
+        Error loading playlists: {error.message}
+      </p>
     {/await}
   </ScrollArea>
   <ScrollArea scrollbarClasses="bg-transparent" orientation="vertical">
@@ -57,7 +65,7 @@
     {:then trackList}
       <TrackList
         tracks={trackList ?? []}
-        onTrackSelected={track => controller.playItem(track)}
+        onTrackSelected={(track) => controller.playItem(track)}
       />
     {/await}
   </ScrollArea>
@@ -67,16 +75,16 @@
     onPreviousTrack={() => controller.previous()}
     onPlayPause={playPause}
     onNextTrack={() => controller.next()}
-    onSeek={pos => controller.seek(pos)}
-    onVolumeChange={volume => controller.setVolume(volume)}
-    onToggleShuffle={shuffle => controller.toggleShuffle?.(shuffle)}
-    onSwitchRepeatMode={mode => controller.switchRepeatMode?.(mode)}
+    onSeek={(pos) => controller.seek(pos)}
+    onVolumeChange={(volume) => controller.setVolume(volume)}
+    onToggleShuffle={(shuffle) => controller.toggleShuffle?.(shuffle)}
+    onSwitchRepeatMode={(mode) => controller.switchRepeatMode?.(mode)}
   />
   <Devices
     class="col-span-2"
     playerDeviceId={deviceId}
-    devices={devices}
-    onActivate={deviceId => controller.activateDevice?.(deviceId)}
+    {devices}
+    onActivate={(deviceId) => controller.activateDevice?.(deviceId)}
   />
 </div>
 

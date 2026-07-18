@@ -16,7 +16,10 @@ describe('FileStorage', () => {
   })
 
   beforeEach(() => {
-    tempFilePath = path.join(os.tmpdir(), `test-toolbox-storage-${Math.random().toString(36).substring(2)}.json`)
+    tempFilePath = path.join(
+      os.tmpdir(),
+      `test-toolbox-storage-${Math.random().toString(36).substring(2)}.json`
+    )
     storage = new FileStorage(tempFilePath)
   })
 
@@ -25,8 +28,7 @@ describe('FileStorage', () => {
       if (fs.existsSync(tempFilePath)) {
         fs.unlinkSync(tempFilePath)
       }
-    }
-    catch {
+    } catch {
       // Ignored
     }
   })
@@ -90,7 +92,9 @@ describe('FileStorage', () => {
 
   it('should handle Windows and Unix paths (expand ~)', () => {
     const defaultStorage = new FileStorage()
-    expect(defaultStorage['filePath']).toBe(path.join(os.homedir(), '.toolbox-storage.json'))
+    expect(defaultStorage['filePath']).toBe(
+      path.join(os.homedir(), '.toolbox-storage.json')
+    )
 
     const tildeStorage = new FileStorage('~/test.json')
     expect(tildeStorage['filePath']).toBe(path.join(os.homedir(), 'test.json'))

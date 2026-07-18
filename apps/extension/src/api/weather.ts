@@ -1,4 +1,9 @@
-import { WeatherClient as BaseWeatherClient, getCurrentPosition, type WeatherInfo, type GeoPosition } from '@melledijkstra/api'
+import {
+  WeatherClient as BaseWeatherClient,
+  getCurrentPosition,
+  type WeatherInfo,
+  type GeoPosition,
+} from '@melledijkstra/api'
 import { WebLocalStorage, minutes } from '@melledijkstra/storage'
 import { Logger } from '@/logger'
 import { appState } from '@/app-state.svelte'
@@ -20,8 +25,7 @@ export class WeatherClient extends BaseWeatherClient {
     if (position) {
       lat = position.lat
       lon = position.lon
-    }
-    else {
+    } else {
       const pos = await getCurrentPosition()
       if (!pos) return
 

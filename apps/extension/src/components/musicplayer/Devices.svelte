@@ -13,9 +13,15 @@
     class?: HTMLAttributes<HTMLDivElement>['class']
   }
 
-  const { playerDeviceId, devices, onActivate, sdkVersion, ...props }: DevicesProps = $props()
-  const activeDevice = $derived(devices.find(device => device.is_active))
-  const otherDevices = $derived(devices.filter(device => !device.is_active))
+  const {
+    playerDeviceId,
+    devices,
+    onActivate,
+    sdkVersion,
+    ...props
+  }: DevicesProps = $props()
+  const activeDevice = $derived(devices.find((device) => device.is_active))
+  const otherDevices = $derived(devices.filter((device) => !device.is_active))
   const isActiveDevice = $derived(playerDeviceId === activeDevice?.id)
 </script>
 

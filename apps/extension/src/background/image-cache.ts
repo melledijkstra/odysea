@@ -19,13 +19,13 @@ export async function trimCache() {
           await cache.delete(req)
         }
       }
-    }),
+    })
   )
 
   // 2) Enforce max entries (oldest-first)
   const remaining = await cache.keys()
   if (remaining.length > MAX_ENTRIES) {
     const toDelete = remaining.slice(0, remaining.length - MAX_ENTRIES)
-    await Promise.allSettled(toDelete.map(req => cache.delete(req)))
+    await Promise.allSettled(toDelete.map((req) => cache.delete(req)))
   }
 }

@@ -11,7 +11,11 @@ export type TaskControllerInterface = {
   getTasks: (taskListId?: string) => Promise<Task[]>
   getTaskLists: () => Promise<TaskList[]>
   createTask: (taskTitle: string, taskListId?: string) => Promise<boolean>
-  setTaskStatus: (taskId: string, status: boolean, taskListId?: string) => Promise<boolean>
+  setTaskStatus: (
+    taskId: string,
+    status: boolean,
+    taskListId?: string
+  ) => Promise<boolean>
   deleteTask: (taskId: string, taskListId?: string) => Promise<boolean>
   updateTask: (task: Task, taskListId?: string) => Promise<boolean>
 }
@@ -32,7 +36,7 @@ export class GoogleTasksController implements TaskControllerInterface, ILogger {
   async deleteTask(taskId: string, taskListId?: string): Promise<boolean> {
     const success = await this.api.deleteTask(taskId, taskListId)
     if (success) {
-      this.state.tasks = this.state.tasks.filter(task => task.id !== taskId)
+      this.state.tasks = this.state.tasks.filter((task) => task.id !== taskId)
     }
     return success
   }
@@ -60,15 +64,17 @@ export class GoogleTasksController implements TaskControllerInterface, ILogger {
       }
 
       return this.state.tasks
-    }
-    catch (error) {
+    } catch (error) {
       addNotification('Error fetching tasks', 'error')
       this.logger.error(error)
       return []
     }
   }
 
-  async createTask(inputTask: string, selectedTaskList?: string): Promise<boolean> {
+  async createTask(
+    inputTask: string,
+    selectedTaskList?: string
+  ): Promise<boolean> {
     const newTask = await this.api.createTask(inputTask, selectedTaskList)
     if (newTask) {
       this.state.tasks = [newTask, ...this.state.tasks]
@@ -77,11 +83,21 @@ export class GoogleTasksController implements TaskControllerInterface, ILogger {
     return !!newTask
   }
 
-  async setTaskStatus(taskId: string, status: boolean, taskListId?: string): Promise<boolean> {
+  async setTaskStatus(
+    taskId: string,
+    status: boolean,
+    taskListId?: string
+  ): Promise<boolean> {
     const taskStatus = status ? 'completed' : 'needsAction'
-    const updatedTask = await this.api.setTaskStatus(taskId, taskStatus, taskListId)
+    const updatedTask = await this.api.setTaskStatus(
+      taskId,
+      taskStatus,
+      taskListId
+    )
     if (updatedTask) {
-      this.state.tasks = this.state.tasks.map(task => task.id === taskId ? updatedTask : task)
+      this.state.tasks = this.state.tasks.map((task) =>
+        task.id === taskId ? updatedTask : task
+      )
     }
     return !!updatedTask
   }
@@ -90,7 +106,9 @@ export class GoogleTasksController implements TaskControllerInterface, ILogger {
     const updatedTask = await this.api.updateTask(task, taskListId)
     this.logger.log('updatedTask', updatedTask)
     if (updatedTask) {
-      this.state.tasks = this.state.tasks.map(task => task.id === updatedTask.id ? updatedTask : task)
+      this.state.tasks = this.state.tasks.map((task) =>
+        task.id === updatedTask.id ? updatedTask : task
+      )
     }
     return !!updatedTask
   }

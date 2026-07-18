@@ -12,13 +12,16 @@ export class Logger {
   public disabled = false
   private readonly printer: LoggerPrinter
 
-  constructor(name: string, disabled?: boolean, printer: LoggerPrinter = console) {
+  constructor(
+    name: string,
+    disabled?: boolean,
+    printer: LoggerPrinter = console
+  ) {
     this.name = name
     this.printer = printer
     if (disabled !== undefined) {
       this.disabled = disabled
-    }
-    else {
+    } else {
       this.disabled = this.isDisabledByEnv()
     }
   }

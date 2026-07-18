@@ -8,7 +8,7 @@ export async function getCurrentTab() {
 
 export async function retrieveUsername(): Promise<string | undefined> {
   const { [NAME_STORAGE_KEY]: name } = (await browser.storage.sync.get(
-    NAME_STORAGE_KEY,
+    NAME_STORAGE_KEY
   )) as { name: string }
 
   return name

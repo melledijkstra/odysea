@@ -1,6 +1,10 @@
 import manifest from '../../manifest.json' with { type: 'json' }
 import { settingsStore } from '@/settings/index.svelte'
-import { GoogleAuthConfig, SpotifyAuthConfig, FitbitAuthConfig } from '@melledijkstra/auth'
+import {
+  GoogleAuthConfig,
+  SpotifyAuthConfig,
+  FitbitAuthConfig,
+} from '@melledijkstra/auth'
 
 export type OauthProvider = 'google' | 'spotify' | 'fitbit'
 

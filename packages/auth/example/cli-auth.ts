@@ -1,19 +1,35 @@
 import * as readline from 'node:readline/promises'
 import { stdin as input, stdout as output } from 'node:process'
 import { FileStorage } from '@melledijkstra/storage'
-import { AuthClient, CliAuthFlowHandler, AuthConfig, OauthProvider } from '../src'
-import { SpotifyAuthConfig, FitbitAuthConfig, GithubAuthConfig, GoogleAuthConfig } from '../src/providers'
+import {
+  AuthClient,
+  CliAuthFlowHandler,
+  AuthConfig,
+  OauthProvider,
+} from '../src'
+import {
+  SpotifyAuthConfig,
+  FitbitAuthConfig,
+  GithubAuthConfig,
+  GoogleAuthConfig,
+} from '../src/providers'
 
 const rl = readline.createInterface({ input, output })
 
 try {
   console.log('--- CLI OAuth Authentication Test ---\n')
 
-  const providerNameInput = await rl.question('Enter Provider (google | github | spotify | fitbit) [default: github]: ')
-  const providerName = (providerNameInput.trim().toLowerCase() || 'github') as OauthProvider
+  const providerNameInput = await rl.question(
+    'Enter Provider (google | github | spotify | fitbit) [default: github]: '
+  )
+  const providerName = (providerNameInput.trim().toLowerCase() ||
+    'github') as OauthProvider
 
-  const redirectUrlInput = await rl.question('Enter Redirect URL [default: http://localhost:3000/callback]: ')
-  const redirectUrl = redirectUrlInput.trim() || 'http://localhost:3000/callback'
+  const redirectUrlInput = await rl.question(
+    'Enter Redirect URL [default: http://localhost:3000/callback]: '
+  )
+  const redirectUrl =
+    redirectUrlInput.trim() || 'http://localhost:3000/callback'
 
   let config: AuthConfig
 
@@ -35,7 +51,9 @@ try {
       process.exit(1)
   }
 
-  console.log('\nInitializing AuthClient with FileStorage and CliAuthFlowHandler...')
+  console.log(
+    '\nInitializing AuthClient with FileStorage and CliAuthFlowHandler...'
+  )
 
   const storage = new FileStorage()
   const handler = new CliAuthFlowHandler()
@@ -54,17 +72,18 @@ try {
     console.log(`Access Token: ${token}`)
 
     // Test retrieving token non-interactively
-    console.log('\nVerifying token storage by fetching token non-interactively...')
+    console.log(
+      '\nVerifying token storage by fetching token non-interactively...'
+    )
     const storedToken = await authClient.getAuthToken(false)
-    console.log(`Stored Token retrieved: ${storedToken ? 'YES (matches)' : 'NO'}`)
-  }
-  else {
+    console.log(
+      `Stored Token retrieved: ${storedToken ? 'YES (matches)' : 'NO'}`
+    )
+  } else {
     console.log('\nAuthentication failed or was cancelled.')
   }
-}
-catch (error) {
+} catch (error) {
   console.error('\nAn error occurred:', error)
-}
-finally {
+} finally {
   rl.close()
 }

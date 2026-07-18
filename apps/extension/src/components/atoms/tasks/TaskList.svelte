@@ -20,17 +20,14 @@
 </script>
 
 {#if tasks.length === 0}
-  <div class="mt-3 text-center text-xs text-gray-400">✨ Add a task to get started ✨</div>
+  <div class="mt-3 text-center text-xs text-gray-400">
+    ✨ Add a task to get started ✨
+  </div>
 {:else}
   <ul {...props}>
     {#each tasks as task (task.id)}
       <li>
-        <TaskItem
-          task={task}
-          onToggleTask={onToggleTask}
-          onRemoveTask={onRemoveTask}
-          onSaveEdit={onSaveEdit}
-        />
+        <TaskItem {task} {onToggleTask} {onRemoveTask} {onSaveEdit} />
       </li>
     {/each}
   </ul>

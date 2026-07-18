@@ -42,7 +42,9 @@ export function convertSpotifyTrackToMPTrack(track: SpotifyTrack): Track {
   }
 }
 
-export const convertSpotifyPlaylist = (playlist: SpotifyPlaylist): Playlist => ({
+export const convertSpotifyPlaylist = (
+  playlist: SpotifyPlaylist
+): Playlist => ({
   id: playlist.id,
   uri: playlist.uri,
   title: playlist.name,
@@ -52,10 +54,13 @@ export const convertSpotifyPlaylist = (playlist: SpotifyPlaylist): Playlist => (
   type: 'playlist',
 })
 
-export const convertApiPlaybackState = (state: ApiPlaybackState): PlaybackState => {
+export const convertApiPlaybackState = (
+  state: ApiPlaybackState
+): PlaybackState => {
   const track = state.item
   const device = state.device
-  const repeatMode = state.repeat_state === 'off' ? 0 : state.repeat_state === 'track' ? 1 : 2
+  const repeatMode =
+    state.repeat_state === 'off' ? 0 : state.repeat_state === 'track' ? 1 : 2
 
   return {
     isPlaying: state.is_playing,
@@ -67,7 +72,10 @@ export const convertApiPlaybackState = (state: ApiPlaybackState): PlaybackState 
   }
 }
 
-export const convertPlayerState = (state: Spotify.PlaybackState, currentState?: PlaybackState): PlaybackState => {
+export const convertPlayerState = (
+  state: Spotify.PlaybackState,
+  currentState?: PlaybackState
+): PlaybackState => {
   const currentTrack = state.track_window.current_track
   const album = currentTrack.album
   const artists = currentTrack.artists

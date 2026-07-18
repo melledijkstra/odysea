@@ -1,6 +1,11 @@
 import type { AuthClient } from '@melledijkstra/auth'
 import { Logger } from '@melledijkstra/toolbox'
-import type { Device, PlaybackState, Playlist, Track } from '../definitions/spotify'
+import type {
+  Device,
+  PlaybackState,
+  Playlist,
+  Track,
+} from '../definitions/spotify'
 import { TokenBaseClient } from '../tokenbaseclient'
 
 const BASE_URL = 'https://api.spotify.com/v1'
@@ -19,10 +24,12 @@ export class SpotifyApiClient extends TokenBaseClient {
       }>
     }
 
-    const response = await this.request<Response>(`/playlists/${playlistId}/tracks`)
+    const response = await this.request<Response>(
+      `/playlists/${playlistId}/tracks`
+    )
 
     if (response) {
-      return response.items.map(item => item.track)
+      return response.items.map((item) => item.track)
     }
 
     return []
@@ -41,8 +48,7 @@ export class SpotifyApiClient extends TokenBaseClient {
         }),
       })
       return true
-    }
-    catch (error) {
+    } catch (error) {
       this.logger.error('Failed to transfer playback device:', error)
       return false
     }
@@ -73,7 +79,9 @@ export class SpotifyApiClient extends TokenBaseClient {
   }
 
   async userPlaylists(): Promise<Array<Playlist>> {
-    const response = await this.request<{ items: Array<Playlist> }>('/me/playlists')
+    const response = await this.request<{ items: Array<Playlist> }>(
+      '/me/playlists'
+    )
 
     return response?.items ?? []
   }
@@ -115,11 +123,9 @@ export class SpotifyApiClient extends TokenBaseClient {
     let mode: string
     if (repeatMode === 1 || repeatMode === 'track') {
       mode = 'track'
-    }
-    else if (repeatMode === 2 || repeatMode === 'context') {
+    } else if (repeatMode === 2 || repeatMode === 'context') {
       mode = 'context'
-    }
-    else {
+    } else {
       mode = 'off'
     }
 
@@ -137,8 +143,7 @@ export class SpotifyApiClient extends TokenBaseClient {
 
     if (context_uri?.startsWith('spotify:track')) {
       body.uris = [context_uri]
-    }
-    else if (context_uri) {
+    } else if (context_uri) {
       body.context_uri = context_uri
     }
 

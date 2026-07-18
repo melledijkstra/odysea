@@ -27,7 +27,9 @@
     fitbit: false,
   })
 
-  function handleStorageChange(changes: Record<string, browser.Storage.StorageChange>) {
+  function handleStorageChange(
+    changes: Record<string, browser.Storage.StorageChange>
+  ) {
     for (const key of Object.keys(clients)) {
       const provider = key as OauthProvider
       const storageKey = clients[provider].storageKey
@@ -97,12 +99,13 @@
     <p class="text-sm">
       <strong>Google:</strong>
       <span class="text-gray-400">{authState.google}</span>
-        <AuthButton
-          class="mt-2"
-          authenticated={authState.google}
-          provider="google"
-          onclick={() => authState.google ? deauthenticate('google') : authenticate('google')}
-        />
+      <AuthButton
+        class="mt-2"
+        authenticated={authState.google}
+        provider="google"
+        onclick={() =>
+          authState.google ? deauthenticate('google') : authenticate('google')}
+      />
     </p>
     <p class="text-sm">
       <strong>Spotify:</strong>
@@ -111,7 +114,10 @@
         class="mt-2"
         authenticated={authState.spotify}
         provider="spotify"
-        onclick={() => authState.spotify ? deauthenticate('spotify') : authenticate('spotify')}
+        onclick={() =>
+          authState.spotify
+            ? deauthenticate('spotify')
+            : authenticate('spotify')}
       />
     </p>
     <p class="text-sm">
@@ -121,7 +127,8 @@
         class="mt-2"
         authenticated={authState.fitbit}
         provider="fitbit"
-        onclick={() => authState.fitbit ? deauthenticate('fitbit') : authenticate('fitbit')}
+        onclick={() =>
+          authState.fitbit ? deauthenticate('fitbit') : authenticate('fitbit')}
       />
     </p>
   </div>

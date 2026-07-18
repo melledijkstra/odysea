@@ -1,9 +1,17 @@
 import type { ILogger } from '@/interfaces/logger.interface'
 import { Logger } from '@/logger'
 import { playbackLoop } from '@melledijkstra/toolbox'
-import type { Album, MusicPlayerInterface, Playlist, PlaybackState, Track } from 'MusicPlayer'
+import type {
+  Album,
+  MusicPlayerInterface,
+  Playlist,
+  PlaybackState,
+  Track,
+} from 'MusicPlayer'
 
-export abstract class BaseMusicController implements MusicPlayerInterface, ILogger {
+export abstract class BaseMusicController
+  implements MusicPlayerInterface, ILogger
+{
   logger: Logger = new Logger('BaseMusicController')
 
   constructor(public state: { playback: PlaybackState }) {}
@@ -54,7 +62,7 @@ export abstract class BaseMusicController implements MusicPlayerInterface, ILogg
     this.cancelPlaybackLoop = playbackLoop(
       () => this.updatePosition(),
       1000, // Update every second
-      initialPos ?? this.state.playback.position_ms,
+      initialPos ?? this.state.playback.position_ms
     )
   }
 
@@ -79,8 +87,7 @@ export abstract class BaseMusicController implements MusicPlayerInterface, ILogg
         this.trackEnded()
         return
       }
-    }
-    else {
+    } else {
       this.stopPlaybackLoop()
     }
     if (this.state.playback.isPlaying) {
@@ -93,8 +100,12 @@ export abstract class BaseMusicController implements MusicPlayerInterface, ILogg
       this.state.playback.position_ms = 0
     }
 
-    if (this.state.playback.currentItem && position > this.state.playback.currentItem.duration_ms) {
-      this.state.playback.position_ms = this.state.playback.currentItem.duration_ms
+    if (
+      this.state.playback.currentItem &&
+      position > this.state.playback.currentItem.duration_ms
+    ) {
+      this.state.playback.position_ms =
+        this.state.playback.currentItem.duration_ms
     }
 
     this.state.playback.position_ms = position

@@ -35,9 +35,6 @@
 
 <Clock />
 {#if appState?.user}
-  <Welcome
-    user={appState.user}
-    {onUsernameChange}
-    {onClearUsername} />
+  <Welcome user={appState.user} {onUsernameChange} {onClearUsername} />
 {/if}
 {@render renderCurrentTask()}

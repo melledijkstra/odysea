@@ -19,11 +19,13 @@
   {/if}
 {/snippet}
 
-<header class={[
-  'w-full p-6',
-  // add vignette effect from top to bottom
-  'bg-gradient-to-b from-zinc-600/60 to-80% to-transparent',
-]}>
+<header
+  class={[
+    'w-full p-6',
+    // add vignette effect from top to bottom
+    'bg-gradient-to-b from-zinc-600/60 to-80% to-transparent',
+  ]}
+>
   <div
     class="float-left flex flex-row items-center justify-start align-middle gap-5"
   >

@@ -8,7 +8,9 @@
   import { settingsStore } from '@/settings/index.svelte'
 
   const { currentWeather, setCurrentWeather } = createWeatherState()
-  const client = $state<WeatherClient>(new WeatherClient(() => settingsStore.apiKeys.weather || ''))
+  const client = $state<WeatherClient>(
+    new WeatherClient(() => settingsStore.apiKeys.weather || '')
+  )
 
   async function retrieveWeather() {
     const weather = await client.getWeather()
@@ -31,8 +33,5 @@
     location={currentWeather.data.location}
   />
 {:else}
-  <IconButton
-    icon={mdiCloudOff}
-    onclick={retrieveWeather}
-  />
+  <IconButton icon={mdiCloudOff} onclick={retrieveWeather} />
 {/if}

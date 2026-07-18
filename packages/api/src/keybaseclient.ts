@@ -6,7 +6,7 @@ export class ApiKeyBaseClient extends BaseClient {
 
   constructor(
     baseUrl: string,
-    apiKey: string | (() => string | undefined) | undefined,
+    apiKey: string | (() => string | undefined) | undefined
   ) {
     super(baseUrl)
 
@@ -14,18 +14,20 @@ export class ApiKeyBaseClient extends BaseClient {
 
     if (this.constructor === ApiKeyBaseClient) {
       throw new Error(
-        'ApiKeyBaseClient is abstract and cannot be instantiated directly.',
+        'ApiKeyBaseClient is abstract and cannot be instantiated directly.'
       )
     }
   }
 
   async request<T>(
     endpoint: string,
-    config?: RequestInit,
+    config?: RequestInit
   ): Promise<T | undefined> {
     const key = this.getApiKey()
     if (!key) {
-      throw new Error('ApiKeyBaseClient needs to be instantiated with a valid API key.')
+      throw new Error(
+        'ApiKeyBaseClient needs to be instantiated with a valid API key.'
+      )
     }
     const [path, query] = endpoint.split('?')
     const searchParams = new URLSearchParams(query || '')

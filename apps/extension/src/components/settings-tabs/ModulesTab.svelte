@@ -1,6 +1,10 @@
 <script lang="ts">
   import { MODULE_CONFIG } from '@/modules'
-  import { settings, DEFAULT_SETTINGS, settingsStore } from '@/settings/index.svelte'
+  import {
+    settings,
+    DEFAULT_SETTINGS,
+    settingsStore,
+  } from '@/settings/index.svelte'
 </script>
 
 <h1 class="text-xl">Modules Settings</h1>
@@ -17,6 +21,8 @@
     <span class="text-base">{title}</span>
   </p>
   <p class="text-gray-400">
-    {id}: {settingsStore.modules[id]} (default: {DEFAULT_SETTINGS.modules?.[id]})
+    {id}: {settingsStore.modules[id]} (default: {DEFAULT_SETTINGS.modules?.[
+      id
+    ]})
   </p>
 {/each}

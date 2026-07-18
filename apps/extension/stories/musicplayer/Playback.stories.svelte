@@ -2,7 +2,10 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import SpotifyPlayback from '@/components/musicplayer/Playback.svelte'
   import { playbackState } from '@/fixtures/musicplayer/state'
-  import { track_ClocksColdPlay, track_NocturneChopin } from '@/fixtures/musicplayer/tracks'
+  import {
+    track_ClocksColdPlay,
+    track_NocturneChopin,
+  } from '@/fixtures/musicplayer/tracks'
 
   const { Story } = defineMeta({
     title: 'Music Player/Playback',
@@ -17,12 +20,16 @@
 
 <Story
   name="Clocks - Coldplay"
-  args={{ playbackState: { ...playbackState, currentItem: track_ClocksColdPlay } }}
+  args={{
+    playbackState: { ...playbackState, currentItem: track_ClocksColdPlay },
+  }}
 />
 
 <Story
   name="Nocturne - Chopin"
-  args={{ playbackState: { ...playbackState, currentItem: track_NocturneChopin } }}
+  args={{
+    playbackState: { ...playbackState, currentItem: track_NocturneChopin },
+  }}
 />
 
 <Story

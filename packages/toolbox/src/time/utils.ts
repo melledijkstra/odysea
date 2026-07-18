@@ -41,7 +41,7 @@ export function formatSeconds(seconds: number): string {
 
   const formatted = `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
 
-  return (isNegative && absoluteSeconds > 0) ? `-${formatted}` : formatted
+  return isNegative && absoluteSeconds > 0 ? `-${formatted}` : formatted
 }
 
 export function renderTimezone(timezone: string) {
@@ -88,7 +88,7 @@ export function getTimePercentage(): string {
 export function playbackLoop(
   callback: (position: number) => void,
   interval: number,
-  initialPosition: number = 0,
+  initialPosition: number = 0
 ): () => void {
   let position = initialPosition
 
@@ -108,11 +108,9 @@ export function getMomentOfDay(): 'morning' | 'afternoon' | 'evening' {
 
   if (hours < 12) {
     momentOfDay = 'morning'
-  }
-  else if (hours < 18) {
+  } else if (hours < 18) {
     momentOfDay = 'afternoon'
-  }
-  else {
+  } else {
     momentOfDay = 'evening'
   }
 

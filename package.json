@@ -14,6 +14,7 @@
     "lint": "turbo run lint",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
+    "format:root": "turbo run format",
     "typecheck": "turbo run typecheck",
     "extension": "pnpm --filter=@odysea/extension run",
     "server": "pnpm --filter=@odysea/server run",
@@ -21,7 +22,7 @@
     "packages": "pnpm --filter=@melledijkstra/* run",
     "cli": "pnpm --filter=@odysea/cli run",
     "storybook:build": "pnpm --filter=@odysea/extension run storybook:build",
-    "local:ci": "pnpm build && pnpm lint && pnpm format:check && CI=true pnpm test && pnpm test:e2e",
+    "local:ci": "pnpm build && pnpm lint && pnpm format && CI=true pnpm test && pnpm test:e2e",
     "cleanup": "rm -rf .turbo node_modules && rm -fr apps/*/node_modules && pnpm cache delete"
   },
   "engines": {

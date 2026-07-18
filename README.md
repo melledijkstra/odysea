@@ -26,4 +26,3 @@ pnpm -filter @odysea/server start       # start the Node server
 ```
 
 See each application's README for more details on features and configuration.
-
