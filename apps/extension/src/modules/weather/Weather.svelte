@@ -28,7 +28,7 @@
 {#if currentWeather.data}
   <WeatherInfo
     iconId={currentWeather.data.icon}
-    temperatureF={currentWeather.data.temperature}
+    temperatureKelvin={currentWeather.data.temperature}
     displayUnit="C"
     location={currentWeather.data.location}
   />

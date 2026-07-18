@@ -198,6 +198,36 @@ export class AuthClient {
     return false
   }
 
+  private async tryRefreshToken(
+    refresh_token: string
+  ): Promise<string | undefined> {
+    this._logger.log('token expired, trying to refresh it')
+    try {
+      const newTokens = await this.refreshAccessToken(refresh_token)
+      if (!newTokens) {
+        throw new Error('Failed to refresh token - user must re-authenticate.')
+      }
+
+      const newAccessToken = newTokens.accessToken()
+      this._logger.log('refreshed new access token, storing it and continue')
+
+      await this.cacheAuthToken(
+        newAccessToken,
+        newTokens.hasRefreshToken() ? newTokens.refreshToken() : refresh_token,
+        newTokens.accessTokenExpiresInSeconds()
+      )
+      return newAccessToken
+    } catch (error) {
+      if (this.isInvalidTokenError(error)) {
+        this._logger.warn('Refresh token is invalid, clearing storage')
+        await this._storage.delete(this.storageKey)
+      } else {
+        this._logger.error('Failed to refresh access token', { error })
+      }
+      return undefined
+    }
+  }
+
   async getTokenFromStoreOrRefreshToken(): Promise<string | undefined> {
     if (this._tokenPromise) {
       this._logger.log(
@@ -209,53 +239,19 @@ export class AuthClient {
     this._tokenPromise = (async () => {
       try {
         const storeToken = await this.getAuthTokenFromStorage()
-        let access_token = storeToken?.access_token
-
         this._logger.debug('token in storage?', !!storeToken)
 
-        // Subtract some buffer (60 seconds) to ensure we refresh before actual expiry
-        const isTokenExpired = AuthClient.isExpired(storeToken)
+        if (!storeToken) return undefined
 
-        const { refresh_token } = storeToken ?? {}
-
-        if (isTokenExpired && refresh_token) {
-          try {
-            this._logger.log('token expired, trying to refresh it')
-            // Refresh the token
-            const newTokens = await this.refreshAccessToken(refresh_token)
-
-            if (!newTokens) {
-              throw new Error(
-                'Failed to refresh token - user must re-authenticate.'
-              )
-            }
-
-            const newAccessToken = newTokens.accessToken()
-            this._logger.log(
-              'refreshed new access token, storing it and continue'
-            )
-            await this.cacheAuthToken(
-              newAccessToken,
-              // if provider doesn't return a new refresh token, keep the old one
-              newTokens.hasRefreshToken()
-                ? newTokens.refreshToken()
-                : refresh_token,
-              newTokens.accessTokenExpiresInSeconds()
-            )
-            access_token = newAccessToken
-          } catch (error) {
-            if (this.isInvalidTokenError(error)) {
-              this._logger.warn('Refresh token is invalid, clearing storage')
-              // remove the stored token so that the user can re-authenticate
-              await this._storage.delete(this.storageKey)
-              access_token = undefined
-            } else {
-              this._logger.error('Failed to refresh access token', { error })
-            }
-          }
+        if (!AuthClient.isExpired(storeToken)) {
+          return storeToken.access_token
         }
 
-        return access_token
+        if (storeToken.refresh_token) {
+          return await this.tryRefreshToken(storeToken.refresh_token)
+        }
+
+        return undefined
       } finally {
         this._tokenPromise = null
       }
@@ -396,33 +392,39 @@ export class AuthClient {
     this._logger.log('Generated Auth URL:', url.href)
 
     if (this._handler) {
-      try {
-        const redirectUrl = await this._handler.open(url)
-        const code = redirectUrl.searchParams.get('code')
-        const state = redirectUrl.searchParams.get('state')
+      return this.handleRedirectFlow(url)
+    }
+  }
 
-        if (code && state) {
-          const tokens = await this.validate(code, state)
-          if (!tokens.hasRefreshToken()) {
-            throw new Error(
-              `Provider '${this.provider.name}' did not return a refresh token.`
-            )
-          }
-          // Store the tokens
-          await this.cacheAuthToken(
-            tokens.accessToken(),
-            tokens.refreshToken(),
-            tokens.accessTokenExpiresInSeconds()
-          )
-          return tokens.accessToken()
-        } else {
-          this._logger.error('Redirect URL missing code or state', {
-            href: redirectUrl.href,
-          })
-        }
-      } catch (error) {
-        this._logger.error('Auth flow failed', { error })
+  private async handleRedirectFlow(url: URL): Promise<string | undefined> {
+    try {
+      const redirectUrl = await this._handler!.open(url)
+      const code = redirectUrl.searchParams.get('code')
+      const state = redirectUrl.searchParams.get('state')
+
+      if (!code || !state) {
+        this._logger.error('Redirect URL missing code or state', {
+          href: redirectUrl.href,
+        })
+        return undefined
       }
+
+      const tokens = await this.validate(code, state)
+      if (!tokens.hasRefreshToken()) {
+        throw new Error(
+          `Provider '${this.provider.name}' did not return a refresh token.`
+        )
+      }
+
+      await this.cacheAuthToken(
+        tokens.accessToken(),
+        tokens.refreshToken(),
+        tokens.accessTokenExpiresInSeconds()
+      )
+      return tokens.accessToken()
+    } catch (error) {
+      this._logger.error('Auth flow failed', { error })
+      return undefined
     }
   }
 }

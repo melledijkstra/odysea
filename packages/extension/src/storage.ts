@@ -1,15 +1,16 @@
 import * as browser from 'webextension-polyfill'
 import {
-  IStorage,
+  BaseStorage,
   CacheItem,
   isCacheItem,
   isExpired,
 } from '@melledijkstra/storage'
 
-export class ExtensionStorage implements IStorage {
+export class ExtensionStorage extends BaseStorage {
   storageArea: browser.Storage.StorageArea
 
   constructor(storageType = browser.storage.local) {
+    super()
     this.storageArea = storageType
   }
 
@@ -54,11 +55,6 @@ export class ExtensionStorage implements IStorage {
     return this.storageArea.clear()
   }
 
-  async has(key: string): Promise<boolean> {
-    const val = await this.get(key)
-    return val !== undefined
-  }
-
   async keys(): Promise<string[]> {
     const allItems = await this.storageArea.get(null)
     const activeKeys: string[] = []
@@ -79,10 +75,5 @@ export class ExtensionStorage implements IStorage {
     }
 
     return activeKeys
-  }
-
-  async size(): Promise<number> {
-    const keys = await this.keys()
-    return keys.length
   }
 }

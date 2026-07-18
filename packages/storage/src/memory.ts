@@ -1,5 +1,5 @@
 import { Logger } from '@melledijkstra/toolbox'
-import { IStorage } from './storage.interface'
+import { BaseStorage } from './base'
 import type { CacheItem } from './types'
 import { isExpired } from './utils'
 
@@ -50,7 +50,7 @@ export function withCache<T, A extends unknown[]>(
   return cachedFunction
 }
 
-export class MemoryCache implements IStorage {
+export class MemoryCache extends BaseStorage {
   logger = new Logger('MemoryCache')
   private _cache: Record<string, CacheItem<unknown> | undefined> = {}
 
@@ -83,27 +83,8 @@ export class MemoryCache implements IStorage {
     this._cache = {}
   }
 
-  async has(key: string): Promise<boolean> {
-    const cachedItem = this._cache[key]
-
-    if (!cachedItem) {
-      return false
-    }
-
-    if (isExpired(cachedItem)) {
-      delete this._cache[key]
-      return false
-    }
-
-    return true
-  }
-
   async keys(): Promise<string[]> {
     return Object.keys(this._cache)
-  }
-
-  async size(): Promise<number> {
-    return Object.keys(this._cache).length
   }
 }
 

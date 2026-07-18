@@ -1,10 +1,12 @@
 import type { AuthClient } from '@melledijkstra/auth'
 import type { TaskList, Task } from '../../definitions/google'
 import { TokenBaseClient } from '../../tokenbaseclient'
+import { Logger } from '@melledijkstra/toolbox'
 
 const BASE_URL = 'https://tasks.googleapis.com/tasks/v1'
 
 export class GoogleTasksApiClient extends TokenBaseClient {
+  private logger = new Logger('GoogleTasksApiClient')
   public taskLists: TaskList[] = []
   public tasks: Task[] = []
 
@@ -12,40 +14,41 @@ export class GoogleTasksApiClient extends TokenBaseClient {
     super(BASE_URL, () => this.auth.getAuthToken())
   }
 
+  private async safeRequest<T>(
+    endpoint: string,
+    options?: RequestInit,
+    queryParams?: URLSearchParams
+  ): Promise<T | undefined> {
+    try {
+      const response = await this.request<T>(endpoint, options, queryParams)
+      return response ?? undefined
+    } catch (error) {
+      this.logger.error(`Error requesting ${endpoint}`, error)
+      return undefined
+    }
+  }
+
   async fetchTasks(
     taskListId: string = '@default',
     completed?: boolean
   ): Promise<Task[]> {
-    try {
-      const queryParams = new URLSearchParams()
-
-      if (!completed) {
-        queryParams.set('showCompleted', 'false')
-      }
-
-      const response = await this.request<{ items: Task[] }>(
-        `/lists/${taskListId}/tasks`,
-        {},
-        queryParams
-      )
-
-      return response?.items ?? []
-    } catch (error) {
-      console.error('Error fetching tasks:', error)
-      return []
+    const queryParams = new URLSearchParams()
+    if (!completed) {
+      queryParams.set('showCompleted', 'false')
     }
+    const response = await this.safeRequest<{ items: Task[] }>(
+      `/lists/${taskListId}/tasks`,
+      {},
+      queryParams
+    )
+    return response?.items ?? []
   }
 
   async getTaskLists(): Promise<TaskList[] | undefined> {
-    try {
-      const response = await this.request<{ items: TaskList[] }>(
-        '/users/@me/lists'
-      )
-
-      return response?.items ?? []
-    } catch (error) {
-      console.error('Error fetching task lists:', error)
-    }
+    const response = await this.safeRequest<{ items: TaskList[] }>(
+      '/users/@me/lists'
+    )
+    return response?.items ?? []
   }
 
   async setTaskStatus(
@@ -54,51 +57,23 @@ export class GoogleTasksApiClient extends TokenBaseClient {
     taskListId: string = '@default'
   ): Promise<Task | undefined> {
     const id = typeof task === 'string' ? task : task.id
-    const taskData: Partial<Task> = {
-      status,
-    }
-    try {
-      const response = await this.request<Task>(
-        `/lists/${taskListId}/tasks/${id}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          method: 'PATCH',
-          body: JSON.stringify(taskData),
-        }
-      )
-
-      if (response) {
-        return response
-      }
-    } catch (error) {
-      console.error('Error completing task', error)
-    }
+    const taskData: Partial<Task> = { status }
+    return this.safeRequest<Task>(`/lists/${taskListId}/tasks/${id}`, {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'PATCH',
+      body: JSON.stringify(taskData),
+    })
   }
 
   async updateTask(
     task: Task,
     taskListId: string = '@default'
   ): Promise<Task | undefined> {
-    try {
-      const response = await this.request<Task>(
-        `/lists/${taskListId}/tasks/${task.id}`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(task),
-        }
-      )
-
-      if (response) {
-        return response
-      }
-    } catch (error) {
-      console.error('Error updating task', error)
-    }
+    return this.safeRequest<Task>(`/lists/${taskListId}/tasks/${task.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(task),
+    })
   }
 
   async createTask(
@@ -106,18 +81,10 @@ export class GoogleTasksApiClient extends TokenBaseClient {
     taskListId: string = '@default'
   ): Promise<Task | undefined> {
     const taskData = JSON.stringify({ title })
-    try {
-      const response = await this.request<Task>(`/lists/${taskListId}/tasks`, {
-        method: 'POST',
-        body: taskData,
-      })
-
-      if (response) {
-        return response
-      }
-    } catch (error) {
-      console.error('Error creating a task', error)
-    }
+    return this.safeRequest<Task>(`/lists/${taskListId}/tasks`, {
+      method: 'POST',
+      body: taskData,
+    })
   }
 
   async deleteTask(
@@ -131,8 +98,8 @@ export class GoogleTasksApiClient extends TokenBaseClient {
       })
       return true
     } catch (error) {
-      console.error('Error deleting task', error)
+      this.logger.error('Error deleting task', error)
+      return false
     }
-    return false
   }
 }
