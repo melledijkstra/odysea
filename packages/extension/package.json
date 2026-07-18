@@ -23,8 +23,8 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/chrome": "^0.1.33",
-    "@types/webextension-polyfill": "^0.12.3",
+    "@types/chrome": "^0.1.43",
+    "@types/webextension-polyfill": "^0.12.5",
     "eslint": "catalog:",
     "webextension-polyfill": "^0.12.0"
   },

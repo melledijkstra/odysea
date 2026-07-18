@@ -12,8 +12,6 @@ import {
   mdiWeatherNightPartlyCloudy,
 } from '@mdi/js'
 
-
-
 export function weatherToMdiIcon(icon?: string) {
   switch (icon) {
     case '01d':

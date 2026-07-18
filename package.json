@@ -29,13 +29,13 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "tsdown": "^0.22.8",
-    "turbo": "^2.10.5",
-    "vitest": "^4.1.10",
     "@melledijkstra/config": "workspace:*",
     "prettier": "catalog:",
+    "prettier-plugin-svelte": "catalog:",
     "prettier-plugin-tailwindcss": "catalog:",
-    "prettier-plugin-svelte": "catalog:"
+    "tsdown": "^0.22.9",
+    "turbo": "^2.10.5",
+    "vitest": "^4.1.10"
   },
   "repository": {
     "type": "git",

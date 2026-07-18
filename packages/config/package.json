@@ -14,21 +14,21 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "globals": "^17.7.0",
-    "eslint-config-prettier": "catalog:",
     "@eslint/css": "^1.4.0",
-    "@eslint/js": "^9.39.4",
+    "@eslint/js": "^9.39.5",
     "@eslint/json": "^2.0.1",
     "@types/node": "catalog:",
-    "@typescript-eslint/parser": "^8.63.0",
+    "@typescript-eslint/parser": "^8.64.0",
     "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
     "eslint-plugin-svelte": "^3.20.0",
     "eslint-plugin-turbo": "catalog:",
+    "globals": "^17.7.0",
     "prettier": "catalog:",
     "rollup-plugin-visualizer": "^6.0.11",
     "svelte-eslint-parser": "^1.8.0",
     "typescript": "catalog:",
-    "typescript-eslint": "^8.63.0"
+    "typescript-eslint": "^8.64.0"
   },
   "peerDependencies": {
     "prettier": "catalog:"

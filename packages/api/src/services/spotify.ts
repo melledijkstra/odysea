@@ -66,7 +66,6 @@ export class SpotifyApiClient extends TokenBaseClient {
     }
   }
 
-
   async toggleShuffle(state: boolean) {
     await this.request(`/me/player/shuffle?state=${state ? 'true' : 'false'}`, {
       method: 'PUT',
@@ -80,7 +79,6 @@ export class SpotifyApiClient extends TokenBaseClient {
 
     return response?.items ?? []
   }
-
 
   async getPlaybackState() {
     this.logger.log('Retrieving playback state from Spotify Web API')

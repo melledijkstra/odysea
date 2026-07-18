@@ -1,12 +1,7 @@
 <script lang="ts">
   import Icon from '@/components/atoms/Icon.svelte'
-  import {
-    weatherToMdiIcon,
-  } from './utils'
-  import {
-    kelvinToCelsius,
-    kelvinToFahrenheit,
-  } from '@melledijkstra/toolbox'
+  import { weatherToMdiIcon } from './utils'
+  import { kelvinToCelsius, kelvinToFahrenheit } from '@melledijkstra/toolbox'
 
   export type WeatherInfoProps = {
     iconId: string
@@ -24,9 +19,11 @@
 
   const temperature = $derived.by(() => {
     if (displayUnit === 'F') {
-      if (temperatureKelvin !== undefined) return kelvinToFahrenheit(temperatureKelvin)
+      if (temperatureKelvin !== undefined)
+        return kelvinToFahrenheit(temperatureKelvin)
     } else {
-      if (temperatureKelvin !== undefined) return kelvinToCelsius(temperatureKelvin)
+      if (temperatureKelvin !== undefined)
+        return kelvinToCelsius(temperatureKelvin)
     }
   })
 
