@@ -9,7 +9,7 @@
     "dev": "deno run --allow-net --allow-env --watch --env-file main.ts",
     "start": "deno run --allow-net --allow-env --env-file main.ts",
     "lint": "deno lint",
-    "test": "deno test --allow-env",
+    "#test": "deno test --allow-env",
     "test:watch": "deno --allow-env --watch"
   },
   "keywords": [

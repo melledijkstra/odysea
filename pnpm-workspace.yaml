@@ -18,6 +18,7 @@ catalog:
   tsx: ^4.23.1
 
 allowBuilds:
+  better-sqlite3: true
   deno: false
   esbuild: true
   sqlite3: true

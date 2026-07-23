@@ -6,3 +6,6 @@ playwright-report
 test-results
 
 pnpm-lock.yaml
+
+# looper project specific files
+.tokens.json
