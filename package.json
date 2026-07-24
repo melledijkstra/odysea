@@ -7,7 +7,10 @@
   "license": "GPL-3.0-only",
   "type": "module",
   "scripts": {
-    "dev": "turbo run dev",
+    "dev:looper": "turbo run dev --ui=tui --filter=looper...",
+    "dev:extension": "turbo run dev --ui=tui --filter=@odysea/extension...",
+    "dev:server": "turbo run dev --ui=tui --filter=@odysea/server...",
+    "dev:cli": "turbo run dev --ui=tui --filter=@odysea/cli...",
     "build": "turbo run build",
     "test": "vitest",
     "test:e2e": "turbo run test:e2e",

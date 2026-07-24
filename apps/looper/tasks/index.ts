@@ -6,4 +6,5 @@
  *   1. Create `tasks/my-new-task.ts` extending ScheduledTask
  *   2. Export it from this file
  */
-export { MockTask } from './mock-task.js'
+export { EmailTask } from './email-task.ts'
+export { NotificationTask } from './notification-task.js'

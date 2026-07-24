@@ -2,7 +2,7 @@ import express from 'express'
 import { Logger } from '@melledijkstra/toolbox'
 import { authClient } from './google-auth.js'
 import { TaskScheduler } from './scheduler.js'
-import { MockTask } from './tasks/index.js'
+import { EmailTask, NotificationTask } from './tasks/index.js'
 
 const logger = new Logger('looper')
 
@@ -21,7 +21,8 @@ app.use(express.json())
 // ---------------------------------------------------------------------------
 const scheduler = new TaskScheduler(
   [
-    new MockTask(),
+    new EmailTask(),
+    new NotificationTask(),
     // new AnotherTask(),
   ],
   PORT
