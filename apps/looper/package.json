@@ -38,7 +38,6 @@
     "@types/node-cron": "^3.0.11",
     "@types/node-notifier": "^8.0.5",
     "tsx": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "^2.1.8"
+    "typescript": "catalog:"
   }
 }

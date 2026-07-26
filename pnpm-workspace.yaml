@@ -16,6 +16,7 @@ catalog:
   prettier-plugin-tailwindcss: ^0.8.1
   eslint-config-prettier: ^10.1.8
   tsx: ^4.23.1
+  vitest: ^4.1.10
 
 allowBuilds:
   better-sqlite3: true
