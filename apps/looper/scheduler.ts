@@ -15,6 +15,10 @@ export class WorkflowScheduler {
   private readonly workflows = new Map<string, Workflow>()
   private readonly cronHandles = new Map<string, CronTask>()
   private watcher: chokidar.FSWatcher | null = null
+  private lastCheckTime = Date.now()
+  private clockDriftInterval: ReturnType<typeof setInterval> | null = null
+  private readonly CHECK_INTERVAL = 10_000 // 10 seconds
+  private readonly DRIFT_THRESHOLD = 30_000 // 30 seconds
 
   constructor(private readonly workflowsDir: string) {}
 
@@ -34,6 +38,54 @@ export class WorkflowScheduler {
       .on('add', (filePath) => this.handleFileEvent(filePath))
       .on('change', (filePath) => this.handleFileEvent(filePath))
       .on('unlink', (filePath) => this.removeWorkflow(filePath))
+
+    this.startClockDriftDetection()
+  }
+
+  stop(): void {
+    logger.log('Stopping WorkflowScheduler...')
+
+    if (this.watcher) {
+      this.watcher.close()
+      this.watcher = null
+    }
+
+    for (const handle of this.cronHandles.values()) {
+      handle.stop()
+    }
+    this.cronHandles.clear()
+
+    if (this.clockDriftInterval) {
+      clearInterval(this.clockDriftInterval)
+      this.clockDriftInterval = null
+    }
+  }
+
+  private startClockDriftDetection(): void {
+    this.lastCheckTime = Date.now()
+    this.clockDriftInterval = setInterval(() => {
+      const now = Date.now()
+      const elapsed = now - this.lastCheckTime
+
+      if (elapsed > this.DRIFT_THRESHOLD) {
+        logger.log(
+          `Sleep/Wake detected! Clock drift of ${Math.round(
+            elapsed / 1000
+          )}s exceeded threshold. Catching up missed workflows...`
+        )
+        this.catchUpMissedExecutions()
+      }
+
+      this.lastCheckTime = now
+    }, this.CHECK_INTERVAL)
+  }
+
+  private catchUpMissedExecutions(): void {
+    for (const workflow of this.workflows.values()) {
+      if (workflow.trigger.type === 'cron') {
+        this.checkMissedExecution(workflow)
+      }
+    }
   }
 
   private handleFileEvent(filePath: string): void {
