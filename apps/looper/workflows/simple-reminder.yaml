@@ -1,0 +1,11 @@
+id: simple-reminder
+name: Simple Hourly Reminder
+trigger:
+  type: cron
+  expression: '0 * * * *' # Every hour
+steps:
+  - id: notifyStep
+    action: system.notify
+    args:
+      title: 'Hourly Check-in'
+      message: "It's time for your hourly check-in! Stay hydrated and take a quick stretch."

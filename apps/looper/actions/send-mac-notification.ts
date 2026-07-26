@@ -23,8 +23,9 @@ export async function sendMacNotification(
     )
 
     logger.log('Mac notification sent successfully.')
-  } catch (err: any) {
-    logger.error(`Failed to send mac notification: ${err.message}`, err)
-    throw new Error(`Failed to send mac notification: ${err.message}`)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    logger.error(`Failed to send mac notification: ${message}`, err)
+    throw new Error(`Failed to send mac notification: ${message}`)
   }
 }

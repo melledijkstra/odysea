@@ -11,13 +11,13 @@ import type { ActionContext } from '../types/actions.ts'
 
 export async function getUserInfo(
   ctx: ActionContext,
-  token: string
+  args: { token: string }
 ): Promise<UserInfo> {
   logger.log(`[${ctx.taskName}] Fetching user info from Google...`)
   const response = await fetch(
     'https://www.googleapis.com/oauth2/v2/userinfo',
     {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${args.token}` },
     }
   )
 

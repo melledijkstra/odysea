@@ -1,0 +1,13 @@
+id: simple-email-webhook
+name: Simple Webhook Email
+trigger:
+  type: webhook
+steps:
+  - id: getUserInfo
+    action: google.getUserInfo
+  - id: sendMailStep
+    action: google.sendEmail
+    args:
+      userInfo:
+        email: '{{ getUserInfo.output.email }}'
+        name: '{{ getUserInfo.output.name }}'

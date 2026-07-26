@@ -1,0 +1,10 @@
+id: simple-webhook
+name: Simple Webhook Trigger
+trigger:
+  type: webhook
+steps:
+  - id: notifyStep
+    action: system.notify
+    args:
+      title: 'Webhook Triggered!'
+      message: 'The webhook has been triggered successfully.'

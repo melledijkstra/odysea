@@ -1,0 +1,14 @@
+id: simple-email
+name: Simple Daily Email
+trigger:
+  type: cron
+  expression: '0 8 * * *' # Every day at 8 AM
+steps:
+  - id: getUserInfo
+    action: google.getUserInfo
+  - id: sendMailStep
+    action: google.sendEmail
+    args:
+      userInfo:
+        email: '{{ getUserInfo.output.email }}'
+        name: '{{ getUserInfo.output.name }}'

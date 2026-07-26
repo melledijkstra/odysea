@@ -1,8 +1,11 @@
 import express from 'express'
 import { Logger } from '@melledijkstra/toolbox'
 import { authClient } from './google-auth.js'
-import { TaskScheduler } from './scheduler.js'
-import { EmailTask, NotificationTask } from './tasks/index.js'
+import { WorkflowScheduler } from './scheduler.js'
+import { WorkflowEngine } from './engine.js'
+import { getLastExecutedTimestamp } from './database.js'
+import { toHuman } from 'cron-translate'
+import path from 'node:path'
 
 const logger = new Logger('looper')
 
@@ -16,17 +19,11 @@ const PORT =
 app.use(express.json())
 
 // ---------------------------------------------------------------------------
-// Task registration
-// Add new tasks here – each task controls its own id, name, cron, and logic.
+// Workflow registration
+// Workflows are loaded dynamically from the workflows/ directory.
 // ---------------------------------------------------------------------------
-const scheduler = new TaskScheduler(
-  [
-    new EmailTask(),
-    new NotificationTask(),
-    // new AnotherTask(),
-  ],
-  PORT
-)
+const workflowsDir = path.resolve('workflows')
+const scheduler = new WorkflowScheduler(workflowsDir)
 
 // ---------------------------------------------------------------------------
 // Auth routes
@@ -86,21 +83,42 @@ app.get('/oauth/callback', async (req, res) => {
 // ---------------------------------------------------------------------------
 
 /**
- * Webhook endpoint — triggers all registered tasks immediately.
+ * Webhook endpoint — triggers a specific workflow.
  * POST /webhook
  */
-app.post('/webhook', (_req, res) => {
+app.post('/webhook', (req, res) => {
   logger.log('Webhook endpoint triggered.')
+  const { workflowId } = req.body
 
-  const tasks = scheduler.getTasks()
-  for (const task of tasks) {
-    task.execute({ reason: 'Webhook Trigger', port: PORT })
+  if (!workflowId) {
+    res.status(400).json({ success: false, message: 'workflowId is required' })
+    return
   }
+
+  const workflows = scheduler.getWorkflows()
+  const workflow = workflows.find((w) => w.id === workflowId)
+
+  if (!workflow) {
+    res.status(404).json({ success: false, message: 'Workflow not found' })
+    return
+  }
+
+  if (workflow.trigger.type !== 'webhook') {
+    res.status(400).json({
+      success: false,
+      message: 'Workflow is not configured for webhook trigger',
+    })
+    return
+  }
+
+  // Execute workflow without awaiting
+  WorkflowEngine.execute(workflow, 'Webhook Trigger').catch((err) => {
+    logger.error(`Webhook execution error for ${workflowId}:`, err)
+  })
 
   res.status(200).json({
     success: true,
-    message: `${tasks.length} task(s) triggered via webhook.`,
-    tasks: tasks.map((t) => t.id),
+    message: `Workflow ${workflowId} triggered via webhook.`,
     timestamp: Date.now(),
   })
 })
@@ -113,35 +131,47 @@ app.get('/status', async (_req, res) => {
   const authenticated = await authClient.isAuthenticated()
   const now = Date.now()
 
-  const taskStatuses = scheduler.getTasks().map((task) => {
-    const lastRun = task.getLastExecutedTimestamp()
-    const cronHandle = scheduler.getCronHandle(task.id)
+  const taskStatuses = scheduler.getWorkflows().map((workflow) => {
+    const lastRun = getLastExecutedTimestamp(workflow.id)
+    const cronHandle = scheduler.getCronHandle(workflow.id)
 
     let nextRunAt: string | null = null
-    if (cronHandle) {
+    if (cronHandle && workflow.trigger.type === 'cron') {
       try {
         const nextRun = cronHandle.getNextRun()
         if (nextRun instanceof Date) {
-          nextRunAt = nextRun.toISOString()
+          nextRunAt = nextRun.toString()
+        } else if (
+          nextRun &&
+          typeof nextRun === 'object' &&
+          'toDate' in nextRun
+        ) {
+          nextRunAt = (nextRun as { toDate: () => Date }).toDate().toString()
         } else if (nextRun) {
-          nextRunAt = new Date(nextRun).toISOString()
+          nextRunAt = new Date(nextRun as unknown as string | number).toString()
         }
       } catch (err) {
-        logger.error(`Error getting next run time for task "${task.id}":`, err)
+        logger.error(
+          `Error getting next run time for workflow "${workflow.id}":`,
+          err
+        )
       }
     }
 
     return {
-      taskId: task.id,
-      taskName: task.name,
+      taskId: workflow.id,
+      taskName: workflow.name,
       lastExecutedAt: lastRun ? new Date(lastRun).toISOString() : null,
       lastExecutedTimestamp: lastRun,
       elapsedMs: lastRun ? now - lastRun : null,
       status: lastRun ? 'Active' : 'Never Executed',
-      cronSchedule: {
-        expression: task.cronExpression,
-        nextRunAt,
+      trigger: {
+        ...workflow.trigger,
+        ...(workflow.trigger.type === 'cron' && {
+          human: toHuman(workflow.trigger.expression),
+        }),
       },
+      nextRunAt,
     }
   })
 
