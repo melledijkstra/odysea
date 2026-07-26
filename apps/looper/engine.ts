@@ -7,7 +7,10 @@ import { updateLastExecutedTimestamp } from './database.js'
 const logger = new Logger('WorkflowEngine')
 
 export class WorkflowEngine {
-  static interpolate(value: unknown, context: Record<string, unknown>): unknown {
+  static interpolate(
+    value: unknown,
+    context: Record<string, unknown>
+  ): unknown {
     if (typeof value === 'string') {
       const exactMatch = /^\s*\{\{\s*([\w.]+)\s*\}\}\s*$/.exec(value)
       if (exactMatch) {
@@ -32,7 +35,14 @@ export class WorkflowEngine {
   }
 
   static resolvePath(path: string, obj: unknown): unknown {
-    return path.split('.').reduce((acc, part) => (acc as Record<string, unknown>) && (acc as Record<string, unknown>)[part], obj)
+    return path
+      .split('.')
+      .reduce(
+        (acc, part) =>
+          (acc as Record<string, unknown>) &&
+          (acc as Record<string, unknown>)[part],
+        obj
+      )
   }
 
   static async execute(workflow: Workflow, triggerReason: string) {
@@ -56,16 +66,17 @@ export class WorkflowEngine {
           throw new Error(`Action not found in registry: ${step.action}`)
         }
 
-        const interpolatedArgs = this.interpolate(step.args || {}, context) as Record<string, unknown>
+        const interpolatedArgs = this.interpolate(
+          step.args || {},
+          context
+        ) as Record<string, unknown>
         const result = await actionFunction(actionCtx, interpolatedArgs)
 
         context[step.id] = { output: result }
       }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error)
-      logger.error(
-        `Error in workflow ${workflow.id}: ${message}`
-      )
+      logger.error(`Error in workflow ${workflow.id}: ${message}`)
       status = 'FAILED'
     }
 

@@ -40,7 +40,8 @@ export async function sendEmail(
       `Email sent successfully to ${args.userInfo.email}. Message ID: ${gmailResponse.data.id}`
     )
   } catch (gmailError: unknown) {
-    const message = gmailError instanceof Error ? gmailError.message : String(gmailError)
+    const message =
+      gmailError instanceof Error ? gmailError.message : String(gmailError)
     logger.error(`Failed to send email: ${message}`, gmailError)
   }
 }
