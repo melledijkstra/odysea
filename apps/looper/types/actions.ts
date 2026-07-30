@@ -1,6 +1,6 @@
-import type { TaskExecutionContext } from './tasks.ts'
+import type { WorkflowExecutionContext } from './workflow.ts'
 
-export interface ActionContext extends TaskExecutionContext {
-  taskName: string
-  taskId: string
+export interface ActionContext extends WorkflowExecutionContext {
+  workflowName: string
+  workflowId: string
 }

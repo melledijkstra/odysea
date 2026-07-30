@@ -6,17 +6,16 @@ const logger = new Logger('Action:SendNotification')
 
 export async function sendNotification(
   ctx: ActionContext,
-  message: string,
-  title?: string
+  args: { message: string; title?: string }
 ): Promise<void> {
-  const notificationTitle = title || `Looper: ${ctx.taskName}`
+  const notificationTitle = args.title || `Looper: ${ctx.workflowName}`
   try {
-    logger.log(`Sending notification for task "${ctx.taskName}"...`)
+    logger.log(`Sending notification for workflow "${ctx.workflowName}"...`)
 
     notifier.notify(
       {
         title: notificationTitle,
-        message: message,
+        message: args.message,
         sound: true,
         wait: true,
       },
@@ -30,8 +29,9 @@ export async function sendNotification(
     )
 
     logger.log('Notification sent successfully.')
-  } catch (err: any) {
-    logger.error(`Failed to send notification: ${err.message}`, err)
-    throw new Error(`Failed to send notification: ${err.message}`)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    logger.error(`Failed to send notification: ${message}`, err)
+    throw new Error(`Failed to send notification: ${message}`)
   }
 }

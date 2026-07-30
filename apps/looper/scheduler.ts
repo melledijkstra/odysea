@@ -1,137 +1,245 @@
 import cron, { type ScheduledTask as CronTask } from 'node-cron'
+import { CronExpressionParser } from 'cron-parser'
 import { Logger } from '@melledijkstra/toolbox'
-import { type ScheduledTask } from './task.js'
+import chokidar from 'chokidar'
+import yaml from 'js-yaml'
+import fs from 'node:fs'
+import path from 'node:path'
+import { WorkflowEngine } from './engine.js'
+import { getLastExecutedTimestamp } from './database.js'
+import type { Workflow } from './types/workflow.js'
 
-const logger = new Logger('TaskScheduler')
+const logger = new Logger('WorkflowScheduler')
 
-/**
- * Manages the lifecycle of all registered tasks:
- *  - Schedules each task via node-cron
- *  - Runs a startup catch-up check for each task
- *  - Exposes scheduled cron handles for status queries
- */
-export class TaskScheduler {
-  /** Map from task id → live cron handle */
+export class CronTriggerManager {
   private readonly cronHandles = new Map<string, CronTask>()
 
-  constructor(
-    private readonly tasks: ScheduledTask[],
-    private readonly port: number | string
-  ) {}
+  register(workflow: Workflow, onTick: (w: Workflow) => Promise<void>): void {
+    if (workflow.trigger.type !== 'cron') return
 
-  /**
-   * Starts all registered tasks.
-   * Call this once after the Express server is listening.
-   */
-  start(): void {
-    for (const task of this.tasks) {
-      this.startupCatchupCheck(task)
-      this.schedule(task)
-    }
-  }
-
-  /**
-   * Returns the cron handle for a given task id, or undefined if not found.
-   */
-  getCronHandle(taskId: string): CronTask | undefined {
-    return this.cronHandles.get(taskId)
-  }
-
-  /**
-   * Returns a snapshot of all registered tasks for use in status routes.
-   */
-  getTasks(): ReadonlyArray<ScheduledTask> {
-    return this.tasks
-  }
-
-  // ---------------------------------------------------------------------------
-  // Private helpers
-  // ---------------------------------------------------------------------------
-
-  private schedule(task: ScheduledTask): void {
+    this.checkMissedExecution(workflow)
+    
     logger.log(
-      `Scheduling task "${task.name}" <${task.id}> with cron: ${task.cronExpression}`
+      `Scheduling workflow "${workflow.name}" <${workflow.id}> with cron: ${workflow.trigger.expression}`
     )
-
     const handle = cron.schedule(
-      task.cronExpression,
-      () => this.onCronTick(task),
+      workflow.trigger.expression,
+      () => onTick(workflow),
       process.env['TZ'] ? { timezone: process.env['TZ'] } : undefined
     )
-
-    this.cronHandles.set(task.id, handle)
+    this.cronHandles.set(workflow.id, handle)
   }
 
-  private async onCronTick(task: ScheduledTask): Promise<void> {
-    logger.log(`Cron tick for task "${task.name}" [${task.id}].`)
-
-    const lastRun = task.getLastExecutedTimestamp()
-    const now = Date.now()
-
-    if (!lastRun) {
-      logger.log(
-        `<${task.id}> No previous execution found. Performing initial execution.`
-      )
-      await task.execute({
-        reason: 'Cron Scheduled Run (Initial)',
-        port: this.port,
-      })
-      return
-    }
-
-    const elapsed = now - lastRun
-    const tolerance = 5_000 // 5-second tolerance for timing jitter
-    const missedRuns = Math.floor(elapsed / task.intervalMs)
-
-    if (missedRuns > 1) {
-      logger.warn(
-        `<${task.id}> Missed execution(s) detected! ` +
-          `Last run was ${Math.round(elapsed / 1000 / 60)} minutes ago. Missed count: ${missedRuns - 1}`
-      )
-      await task.execute({
-        reason: 'Cron Scheduled Run (Recovering from missed run)',
-        port: this.port,
-      })
-    } else if (elapsed >= task.intervalMs - tolerance) {
-      logger.log(`<${task.id}> Scheduled time reached. Executing task.`)
-      await task.execute({ reason: 'Cron Scheduled Run', port: this.port })
-    } else {
-      logger.log(
-        `<${task.id}> Skipping execution: task was already run ` +
-          `${Math.round(elapsed / 1000)} seconds ago (likely via webhook or manual trigger).`
-      )
+  unregister(workflowId: string): void {
+    const handle = this.cronHandles.get(workflowId)
+    if (handle) {
+      handle.stop()
+      this.cronHandles.delete(workflowId)
     }
   }
 
-  private async startupCatchupCheck(task: ScheduledTask): Promise<void> {
-    logger.log(
-      `Running startup catch-up check for task "${task.name}" <${task.id}>...`
-    )
+  catchUpMissedExecutions(workflows: Iterable<Workflow>): void {
+    for (const workflow of workflows) {
+      if (workflow.trigger.type === 'cron') {
+        this.checkMissedExecution(workflow)
+      }
+    }
+  }
 
-    const lastRun = task.getLastExecutedTimestamp()
-    const now = Date.now()
+  private checkMissedExecution(workflow: Workflow): void {
+    if (workflow.trigger.type !== 'cron') return
 
-    if (!lastRun) {
-      logger.log(
-        `<${task.id}> No previous execution found. Performing startup initial run.`
+    try {
+      const lastExecutedTimestamp = getLastExecutedTimestamp(workflow.id) || 0
+
+      const interval = CronExpressionParser.parse(
+        workflow.trigger.expression,
+        process.env['TZ'] ? { tz: process.env['TZ'] } : undefined
       )
-      await task.execute({ reason: 'Startup Initial Run', port: this.port })
-      return
+
+      const expectedPrevRun = interval.prev().toDate().getTime()
+
+      if (expectedPrevRun > lastExecutedTimestamp) {
+        logger.log(
+          `Workflow "${workflow.name}" [${workflow.id}] missed its scheduled run at ${new Date(expectedPrevRun).toISOString()}. Executing now.`
+        )
+        // Execute without awaiting to not block the scheduler
+        WorkflowEngine.execute(workflow, 'Catch-up Cron Scheduled Run').catch(
+          (err) => {
+            logger.error(
+              `Error during catch-up execution for workflow ${workflow.id}:`,
+              err
+            )
+          }
+        )
+      }
+    } catch (error) {
+      logger.error(
+        `Failed to check missed execution for workflow ${workflow.id}:`,
+        error
+      )
+    }
+  }
+
+  stopAll(): void {
+    for (const handle of this.cronHandles.values()) {
+      handle.stop()
+    }
+    this.cronHandles.clear()
+  }
+
+  getNextRunTime(workflow: Workflow): string | null {
+    if (workflow.trigger.type !== 'cron') return null
+    const handle = this.cronHandles.get(workflow.id)
+    if (!handle) return null
+
+    try {
+      // @ts-ignore - Some versions of node-cron have this undocumented method
+      const nextRun = handle.getNextRun ? handle.getNextRun() : undefined
+      if (nextRun instanceof Date) {
+        return nextRun.toString()
+      } else if (nextRun && typeof nextRun === 'object' && 'toDate' in nextRun) {
+        return (nextRun as { toDate: () => Date }).toDate().toString()
+      } else if (nextRun) {
+        return new Date(nextRun as unknown as string | number).toString()
+      }
+    } catch (err) {
+      logger.error(
+        `Error getting next run time for workflow "${workflow.id}":`,
+        err
+      )
+    }
+    return null
+  }
+}
+
+export class WorkflowScheduler {
+  private readonly workflows = new Map<string, Workflow>()
+  private readonly cronManager = new CronTriggerManager()
+  private watcher: chokidar.FSWatcher | null = null
+  private lastCheckTime = Date.now()
+  private clockDriftInterval: ReturnType<typeof setInterval> | null = null
+  private readonly CHECK_INTERVAL = 10_000 // 10 seconds
+  private readonly DRIFT_THRESHOLD = 30_000 // 30 seconds
+
+  constructor(private readonly workflowsDir: string) {}
+
+  start(): void {
+    logger.log(`Starting WorkflowScheduler, watching: ${this.workflowsDir}`)
+
+    if (!fs.existsSync(this.workflowsDir)) {
+      fs.mkdirSync(this.workflowsDir, { recursive: true })
     }
 
-    const elapsed = now - lastRun
+    this.watcher = chokidar.watch(this.workflowsDir, {
+      persistent: true,
+      ignoreInitial: false,
+    })
 
-    if (elapsed >= task.intervalMs) {
-      logger.log(
-        `<${task.id}> Missed execution detected at startup! ` +
-          `Last run was ${Math.round(elapsed / 1000 / 60)} minutes ago. Triggering catch-up task.`
-      )
-      await task.execute({ reason: 'Startup Catch-up Run', port: this.port })
-    } else {
-      logger.log(
-        `<${task.id}> Task was run recently ` +
-          `(${Math.round(elapsed / 1000)} seconds ago). No catch-up needed.`
-      )
+    this.watcher
+      .on('add', (filePath) => this.handleFileEvent(filePath))
+      .on('change', (filePath) => this.handleFileEvent(filePath))
+      .on('unlink', (filePath) => this.removeWorkflow(filePath))
+
+    this.startClockDriftDetection()
+  }
+
+  stop(): void {
+    logger.log('Stopping WorkflowScheduler...')
+
+    if (this.watcher) {
+      this.watcher.close()
+      this.watcher = null
     }
+
+    this.cronManager.stopAll()
+
+    if (this.clockDriftInterval) {
+      clearInterval(this.clockDriftInterval)
+      this.clockDriftInterval = null
+    }
+  }
+
+  private startClockDriftDetection(): void {
+    this.lastCheckTime = Date.now()
+    this.clockDriftInterval = setInterval(() => {
+      const now = Date.now()
+      const elapsed = now - this.lastCheckTime
+
+      if (elapsed > this.DRIFT_THRESHOLD) {
+        logger.log(
+          `Sleep/Wake detected! Clock drift of ${Math.round(
+            elapsed / 1000
+          )}s exceeded threshold. Catching up missed workflows...`
+        )
+        this.cronManager.catchUpMissedExecutions(this.workflows.values())
+      }
+
+      this.lastCheckTime = now
+    }, this.CHECK_INTERVAL)
+  }
+
+  private handleFileEvent(filePath: string): void {
+    if (!filePath.endsWith('.yml') && !filePath.endsWith('.yaml')) return
+
+    try {
+      const fileContent = fs.readFileSync(filePath, 'utf8')
+      const parsed = yaml.load(fileContent) as Record<string, unknown>
+      if (
+        !parsed ||
+        !parsed['name'] ||
+        !parsed['trigger'] ||
+        !parsed['steps']
+      ) {
+        logger.error(
+          `Invalid workflow file (missing required fields): ${filePath}`
+        )
+        return
+      }
+
+      const id =
+        (parsed['id'] as string) ||
+        path.basename(filePath, path.extname(filePath))
+      const workflow: Workflow = {
+        ...parsed,
+        id,
+      } as unknown as Workflow
+
+      this.registerWorkflow(workflow)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error)
+      logger.error(`Error loading workflow ${filePath}: ${message}`)
+    }
+  }
+
+  private registerWorkflow(workflow: Workflow): void {
+    this.unregisterWorkflow(workflow.id)
+
+    this.workflows.set(workflow.id, workflow)
+    logger.log(`Registered workflow: ${workflow.name} [${workflow.id}]`)
+
+    this.cronManager.register(workflow, async (w) => {
+      logger.log(`Cron tick for workflow "${w.name}" [${w.id}].`)
+      await WorkflowEngine.execute(w, 'Cron Scheduled Run')
+    })
+  }
+
+  private unregisterWorkflow(workflowId: string): void {
+    this.cronManager.unregister(workflowId)
+    this.workflows.delete(workflowId)
+  }
+
+  private removeWorkflow(filePath: string): void {
+    const id = path.basename(filePath, path.extname(filePath))
+    logger.log(`Removing workflow: ${id}`)
+    this.unregisterWorkflow(id)
+  }
+
+  getWorkflows(): ReadonlyArray<Workflow> {
+    return Array.from(this.workflows.values())
+  }
+  
+  getCronManager(): CronTriggerManager {
+    return this.cronManager
   }
 }

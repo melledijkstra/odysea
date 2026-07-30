@@ -11,9 +11,9 @@ export async function sendMacNotification(
   message: string,
   title?: string
 ): Promise<void> {
-  const notificationTitle = title || `Looper: ${ctx.taskName}`
+  const notificationTitle = title || `Looper: ${ctx.workflowName}`
   try {
-    logger.log(`Sending mac notification for task "${ctx.taskName}"...`)
+    logger.log(`Sending mac notification for workflow "${ctx.workflowName}"...`)
 
     const safeTitle = notificationTitle.replace(/"/g, '\\"')
     const safeMessage = message.replace(/"/g, '\\"')
@@ -23,8 +23,9 @@ export async function sendMacNotification(
     )
 
     logger.log('Mac notification sent successfully.')
-  } catch (err: any) {
-    logger.error(`Failed to send mac notification: ${err.message}`, err)
-    throw new Error(`Failed to send mac notification: ${err.message}`)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    logger.error(`Failed to send mac notification: ${message}`, err)
+    throw new Error(`Failed to send mac notification: ${message}`)
   }
 }
