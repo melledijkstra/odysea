@@ -1,5 +1,5 @@
 export interface Identifiable {
-  id: string
+  id: number
 }
 
 export type Insertable<T extends Identifiable> = Omit<
@@ -12,5 +12,5 @@ export interface IRepositoryAdapter<T extends Identifiable> {
   getAll(): Promise<T[]>
   add(item: Insertable<T>): Promise<T>
   update(item: T): Promise<void>
-  delete(id: string): Promise<void>
+  delete(id: number): Promise<void>
 }
