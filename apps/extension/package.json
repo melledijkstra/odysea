@@ -31,7 +31,7 @@
     "eslint": "catalog:",
     "jsdom": "^29.1.1",
     "storybook": "^10.5.5",
-    "svelte": "^5.56.6",
+    "svelte": "^5.56.8",
     "svelte-check": "^4.7.3",
     "tailwindcss": "^4.3.3",
     "typescript": "catalog:",
