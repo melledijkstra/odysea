@@ -1,7 +1,7 @@
 {
   "name": "looper",
   "version": "1.0.0",
-  "description": "Automation tool for running tasks on a schedule",
+  "description": "Automation tool for running workflows on a schedule",
   "author": "Melle Dijkstra",
   "main": "index.ts",
   "type": "module",

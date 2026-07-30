@@ -79,7 +79,7 @@ app.get('/oauth/callback', async (req, res) => {
 })
 
 // ---------------------------------------------------------------------------
-// Task routes
+// Workflow routes
 // ---------------------------------------------------------------------------
 
 /**
@@ -124,14 +124,14 @@ app.post('/webhook', (req, res) => {
 })
 
 /**
- * Status endpoint — returns execution state for all registered tasks.
+ * Status endpoint — returns execution state for all registered workflows.
  * GET /status
  */
 app.get('/status', async (_req, res) => {
   const authenticated = await authClient.isAuthenticated()
   const now = Date.now()
 
-  const taskStatuses = scheduler.getWorkflows().map((workflow) => {
+  const workflowStatuses = scheduler.getWorkflows().map((workflow) => {
     const lastRun = getLastExecutedTimestamp(workflow.id)
     const nextRunAt = scheduler.getCronManager().getNextRunTime(workflow)
 
@@ -153,7 +153,7 @@ app.get('/status', async (_req, res) => {
   })
 
   res.status(200).json({
-    tasks: taskStatuses,
+    workflows: workflowStatuses,
     googleAuth: {
       authenticated,
       authUrl: `http://localhost:${PORT}/auth/google`,
