@@ -8,9 +8,9 @@ export async function sendNotification(
   ctx: ActionContext,
   args: { message: string; title?: string }
 ): Promise<void> {
-  const notificationTitle = args.title || `Looper: ${ctx.taskName}`
+  const notificationTitle = args.title || `Looper: ${ctx.workflowName}`
   try {
-    logger.log(`Sending notification for task "${ctx.taskName}"...`)
+    logger.log(`Sending notification for workflow "${ctx.workflowName}"...`)
 
     notifier.notify(
       {

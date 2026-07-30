@@ -74,7 +74,7 @@ describe('WorkflowEngine Execution', () => {
     expect(actionRegistry['test.action1']).toHaveBeenCalledTimes(1)
     expect(actionRegistry['test.action2']).toHaveBeenCalledTimes(1)
     expect(actionRegistry['test.action2']).toHaveBeenCalledWith(
-      expect.objectContaining({ taskId: 'test-wf' }),
+      expect.objectContaining({ workflowId: 'test-wf' }),
       { prev: 'ok' }
     )
     expect(db.updateLastExecutedTimestamp).toHaveBeenCalledWith(

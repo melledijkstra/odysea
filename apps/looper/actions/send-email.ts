@@ -15,14 +15,14 @@ export async function sendEmail(
     oauth2Client.setCredentials({ access_token: args.token })
     const gmail = google.gmail({ version: 'v1', auth: oauth2Client })
 
-    const subject = `Task Execution: ${ctx.taskName}`
+    const subject = `Workflow Execution: ${ctx.workflowName}`
     const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`
     const messageParts = [
       `To: ${args.userInfo.email}`,
       `Subject: ${utf8Subject}`,
       'Content-Type: text/plain; charset=utf-8',
       '',
-      `Hello ${args.userInfo.name || 'User'},\n\nThe scheduled task "${ctx.taskName}" was executed successfully.\nTrigger Reason: ${ctx.reason}\nExecution Time: ${new Date().toISOString()}\n\nBest,\nLooper`,
+      `Hello ${args.userInfo.name || 'User'},\n\nThe scheduled workflow "${ctx.workflowName}" was executed successfully.\nTrigger Reason: ${ctx.reason}\nExecution Time: ${new Date().toISOString()}\n\nBest,\nLooper`,
     ]
 
     const encodedMessage = Buffer.from(messageParts.join('\n'))

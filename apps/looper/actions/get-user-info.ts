@@ -13,7 +13,7 @@ export async function getUserInfo(
   ctx: ActionContext,
   args: { token: string }
 ): Promise<UserInfo> {
-  logger.log(`[${ctx.taskName}] Fetching user info from Google...`)
+  logger.log(`[${ctx.workflowName}] Fetching user info from Google...`)
   const response = await fetch(
     'https://www.googleapis.com/oauth2/v2/userinfo',
     {

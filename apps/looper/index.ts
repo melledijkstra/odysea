@@ -133,34 +133,11 @@ app.get('/status', async (_req, res) => {
 
   const taskStatuses = scheduler.getWorkflows().map((workflow) => {
     const lastRun = getLastExecutedTimestamp(workflow.id)
-    const cronHandle = scheduler.getCronHandle(workflow.id)
-
-    let nextRunAt: string | null = null
-    if (cronHandle && workflow.trigger.type === 'cron') {
-      try {
-        const nextRun = cronHandle.getNextRun()
-        if (nextRun instanceof Date) {
-          nextRunAt = nextRun.toString()
-        } else if (
-          nextRun &&
-          typeof nextRun === 'object' &&
-          'toDate' in nextRun
-        ) {
-          nextRunAt = (nextRun as { toDate: () => Date }).toDate().toString()
-        } else if (nextRun) {
-          nextRunAt = new Date(nextRun as unknown as string | number).toString()
-        }
-      } catch (err) {
-        logger.error(
-          `Error getting next run time for workflow "${workflow.id}":`,
-          err
-        )
-      }
-    }
+    const nextRunAt = scheduler.getCronManager().getNextRunTime(workflow)
 
     return {
-      taskId: workflow.id,
-      taskName: workflow.name,
+      workflowId: workflow.id,
+      workflowName: workflow.name,
       lastExecutedAt: lastRun ? new Date(lastRun).toISOString() : null,
       lastExecutedTimestamp: lastRun,
       elapsedMs: lastRun ? now - lastRun : null,

@@ -50,8 +50,8 @@ export class WorkflowEngine {
     const context: Record<string, unknown> = {}
 
     const actionCtx: ActionContext = {
-      taskName: workflow.name,
-      taskId: workflow.id,
+      workflowName: workflow.name,
+      workflowId: workflow.id,
       reason: triggerReason,
       port: process.env['PORT'] || 5050,
     }

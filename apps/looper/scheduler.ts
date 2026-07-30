@@ -11,9 +11,111 @@ import type { Workflow } from './types/workflow.js'
 
 const logger = new Logger('WorkflowScheduler')
 
+export class CronTriggerManager {
+  private readonly cronHandles = new Map<string, CronTask>()
+
+  register(workflow: Workflow, onTick: (w: Workflow) => Promise<void>): void {
+    if (workflow.trigger.type !== 'cron') return
+
+    this.checkMissedExecution(workflow)
+    
+    logger.log(
+      `Scheduling workflow "${workflow.name}" <${workflow.id}> with cron: ${workflow.trigger.expression}`
+    )
+    const handle = cron.schedule(
+      workflow.trigger.expression,
+      () => onTick(workflow),
+      process.env['TZ'] ? { timezone: process.env['TZ'] } : undefined
+    )
+    this.cronHandles.set(workflow.id, handle)
+  }
+
+  unregister(workflowId: string): void {
+    const handle = this.cronHandles.get(workflowId)
+    if (handle) {
+      handle.stop()
+      this.cronHandles.delete(workflowId)
+    }
+  }
+
+  catchUpMissedExecutions(workflows: Iterable<Workflow>): void {
+    for (const workflow of workflows) {
+      if (workflow.trigger.type === 'cron') {
+        this.checkMissedExecution(workflow)
+      }
+    }
+  }
+
+  private checkMissedExecution(workflow: Workflow): void {
+    if (workflow.trigger.type !== 'cron') return
+
+    try {
+      const lastExecutedTimestamp = getLastExecutedTimestamp(workflow.id) || 0
+
+      const interval = CronExpressionParser.parse(
+        workflow.trigger.expression,
+        process.env['TZ'] ? { tz: process.env['TZ'] } : undefined
+      )
+
+      const expectedPrevRun = interval.prev().toDate().getTime()
+
+      if (expectedPrevRun > lastExecutedTimestamp) {
+        logger.log(
+          `Workflow "${workflow.name}" [${workflow.id}] missed its scheduled run at ${new Date(expectedPrevRun).toISOString()}. Executing now.`
+        )
+        // Execute without awaiting to not block the scheduler
+        WorkflowEngine.execute(workflow, 'Catch-up Cron Scheduled Run').catch(
+          (err) => {
+            logger.error(
+              `Error during catch-up execution for workflow ${workflow.id}:`,
+              err
+            )
+          }
+        )
+      }
+    } catch (error) {
+      logger.error(
+        `Failed to check missed execution for workflow ${workflow.id}:`,
+        error
+      )
+    }
+  }
+
+  stopAll(): void {
+    for (const handle of this.cronHandles.values()) {
+      handle.stop()
+    }
+    this.cronHandles.clear()
+  }
+
+  getNextRunTime(workflow: Workflow): string | null {
+    if (workflow.trigger.type !== 'cron') return null
+    const handle = this.cronHandles.get(workflow.id)
+    if (!handle) return null
+
+    try {
+      // @ts-ignore - Some versions of node-cron have this undocumented method
+      const nextRun = handle.getNextRun ? handle.getNextRun() : undefined
+      if (nextRun instanceof Date) {
+        return nextRun.toString()
+      } else if (nextRun && typeof nextRun === 'object' && 'toDate' in nextRun) {
+        return (nextRun as { toDate: () => Date }).toDate().toString()
+      } else if (nextRun) {
+        return new Date(nextRun as unknown as string | number).toString()
+      }
+    } catch (err) {
+      logger.error(
+        `Error getting next run time for workflow "${workflow.id}":`,
+        err
+      )
+    }
+    return null
+  }
+}
+
 export class WorkflowScheduler {
   private readonly workflows = new Map<string, Workflow>()
-  private readonly cronHandles = new Map<string, CronTask>()
+  private readonly cronManager = new CronTriggerManager()
   private watcher: chokidar.FSWatcher | null = null
   private lastCheckTime = Date.now()
   private clockDriftInterval: ReturnType<typeof setInterval> | null = null
@@ -50,10 +152,7 @@ export class WorkflowScheduler {
       this.watcher = null
     }
 
-    for (const handle of this.cronHandles.values()) {
-      handle.stop()
-    }
-    this.cronHandles.clear()
+    this.cronManager.stopAll()
 
     if (this.clockDriftInterval) {
       clearInterval(this.clockDriftInterval)
@@ -73,19 +172,11 @@ export class WorkflowScheduler {
             elapsed / 1000
           )}s exceeded threshold. Catching up missed workflows...`
         )
-        this.catchUpMissedExecutions()
+        this.cronManager.catchUpMissedExecutions(this.workflows.values())
       }
 
       this.lastCheckTime = now
     }, this.CHECK_INTERVAL)
-  }
-
-  private catchUpMissedExecutions(): void {
-    for (const workflow of this.workflows.values()) {
-      if (workflow.trigger.type === 'cron') {
-        this.checkMissedExecution(workflow)
-      }
-    }
   }
 
   private handleFileEvent(filePath: string): void {
@@ -127,53 +218,14 @@ export class WorkflowScheduler {
     this.workflows.set(workflow.id, workflow)
     logger.log(`Registered workflow: ${workflow.name} [${workflow.id}]`)
 
-    if (workflow.trigger.type === 'cron') {
-      this.checkMissedExecution(workflow)
-      this.scheduleCron(workflow)
-    }
-  }
-
-  private checkMissedExecution(workflow: Workflow): void {
-    if (workflow.trigger.type !== 'cron') return
-
-    try {
-      const lastExecutedTimestamp = getLastExecutedTimestamp(workflow.id) || 0
-
-      const interval = CronExpressionParser.parse(
-        workflow.trigger.expression,
-        process.env['TZ'] ? { tz: process.env['TZ'] } : undefined
-      )
-
-      const expectedPrevRun = interval.prev().toDate().getTime()
-
-      if (expectedPrevRun > lastExecutedTimestamp) {
-        logger.log(
-          `Workflow "${workflow.name}" [${workflow.id}] missed its scheduled run at ${new Date(expectedPrevRun).toISOString()}. Executing now.`
-        )
-        // Execute without awaiting to not block the scheduler
-        WorkflowEngine.execute(workflow, 'Catch-up Cron Scheduled Run').catch(
-          (err) => {
-            logger.error(
-              `Error during catch-up execution for workflow ${workflow.id}:`,
-              err
-            )
-          }
-        )
-      }
-    } catch (error) {
-      logger.error(
-        `Failed to check missed execution for workflow ${workflow.id}:`,
-        error
-      )
-    }
+    this.cronManager.register(workflow, async (w) => {
+      logger.log(`Cron tick for workflow "${w.name}" [${w.id}].`)
+      await WorkflowEngine.execute(w, 'Cron Scheduled Run')
+    })
   }
 
   private unregisterWorkflow(workflowId: string): void {
-    const handle = this.cronHandles.get(workflowId)
-    if (handle) {
-      handle.stop()
-      this.cronHandles.delete(workflowId)
-    }
+    this.cronManager.unregister(workflowId)
     this.workflows.delete(workflowId)
   }
 
@@ -183,32 +235,11 @@ export class WorkflowScheduler {
     this.unregisterWorkflow(id)
   }
 
-  private scheduleCron(workflow: Workflow): void {
-    if (workflow.trigger.type !== 'cron') return
-
-    logger.log(
-      `Scheduling workflow "${workflow.name}" <${workflow.id}> with cron: ${workflow.trigger.expression}`
-    )
-
-    const handle = cron.schedule(
-      workflow.trigger.expression,
-      () => this.onCronTick(workflow),
-      process.env['TZ'] ? { timezone: process.env['TZ'] } : undefined
-    )
-
-    this.cronHandles.set(workflow.id, handle)
-  }
-
-  private async onCronTick(workflow: Workflow): Promise<void> {
-    logger.log(`Cron tick for workflow "${workflow.name}" [${workflow.id}].`)
-    await WorkflowEngine.execute(workflow, 'Cron Scheduled Run')
-  }
-
-  getCronHandle(workflowId: string): CronTask | undefined {
-    return this.cronHandles.get(workflowId)
-  }
-
   getWorkflows(): ReadonlyArray<Workflow> {
     return Array.from(this.workflows.values())
+  }
+  
+  getCronManager(): CronTriggerManager {
+    return this.cronManager
   }
 }

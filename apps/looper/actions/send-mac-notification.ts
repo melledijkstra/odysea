@@ -11,9 +11,9 @@ export async function sendMacNotification(
   message: string,
   title?: string
 ): Promise<void> {
-  const notificationTitle = title || `Looper: ${ctx.taskName}`
+  const notificationTitle = title || `Looper: ${ctx.workflowName}`
   try {
-    logger.log(`Sending mac notification for task "${ctx.taskName}"...`)
+    logger.log(`Sending mac notification for workflow "${ctx.workflowName}"...`)
 
     const safeTitle = notificationTitle.replace(/"/g, '\\"')
     const safeMessage = message.replace(/"/g, '\\"')
