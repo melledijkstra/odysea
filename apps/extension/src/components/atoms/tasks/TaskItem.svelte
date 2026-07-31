@@ -30,7 +30,7 @@
   let editMode = $state(false)
 </script>
 
-<ContextMenu items={menuItems}>
+<ContextMenu items={menuItems} {open}>
   <div
     class="relative flex items-center gap-1 text-sm text-white hover:bg-gray-800 group/task rounded-md p-1"
   >

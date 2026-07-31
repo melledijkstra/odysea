@@ -92,7 +92,7 @@ export class UnsplashClient extends BaseUnsplashClient {
     const today = formatDate(new Date())
     const cached = await this.cache.getDailyImageInfo()
 
-    let imageUrl = undefined
+    let imageUrl: string
 
     if (cached?.date === today) {
       this.logger.log('retrieved daily image from cache')
