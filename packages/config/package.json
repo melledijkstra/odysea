@@ -21,7 +21,7 @@
     "@typescript-eslint/parser": "^8.64.0",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "eslint-plugin-svelte": "^3.20.0",
+    "eslint-plugin-svelte": "^3.22.0",
     "eslint-plugin-turbo": "catalog:",
     "globals": "^17.7.0",
     "prettier": "catalog:",
