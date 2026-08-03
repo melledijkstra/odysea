@@ -11,12 +11,14 @@
   const unsplashClient = $state<UnsplashClient>(
     new UnsplashClient(
       settingsStore.network.serverlessHost,
-      settingsStore.ui.dailyImageQuery
+      settingsStore.ui.dailyImageQuery,
+      settingsStore.ui.dailyImageCollections
     )
   )
 
   const serverlessHost = $derived(settingsStore.network.serverlessHost)
   const dailyImageQuery = $derived(settingsStore.ui.dailyImageQuery)
+  const dailyImageCollections = $derived(settingsStore.ui.dailyImageCollections)
 
   async function refreshBackround() {
     const url = await unsplashClient?.refreshDailyImage()
@@ -51,6 +53,17 @@
         unsplashQuery: unsplashClient.query,
       })
       unsplashClient.query = settingsStore.ui.dailyImageQuery
+      unsplashClient.clearNextImage()
+    }
+    if (
+      JSON.stringify(dailyImageCollections) !==
+      JSON.stringify(unsplashClient.collections)
+    ) {
+      logger.log('collections changed', {
+        dailyImageCollections,
+        unsplashCollections: unsplashClient.collections,
+      })
+      unsplashClient.collections = settingsStore.ui.dailyImageCollections
       unsplashClient.clearNextImage()
     }
   })

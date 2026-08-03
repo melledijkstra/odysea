@@ -30,7 +30,7 @@ Shared libraries intended for use across the apps:
 
 - **Package Manager**: pnpm
 - **Monorepo Tooling**: Turborepo
-- **Frontend**: Svelte 5, Vite, TailwindCSS
+- **Frontend**: Svelte 5, Vite, Bits UI, TailwindCSS
 - **Backend**: Node.js, Express, SQLite
 - **Testing**: Vitest
 - **Code Quality**: Prettier for formatting, eslint for code quality, TypeScript for strict typing

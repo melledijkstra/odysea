@@ -1,42 +1,26 @@
-import {
-  UnsplashClient as BaseUnsplashClient,
-  type UnsplashResponse,
-} from '@melledijkstra/api'
+import { UnsplashClient as BaseUnsplashClient } from '@melledijkstra/api'
 import { SERVERLESS_HOST_URL } from '@/constants'
 import browser from 'webextension-polyfill'
 import { addDays, formatDate } from '@melledijkstra/toolbox'
 import { ImageCache, type ImageInfo } from '../cache/image-cache'
 
-const ENDPOINT = '/api/daily-image'
-
 export class UnsplashClient extends BaseUnsplashClient {
   private readonly cache: ImageCache
 
-  constructor(host: string = SERVERLESS_HOST_URL, query?: string) {
-    super(host || SERVERLESS_HOST_URL, query)
+  constructor(
+    host: string = SERVERLESS_HOST_URL,
+    query?: string,
+    collections?: string[]
+  ) {
+    super(host || SERVERLESS_HOST_URL, query, collections)
     this.cache = new ImageCache()
   }
 
-  // Override fetchUnsplashImage to append the Chrome Extension X-Extension-ID header
-  async fetchUnsplashImage(): Promise<UnsplashResponse> {
-    this.logger.log('Fetching Unsplash image from', {
-      host: this.host,
-      endpoint: ENDPOINT,
-      query: this.query,
-    })
-    const serverlessUrl = new URL(ENDPOINT, this.host)
-
-    if (this.query) {
-      serverlessUrl.searchParams.set('query', this.query)
-    }
-
-    const response = await fetch(serverlessUrl, {
-      headers: {
-        'X-Extension-ID': browser.runtime.id,
-      },
-    })
-
-    return (await response.json()) as UnsplashResponse
+  // Override headers to append the Chrome Extension X-Extension-ID header
+  getHeaders(): Headers {
+    const headers = super.getHeaders()
+    headers.set('X-Extension-ID', browser.runtime.id)
+    return headers
   }
 
   async retrieveNextImage(): Promise<ImageInfo> {

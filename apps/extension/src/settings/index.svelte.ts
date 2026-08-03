@@ -17,6 +17,7 @@ export type SettingsState = {
   ui: {
     showQuotes: boolean
     dailyImageQuery?: string
+    dailyImageCollections?: string[]
     showCurrentTask: boolean
   }
   apiKeys: {
@@ -49,6 +50,7 @@ export const DEFAULT_SETTINGS: SettingsState = {
   ui: {
     showCurrentTask: false,
     dailyImageQuery: 'landscape',
+    dailyImageCollections: [],
     showQuotes: true,
   },
   apiKeys: {},
