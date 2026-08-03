@@ -1,19 +1,27 @@
-import { UnsplashClient as BaseUnsplashClient } from '@melledijkstra/api'
+import {
+  UnsplashClient as BaseUnsplashClient,
+  type UnsplashConfig,
+} from '@melledijkstra/api'
 import { SERVERLESS_HOST_URL } from '@/constants'
 import browser from 'webextension-polyfill'
 import { addDays, formatDate } from '@melledijkstra/toolbox'
 import { ImageCache, type ImageInfo } from '../cache/image-cache'
+import { settingsStore } from '@/settings/index.svelte'
 
 export class UnsplashClient extends BaseUnsplashClient {
   private readonly cache: ImageCache
 
-  constructor(
-    host: string = SERVERLESS_HOST_URL,
-    query?: string,
-    collections?: string[]
-  ) {
-    super(host || SERVERLESS_HOST_URL, query, collections)
+  constructor() {
+    super({ host: SERVERLESS_HOST_URL })
     this.cache = new ImageCache()
+  }
+
+  getConfig(): UnsplashConfig {
+    return {
+      host: settingsStore.network.serverlessHost || SERVERLESS_HOST_URL,
+      query: settingsStore.ui.dailyImageQuery,
+      collections: settingsStore.ui.dailyImageCollections,
+    }
   }
 
   // Override headers to append the Chrome Extension X-Extension-ID header
@@ -119,3 +127,5 @@ export class UnsplashClient extends BaseUnsplashClient {
     return this.cache.clearImageCache()
   }
 }
+
+export const unsplashClient = new UnsplashClient()

@@ -3,21 +3,26 @@ import type { UnsplashResponse } from '../definitions/unsplash'
 
 const ENDPOINT = '/api/daily-image'
 
+export interface UnsplashConfig {
+  host: string
+  query?: string
+  collections?: string[]
+}
+
 export class UnsplashClient {
   public logger: Logger = new Logger('UnsplashClient')
-  private HOST: string
-  public query?: string
-  public collections?: string[]
+  public config: UnsplashConfig
 
-  constructor(host: string, query?: string, collections?: string[]) {
-    this.HOST = host
-    this.logger.log('UnsplashClient initialized with host:', this.HOST)
-    this.query = query
-    this.collections = collections
+  constructor(config: UnsplashConfig) {
+    this.config = config
+    this.logger.log(
+      'UnsplashClient initialized with host:',
+      this.getConfig().host
+    )
   }
 
-  get host(): string {
-    return this.HOST
+  getConfig(): UnsplashConfig {
+    return this.config
   }
 
   setHost(host: string) {
@@ -25,16 +30,17 @@ export class UnsplashClient {
       throw new Error('Serverless host domain cannot be empty')
     }
     this.logger.log('Setting new host for UnsplashClient:', host)
-    this.HOST = host
+    this.getConfig().host = host
   }
 
   getQueryParameters(): URLSearchParams {
     const params = new URLSearchParams()
-    if (this.query) {
-      params.set('query', this.query)
+    const config = this.getConfig()
+    if (config.query) {
+      params.set('query', config.query)
     }
-    if (this.collections && this.collections.length > 0) {
-      params.set('collections', this.collections.join(','))
+    if (config.collections && config.collections.length > 0) {
+      params.set('collections', config.collections.join(','))
     }
     return params
   }
@@ -46,12 +52,13 @@ export class UnsplashClient {
   }
 
   async fetchUnsplashImage(): Promise<UnsplashResponse> {
+    const config = this.getConfig()
     this.logger.log('Fetching Unsplash image from', {
-      host: this.HOST,
+      host: config.host,
       endpoint: ENDPOINT,
-      query: this.query,
+      query: config.query,
     })
-    const serverUrl = new URL(ENDPOINT, this.HOST)
+    const serverUrl = new URL(ENDPOINT, config.host)
 
     const queryParams = this.getQueryParameters()
     serverUrl.search = queryParams.toString()

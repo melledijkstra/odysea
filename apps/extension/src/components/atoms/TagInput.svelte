@@ -10,30 +10,37 @@
     tags = $bindable<string[]>([]),
     label = null,
     labelProps = {},
+    ontagschange,
     ...props
   }: {
     tags?: string[]
     label?: string | null
     labelProps?: HTMLLabelAttributes
+    ontagschange?: (tags: string[]) => void
   } & HTMLInputAttributes = $props()
 
   let inputValue = $state('')
 
-  function handleKeydown(e: KeyboardEvent) {
+  function handleKeydown(
+    e: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
     if (e.key === 'Enter' && inputValue.trim()) {
       e.preventDefault()
       if (!tags.includes(inputValue.trim())) {
         tags = [...tags, inputValue.trim()]
+        ontagschange?.(tags)
       }
       inputValue = ''
     } else if (e.key === 'Backspace' && !inputValue && tags.length > 0) {
       tags = tags.slice(0, -1)
+      ontagschange?.(tags)
     }
     props.onkeydown?.(e)
   }
 
   function removeTag(index: number) {
     tags = tags.filter((_, i) => i !== index)
+    ontagschange?.(tags)
   }
 </script>
 

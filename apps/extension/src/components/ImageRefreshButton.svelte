@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { UnsplashClient } from '@/api/unsplash'
+  import { unsplashClient } from '@/api/unsplash'
   import { setBackgroundImage } from '@/stores/background.svelte'
   import IconButton from './atoms/IconButton.svelte'
   import { mdiCameraRetakeOutline } from '@mdi/js'
@@ -8,62 +8,21 @@
 
   const logger = new Logger('ImageRefreshButton')
 
-  const unsplashClient = $state<UnsplashClient>(
-    new UnsplashClient(
-      settingsStore.network.serverlessHost,
-      settingsStore.ui.dailyImageQuery,
-      settingsStore.ui.dailyImageCollections
-    )
-  )
-
   const serverlessHost = $derived(settingsStore.network.serverlessHost)
   const dailyImageQuery = $derived(settingsStore.ui.dailyImageQuery)
   const dailyImageCollections = $derived(settingsStore.ui.dailyImageCollections)
 
   async function refreshBackround() {
-    const url = await unsplashClient?.refreshDailyImage()
+    const url = await unsplashClient.refreshDailyImage()
     if (url) {
       setBackgroundImage(url)
     }
   }
 
   $effect(() => {
-    if (!!serverlessHost && serverlessHost !== unsplashClient?.host) {
-      unsplashClient.setHost(serverlessHost)
-    }
-  })
-
-  $effect(() => {
-    logger.log('settings changed', {
-      serverlessHost: settingsStore.network.serverlessHost,
-      unsplashHost: unsplashClient?.host,
-      dailyImageQuery: settingsStore.ui.dailyImageQuery,
-      unsplashQuery: unsplashClient.query,
-    })
-    if (!!serverlessHost && serverlessHost !== unsplashClient?.host) {
-      logger.log('serverlessHost changed', {
-        serverlessHost,
-        unsplashHost: unsplashClient?.host,
-      })
-      unsplashClient.setHost(settingsStore.network.serverlessHost)
-    }
-    if (dailyImageQuery !== unsplashClient.query) {
-      logger.log('query changed', {
-        dailyImageQuery,
-        unsplashQuery: unsplashClient.query,
-      })
-      unsplashClient.query = settingsStore.ui.dailyImageQuery
-      unsplashClient.clearNextImage()
-    }
-    if (
-      JSON.stringify(dailyImageCollections) !==
-      JSON.stringify(unsplashClient.collections)
-    ) {
-      logger.log('collections changed', {
-        dailyImageCollections,
-        unsplashCollections: unsplashClient.collections,
-      })
-      unsplashClient.collections = settingsStore.ui.dailyImageCollections
+    // Clear the cache whenever the query parameters for Unsplash change
+    if (serverlessHost || dailyImageQuery || dailyImageCollections) {
+      logger.log('Unsplash settings changed, clearing next image cache')
       unsplashClient.clearNextImage()
     }
   })
