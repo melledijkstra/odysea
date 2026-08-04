@@ -1,12 +1,8 @@
 import manifest from '../../manifest.json' with { type: 'json' }
 import { settingsStore } from '@/settings/index.svelte'
-import {
-  GoogleAuthConfig,
-  SpotifyAuthConfig,
-  FitbitAuthConfig,
-} from '@melledijkstra/auth'
+import { GoogleAuthConfig, SpotifyAuthConfig } from '@melledijkstra/auth'
 
-export type OauthProvider = 'google' | 'spotify' | 'fitbit'
+export type OauthProvider = 'google' | 'spotify'
 
 export class GoogleAuthProvider extends GoogleAuthConfig {
   get clientId() {
@@ -28,12 +24,4 @@ export class SpotifyAuthProvider extends SpotifyAuthConfig {
     'user-modify-playback-state',
     'playlist-read-private',
   ]
-}
-
-export class FitbitAuthProvider extends FitbitAuthConfig {
-  get clientId() {
-    return settingsStore.apiKeys.fitbit || ''
-  }
-
-  scopes = ['sleep', 'activity']
 }

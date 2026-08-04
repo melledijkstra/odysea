@@ -79,7 +79,6 @@ export class AuthClient {
           redirectUrl
         )
         break
-      case 'fitbit':
       default:
         this._arcticClient = new OAuth2Client(
           provider.clientId,

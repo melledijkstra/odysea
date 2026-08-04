@@ -23,7 +23,6 @@ Mizu is a personal homepage extension that enhances your new tab page with a var
 - Well Being: Provides a guided breathing exercise.
 - Spotify: Offers in-page Spotify playback controls.
 - World Clocks: Displays local times from multiple time zones.
-- Fitbit: Retrieves your daily sleep statistics.
 
 ## Installation
 

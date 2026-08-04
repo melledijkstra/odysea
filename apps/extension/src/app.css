@@ -19,7 +19,6 @@
   /* - Brands - */
   --color-spotify: #1db954;
   --color-google: #4285f4;
-  --color-fitbit: #3db6b8;
 
   --animate-fade-in: fadeIn 0.5s ease-in;
   @keyframes fadeIn {

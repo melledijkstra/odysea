@@ -13,7 +13,6 @@ The extension utilizes a primarily dark theme (`bg-black`) with targeted accents
 - `primary`: `#4285F4` (Google Blue) - Used as the primary action color.
 - `spotify`: `#1DB954` - Used for Spotify-related UI elements.
 - `google`: `#4285F4` - Used for Google-related UI elements.
-- `fitbit`: `#3DB6B8` - Used for Fitbit-related UI elements.
 
 **Backgrounds:**
 

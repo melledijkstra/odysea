@@ -1,5 +1,4 @@
 <script lang="ts">
-  import IconFitbit from '@/icons/IconFitbit.svelte'
   import type { HTMLAttributes } from 'svelte/elements'
   import { fade } from 'svelte/transition'
 
@@ -33,7 +32,5 @@
   class={['text-white rounded-lg text-right', props.class]}
 >
   <p class="text-base">{formatted}</p>
-  <p class="text-xs flex justify-end gap-1 items-center">
-    <IconFitbit /> Sleep
-  </p>
+  <p class="text-xs flex justify-end gap-1 items-center">Sleep</p>
 </div>

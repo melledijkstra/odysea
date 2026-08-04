@@ -9,7 +9,6 @@ import {
 } from '../src'
 import {
   SpotifyAuthConfig,
-  FitbitAuthConfig,
   GithubAuthConfig,
   GoogleAuthConfig,
 } from '../src/providers'
@@ -20,7 +19,7 @@ try {
   console.log('--- CLI OAuth Authentication Test ---\n')
 
   const providerNameInput = await rl.question(
-    'Enter Provider (google | github | spotify | fitbit) [default: github]: '
+    'Enter Provider (google | github | spotify) [default: github]: '
   )
   const providerName = (providerNameInput.trim().toLowerCase() ||
     'github') as OauthProvider
@@ -42,9 +41,6 @@ try {
       break
     case 'spotify':
       config = new SpotifyAuthConfig()
-      break
-    case 'fitbit':
-      config = new FitbitAuthConfig()
       break
     default:
       console.error(`Error: Unsupported provider '${providerName}'`)

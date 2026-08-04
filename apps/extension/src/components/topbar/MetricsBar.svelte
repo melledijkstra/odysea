@@ -13,21 +13,21 @@
   import { onMount } from 'svelte'
   import Sleep from '../atoms/metrics/Sleep.svelte'
   import { AuthClient } from '@melledijkstra/extension'
-  import { FitbitAuthProvider } from '@/oauth2/providers'
-  import { FitbitClient } from '@melledijkstra/api'
+  import { GoogleAuthProvider } from '@/oauth2/providers'
+  // TODO: Use new GoogleHealthClient when implemented in ticket #269
 
   const cache = new WebLocalStorage()
 
   type Metric = CountDown | WorldClock | Counter
 
-  const STORAGE_KEY = 'fitbit::sleep_minutes'
+  const STORAGE_KEY = 'googlehealth::sleep_minutes'
 
-  const authClient = new AuthClient(new FitbitAuthProvider())
+  const authClient = new AuthClient(new GoogleAuthProvider())
 
   const props: { metrics?: Metric[] } = $props()
   let sleepMetricEnabled = $state(false)
   let token = $state<string>()
-  let client = $state<FitbitClient>()
+  // let client = $state<GoogleHealthClient>()
 
   let sleepMinutes = $state<number>(0) // Default to 8 hours in minutes
 
@@ -53,10 +53,9 @@
   }
 
   async function getSleepData(token: string) {
-    if (!client) {
-      client = new FitbitClient(token)
-    }
-    sleepMinutes = await client.getSleep()
+    // TODO: implement with new Google Health API client (Ticket #269)
+    // sleepMinutes = await client.getSleep()
+    sleepMinutes = 480 // mock for now
     await cache.set(STORAGE_KEY, sleepMinutes, 60 * 60 * 1000) // Cache for 1 hour
   }
 

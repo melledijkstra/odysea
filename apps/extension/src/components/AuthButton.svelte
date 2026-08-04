@@ -2,7 +2,6 @@
   import type { OauthProvider } from '@/oauth2/providers'
   import Button from './atoms/Button.svelte'
   import type { HTMLButtonAttributes } from 'svelte/elements'
-  import IconFitbit from '@/icons/IconFitbit.svelte'
   import IconGoogle from '@/icons/IconGoogle.svelte'
   import IconSpotify from '@/icons/IconSpotify.svelte'
 
@@ -16,9 +15,6 @@
     ],
     spotify: [
       'bg-spotify hover:bg-spotify/80 focus:ring-4 focus:outline-hidden focus:ring-spotify/50 dark:focus:ring-spotify/55',
-    ],
-    fitbit: [
-      'bg-fitbit hover:bg-fitbit/80 focus:ring-4 focus:outline-hidden focus:ring-fitbit/50 dark:focus:ring-fitbit/55',
     ],
   }
 
@@ -46,8 +42,6 @@
     <IconGoogle />
   {:else if provider === 'spotify'}
     <IconSpotify />
-  {:else if provider === 'fitbit'}
-    <IconFitbit />
   {/if}
   {#if children}
     {@render children()}

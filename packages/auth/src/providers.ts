@@ -2,8 +2,7 @@ import { Google, GitHub, OAuth2Client, Spotify } from 'arctic'
 
 export type ArcticClient = Google | GitHub | Spotify | OAuth2Client
 
-export type OauthProvider = 'google' | 'spotify' | 'fitbit' | 'github'
-
+export type OauthProvider = 'google' | 'spotify' | 'github'
 export abstract class AuthConfig {
   name: OauthProvider
 
@@ -23,7 +22,11 @@ export abstract class AuthConfig {
 
 export class GoogleAuthConfig extends AuthConfig {
   constructor() {
-    super('google', ['openid', 'profile'])
+    super('google', [
+      'openid',
+      'profile',
+      'https://www.googleapis.com/auth/googlehealth.sleep.readonly',
+    ])
     this.extraParams = {
       access_type: 'offline',
       prompt: 'consent',
@@ -64,21 +67,5 @@ export class SpotifyAuthConfig extends AuthConfig {
 
   get clientSecret(): string | undefined {
     return process.env.SPOTIFY_CLIENT_SECRET!
-  }
-}
-
-export class FitbitAuthConfig extends AuthConfig {
-  constructor() {
-    super('fitbit', ['activity', 'sleep'])
-    this.authEndpoint = 'https://www.fitbit.com/oauth2/authorize'
-    this.tokenEndpoint = 'https://api.fitbit.com/oauth2/token'
-  }
-
-  get clientId(): string {
-    return process.env.FITBIT_CLIENT_ID!
-  }
-
-  get clientSecret(): string | undefined {
-    return process.env.FITBIT_CLIENT_SECRET!
   }
 }
