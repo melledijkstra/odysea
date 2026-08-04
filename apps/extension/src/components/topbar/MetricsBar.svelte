@@ -14,7 +14,7 @@
   import Sleep from '../atoms/metrics/Sleep.svelte'
   import { AuthClient } from '@melledijkstra/extension'
   import { GoogleAuthProvider } from '@/oauth2/providers'
-  // TODO: Use new GoogleHealthClient when implemented in ticket #269
+  import { GoogleHealthApiClient } from '@melledijkstra/api'
 
   const cache = new WebLocalStorage()
 
@@ -26,8 +26,8 @@
 
   const props: { metrics?: Metric[] } = $props()
   let sleepMetricEnabled = $state(false)
-  let token = $state<string>()
-  // let client = $state<GoogleHealthClient>()
+
+  let client = $state<GoogleHealthApiClient>()
 
   let sleepMinutes = $state<number>(0) // Default to 8 hours in minutes
 
@@ -52,18 +52,18 @@
     return typeof (metric as WorldClock)?.timeZone !== 'undefined'
   }
 
-  async function getSleepData(token: string) {
-    // TODO: implement with new Google Health API client (Ticket #269)
-    // sleepMinutes = await client.getSleep()
-    sleepMinutes = 480 // mock for now
+  async function getSleepData() {
+    if (!client) {
+      client = new GoogleHealthApiClient(authClient)
+    }
+    sleepMinutes = await client.getSleep()
     await cache.set(STORAGE_KEY, sleepMinutes, 60 * 60 * 1000) // Cache for 1 hour
   }
 
   async function authenticate() {
     const tokenData = await authClient.getAuthToken(true)
     if (tokenData) {
-      token = tokenData
-      getSleepData(token)
+      getSleepData()
     }
   }
 
@@ -84,13 +84,12 @@
     const tokenData = await authClient.getTokenFromStoreOrRefreshToken()
 
     if (tokenData) {
-      token = tokenData
-      getSleepData(token)
+      getSleepData()
     }
   })
 </script>
 
-{#if !!metrics.length}
+{#if !!metrics.length || sleepMetricEnabled}
   <div class="flex flex-row gap-5 items-center">
     {#each metrics as metric, i (i)}
       {#if isClock(metric)}

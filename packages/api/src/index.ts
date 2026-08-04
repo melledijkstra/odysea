@@ -10,6 +10,7 @@ export * from './services/weather'
 
 // Google Apis
 export * from './services/google/account'
+export * from './services/google/health'
 export * from './services/google/photos'
 export * from './services/google/tasks'
 
