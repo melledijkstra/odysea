@@ -5,7 +5,6 @@
   import {
     GoogleAuthProvider,
     SpotifyAuthProvider,
-    FitbitAuthProvider,
     type OauthProvider,
   } from '@/oauth2/providers'
   import Input from '@/components/atoms/Input.svelte'
@@ -18,13 +17,11 @@
   const clients = {
     google: new AuthClient(new GoogleAuthProvider()),
     spotify: new AuthClient(new SpotifyAuthProvider()),
-    fitbit: new AuthClient(new FitbitAuthProvider()),
   } as const
 
   const authState = $state({
     google: false,
     spotify: false,
-    fitbit: false,
   })
 
   function handleStorageChange(
@@ -51,7 +48,6 @@
     logger.log('Retrieving authentication state from all providers...')
     authState.google = await clients.google.isAuthenticated()
     authState.spotify = await clients.spotify.isAuthenticated()
-    authState.fitbit = await clients.fitbit.isAuthenticated()
   }
 
   async function authenticate(provider: OauthProvider) {
@@ -84,11 +80,6 @@
     bind:value={settingsStore.apiKeys.spotify}
     onchange={() => settings.saveSettingsToStorage()}
   />
-  <Input
-    label="Fitbit Client ID"
-    bind:value={settingsStore.apiKeys.fitbit}
-    onchange={() => settings.saveSettingsToStorage()}
-  />
 </div>
 
 <h1 class="text-xl mb-3">Authentication</h1>
@@ -118,17 +109,6 @@
           authState.spotify
             ? deauthenticate('spotify')
             : authenticate('spotify')}
-      />
-    </p>
-    <p class="text-sm">
-      <strong>Fitbit:</strong>
-      <span class="text-gray-400">{authState.fitbit}</span>
-      <AuthButton
-        class="mt-2"
-        authenticated={authState.fitbit}
-        provider="fitbit"
-        onclick={() =>
-          authState.fitbit ? deauthenticate('fitbit') : authenticate('fitbit')}
       />
     </p>
   </div>

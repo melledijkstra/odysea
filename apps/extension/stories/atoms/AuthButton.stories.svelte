@@ -14,7 +14,7 @@
       provider: {
         control: {
           type: 'select',
-          options: ['google', 'github', 'fitbit'],
+          options: ['google', 'github', 'spotify'],
         },
       },
     },
@@ -23,12 +23,10 @@
 
 <Story name="Google" args={{ provider: 'google' }} />
 
-<Story name="Fitbit" args={{ provider: 'fitbit' }} />
-
 <Story name="Spotify" args={{ provider: 'spotify' }} />
 
 <Story name="Google (disabled)" args={{ provider: 'google', disabled: true }} />
-<Story name="Fitbit (disabled)" args={{ provider: 'fitbit', disabled: true }} />
+
 <Story
   name="Spotify (disabled)"
   args={{ provider: 'spotify', disabled: true }}

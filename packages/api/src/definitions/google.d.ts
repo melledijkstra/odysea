@@ -18,3 +18,13 @@ export type Task = {
   updated?: string
   webViewLink?: string
 }
+
+export type ReconcileDataPointsResponse = {
+  dataPoints?: Array<{
+    sleep?: {
+      summary?: {
+        minutesAsleep?: string // int64 format
+      }
+    }
+  }>
+}

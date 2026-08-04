@@ -13,23 +13,23 @@
   import { onMount } from 'svelte'
   import Sleep from '../atoms/metrics/Sleep.svelte'
   import { AuthClient } from '@melledijkstra/extension'
-  import { FitbitAuthProvider } from '@/oauth2/providers'
-  import { FitbitClient } from '@melledijkstra/api'
+  import { GoogleHealthAuthProvider } from '@/oauth2/providers'
+  import { GoogleHealthApiClient } from '@melledijkstra/api'
 
   const cache = new WebLocalStorage()
 
   type Metric = CountDown | WorldClock | Counter
 
-  const STORAGE_KEY = 'fitbit::sleep_minutes'
+  const STORAGE_KEY = 'googlehealth::sleep_minutes'
 
-  const authClient = new AuthClient(new FitbitAuthProvider())
+  const authClient = new AuthClient(new GoogleHealthAuthProvider())
 
   const props: { metrics?: Metric[] } = $props()
   let sleepMetricEnabled = $state(false)
-  let token = $state<string>()
-  let client = $state<FitbitClient>()
 
-  let sleepMinutes = $state<number>(0) // Default to 8 hours in minutes
+  let client = $state<GoogleHealthApiClient>()
+
+  let sleepMinutes = $state<number>() // Default to 8 hours in minutes
 
   const metrics: Metric[] = $derived.by(() => {
     if (props.metrics?.length) {
@@ -52,9 +52,9 @@
     return typeof (metric as WorldClock)?.timeZone !== 'undefined'
   }
 
-  async function getSleepData(token: string) {
+  async function getSleepData() {
     if (!client) {
-      client = new FitbitClient(token)
+      client = new GoogleHealthApiClient(authClient)
     }
     sleepMinutes = await client.getSleep()
     await cache.set(STORAGE_KEY, sleepMinutes, 60 * 60 * 1000) // Cache for 1 hour
@@ -63,8 +63,7 @@
   async function authenticate() {
     const tokenData = await authClient.getAuthToken(true)
     if (tokenData) {
-      token = tokenData
-      getSleepData(token)
+      getSleepData()
     }
   }
 
@@ -82,16 +81,11 @@
       return
     }
 
-    const tokenData = await authClient.getTokenFromStoreOrRefreshToken()
-
-    if (tokenData) {
-      token = tokenData
-      getSleepData(token)
-    }
+    getSleepData()
   })
 </script>
 
-{#if !!metrics.length}
+{#if !!metrics.length || sleepMetricEnabled}
   <div class="flex flex-row gap-5 items-center">
     {#each metrics as metric, i (i)}
       {#if isClock(metric)}

@@ -24,7 +24,6 @@ export type SettingsState = {
     weather?: string
     google?: string
     spotify?: string
-    fitbit?: string
   }
 }
 
