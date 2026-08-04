@@ -29,7 +29,7 @@
 
   let client = $state<GoogleHealthApiClient>()
 
-  let sleepMinutes = $state<number>(0) // Default to 8 hours in minutes
+  let sleepMinutes = $state<number>() // Default to 8 hours in minutes
 
   const metrics: Metric[] = $derived.by(() => {
     if (props.metrics?.length) {

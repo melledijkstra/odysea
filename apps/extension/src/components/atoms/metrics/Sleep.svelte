@@ -5,14 +5,15 @@
   const {
     minutes,
     ...props
-  }: { minutes: number } & HTMLAttributes<HTMLDivElement> = $props()
+  }: { minutes: number | undefined } & HTMLAttributes<HTMLDivElement> = $props()
 
-  const hours = $derived(Math.floor(minutes / 60))
-  const remainingMins = $derived(minutes % 60)
   const formatted = $derived.by(() => {
     if (!minutes || minutes < 0) {
       return 'No data'
     }
+
+    const hours = Math.floor(minutes / 60)
+    const remainingMins = minutes % 60
 
     if (remainingMins === 0) {
       return `${hours}h`

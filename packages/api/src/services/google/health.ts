@@ -13,24 +13,10 @@ export class GoogleHealthApiClient extends TokenBaseClient {
     super(BASE_URL, () => this.auth.getAuthToken())
   }
 
-  private async safeRequest<T>(
-    endpoint: string,
-    options?: RequestInit,
-    queryParams?: URLSearchParams
-  ): Promise<T | undefined> {
-    try {
-      const response = await this.request<T>(endpoint, options, queryParams)
-      return response ?? undefined
-    } catch (error) {
-      this.logger.error(`Error requesting ${endpoint}`, error)
-      return undefined
-    }
-  }
-
   /**
    * Retrieves total sleep minutes for today.
    */
-  async getSleep(): Promise<number> {
+  async getSleep(): Promise<number | undefined> {
     const now = new Date()
     const yesterday = new Date(now)
     yesterday.setDate(now.getDate() - 1)
@@ -43,14 +29,24 @@ export class GoogleHealthApiClient extends TokenBaseClient {
       filter: filter,
     })
 
-    const response = await this.safeRequest<ReconcileDataPointsResponse>(
-      `/users/me/dataTypes/sleep/dataPoints:reconcile`,
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      },
-      urlParams
-    )
+    let response: ReconcileDataPointsResponse | undefined
+    try {
+      const res = await this.request<ReconcileDataPointsResponse>(
+        `/users/me/dataTypes/sleep/dataPoints:reconcile`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        },
+        urlParams
+      )
+      response = res ?? undefined
+    } catch (error) {
+      this.logger.error(
+        'Error requesting /users/me/dataTypes/sleep/dataPoints:reconcile',
+        error
+      )
+      return undefined
+    }
 
     this.logger.log('Sleep data response:', response)
 
@@ -58,21 +54,26 @@ export class GoogleHealthApiClient extends TokenBaseClient {
 
     if (points.length === 0) {
       this.logger.log('No sleep points returned from API or empty response')
-      return 0
+      return undefined
     }
 
     // Find the latest point and extract the duration
     let totalMinutes = 0
     for (const point of points) {
-      const durationStr = point.sleep?.summary?.minutesAsleep
-      if (durationStr) {
-        const duration = parseInt(durationStr, 10)
-        if (!isNaN(duration)) {
-          totalMinutes = Math.max(totalMinutes, duration)
-        }
-      }
+      const duration = this.extractSleepDuration(point)
+      totalMinutes = Math.max(totalMinutes, duration)
     }
 
     return totalMinutes
+  }
+
+  private extractSleepDuration(
+    point: NonNullable<ReconcileDataPointsResponse['dataPoints']>[number]
+  ): number {
+    const durationStr = point.sleep?.summary?.minutesAsleep
+    if (!durationStr) return 0
+
+    const duration = parseInt(durationStr, 10)
+    return isNaN(duration) ? 0 : duration
   }
 }
