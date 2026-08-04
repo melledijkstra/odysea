@@ -22,11 +22,7 @@ export abstract class AuthConfig {
 
 export class GoogleAuthConfig extends AuthConfig {
   constructor() {
-    super('google', [
-      'openid',
-      'profile',
-      'https://www.googleapis.com/auth/googlehealth.sleep.readonly',
-    ])
+    super('google', ['openid', 'profile'])
     this.extraParams = {
       access_type: 'offline',
       prompt: 'consent',

@@ -26,7 +26,11 @@ export class AuthClient extends BaseAuthClient {
   }
 
   async getAuthTokenChrome(interactive = false): Promise<string | undefined> {
-    const oauth2 = await chrome.identity.getAuthToken({ interactive })
+    const details: chrome.identity.TokenDetails = { interactive }
+    if (this.provider.scopes && this.provider.scopes.length > 0) {
+      details.scopes = this.provider.scopes
+    }
+    const oauth2 = await chrome.identity.getAuthToken(details)
     return oauth2?.token
   }
 

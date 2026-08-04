@@ -9,7 +9,22 @@ export class GoogleAuthProvider extends GoogleAuthConfig {
     return settingsStore.apiKeys.google || ''
   }
 
-  scopes = manifest.oauth2.scopes
+  scopes = manifest.oauth2.scopes.filter(
+    (scope) => !scope.includes('googlehealth')
+  )
+}
+
+export class GoogleHealthAuthProvider extends GoogleAuthConfig {
+  get clientId() {
+    return settingsStore.apiKeys.google || ''
+  }
+
+  scopes = [
+    'profile',
+    'email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/googlehealth.sleep.readonly',
+  ]
 }
 
 export class SpotifyAuthProvider extends SpotifyAuthConfig {

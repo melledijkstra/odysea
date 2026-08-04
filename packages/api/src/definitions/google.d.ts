@@ -19,14 +19,11 @@ export type Task = {
   webViewLink?: string
 }
 
-export type SleepRollUpResponse = {
-  points?: Array<{
-    value?: {
-      durationMinutes?: number
-      sleep?: {
-        summary?: {
-          totalDurationMinutes?: number
-        }
+export type ReconcileDataPointsResponse = {
+  dataPoints?: Array<{
+    sleep?: {
+      summary?: {
+        minutesAsleep?: string // int64 format
       }
     }
   }>

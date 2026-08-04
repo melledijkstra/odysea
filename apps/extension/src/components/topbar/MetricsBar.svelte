@@ -13,7 +13,7 @@
   import { onMount } from 'svelte'
   import Sleep from '../atoms/metrics/Sleep.svelte'
   import { AuthClient } from '@melledijkstra/extension'
-  import { GoogleAuthProvider } from '@/oauth2/providers'
+  import { GoogleHealthAuthProvider } from '@/oauth2/providers'
   import { GoogleHealthApiClient } from '@melledijkstra/api'
 
   const cache = new WebLocalStorage()
@@ -22,7 +22,7 @@
 
   const STORAGE_KEY = 'googlehealth::sleep_minutes'
 
-  const authClient = new AuthClient(new GoogleAuthProvider())
+  const authClient = new AuthClient(new GoogleHealthAuthProvider())
 
   const props: { metrics?: Metric[] } = $props()
   let sleepMetricEnabled = $state(false)
@@ -81,11 +81,7 @@
       return
     }
 
-    const tokenData = await authClient.getTokenFromStoreOrRefreshToken()
-
-    if (tokenData) {
-      getSleepData()
-    }
+    getSleepData()
   })
 </script>
 

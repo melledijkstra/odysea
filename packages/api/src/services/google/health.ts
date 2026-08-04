@@ -1,7 +1,8 @@
 import type { AuthClient } from '@melledijkstra/auth'
 import { TokenBaseClient } from '../../tokenbaseclient'
 import { Logger } from '@melledijkstra/toolbox'
-import type { SleepRollUpResponse } from '../../definitions/google'
+
+import type { ReconcileDataPointsResponse } from '../../definitions/google'
 
 const BASE_URL = 'https://health.googleapis.com/v4'
 
@@ -34,60 +35,41 @@ export class GoogleHealthApiClient extends TokenBaseClient {
     const yesterday = new Date(now)
     yesterday.setDate(now.getDate() - 1)
 
-    const requestBody = {
-      range: {
-        start: {
-          date: {
-            year: yesterday.getFullYear(),
-            month: yesterday.getMonth() + 1,
-            day: yesterday.getDate(),
-          },
-          time: { hours: 0, minutes: 0, seconds: 0 },
-        },
-        end: {
-          date: {
-            year: now.getFullYear(),
-            month: now.getMonth() + 1,
-            day: now.getDate(),
-          },
-          time: { hours: 0, minutes: 0, seconds: 0 },
-        },
-      },
-      windowSizeDays: 1,
-    }
+    const startTime = yesterday.toISOString()
 
-    const response = await this.safeRequest<SleepRollUpResponse>(
-      '/users/me/dataTypes/sleep/dataPoints:dailyRollUp',
+    // We need to URL encode the filter string
+    const filter = `sleep.interval.end_time >= "${startTime}"`
+    const urlParams = new URLSearchParams({
+      filter: filter,
+    })
+
+    const response = await this.safeRequest<ReconcileDataPointsResponse>(
+      `/users/me/dataTypes/sleep/dataPoints:reconcile`,
       {
-        method: 'POST',
+        method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      }
+      },
+      urlParams
     )
-
-    if (!response || !response.points || response.points.length === 0) {
-      this.logger.log(
-        'No sleep points returned from API or empty response',
-        response
-      )
-      return 0
-    }
 
     this.logger.log('Sleep data response:', response)
 
+    const points = response?.dataPoints || []
+
+    if (points.length === 0) {
+      this.logger.log('No sleep points returned from API or empty response')
+      return 0
+    }
+
     // Find the latest point and extract the duration
-    // The structure depends on Google's final sleep schema,
-    // usually it contains a sleep summary with total duration.
-    // For now we will safely navigate through the expected structure.
     let totalMinutes = 0
-    for (const point of response.points) {
-      if (point.value?.sleep?.summary?.totalDurationMinutes) {
-        totalMinutes = Math.max(
-          totalMinutes,
-          point.value.sleep.summary.totalDurationMinutes
-        )
-      } else if (point.value?.durationMinutes) {
-        totalMinutes = Math.max(totalMinutes, point.value.durationMinutes)
+    for (const point of points) {
+      const durationStr = point.sleep?.summary?.minutesAsleep
+      if (durationStr) {
+        const duration = parseInt(durationStr, 10)
+        if (!isNaN(duration)) {
+          totalMinutes = Math.max(totalMinutes, duration)
+        }
       }
     }
 
