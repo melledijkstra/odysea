@@ -1,5 +1,4 @@
 import { SpotifyApiClient } from '@melledijkstra/api'
-import { MemoryCache, minutes } from '@melledijkstra/storage'
 import type { AuthClient } from '@melledijkstra/extension'
 import type { Playlist, Track } from 'MusicPlayer'
 import {
@@ -12,7 +11,6 @@ import { Logger } from '@/logger'
 export class SpotifyApiService {
   private logger = new Logger('SpotifyApiService')
   private api: SpotifyApiClient
-  private cache = new MemoryCache()
 
   constructor(authClient: AuthClient) {
     this.api = new SpotifyApiClient(authClient)
@@ -24,19 +22,13 @@ export class SpotifyApiService {
   }
 
   async getPlaylists(): Promise<Playlist[]> {
-    const cached = await this.cache.get<Playlist[]>('playlists')
-    if (cached) {
-      return cached
-    }
     try {
       const playlists = await this.api.userPlaylists()
-      const converted = playlists.map(convertSpotifyPlaylist)
-      await this.cache.set('playlists', converted, minutes(5))
-      return converted
+      return playlists.map(convertSpotifyPlaylist)
     } catch (error) {
       this.logger.error('Failed to retrieve playlists', error)
+      return []
     }
-    return []
   }
 
   async toggleRepeatMode(repeatMode: string | number): Promise<void> {

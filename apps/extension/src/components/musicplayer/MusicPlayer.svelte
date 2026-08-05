@@ -6,12 +6,12 @@
     MusicPlayerInterface,
     Playlist,
     PlaybackState,
-    Track,
   } from 'MusicPlayer'
   import type { Device } from '@melledijkstra/api'
   import ListSkeleton from './ListSkeleton.svelte'
   import ScrollArea from '../atoms/ScrollArea.svelte'
   import TrackList from './TrackList.svelte'
+  import { createQuery } from '@tanstack/svelte-query'
 
   const {
     state: MPState,
@@ -25,7 +25,23 @@
     deviceId?: string
   } = $props()
 
-  let fetchItems = $state<Promise<Track[]>>()
+  let selectedPlaylist = $state<Playlist | null>(null)
+
+  const playlistsQuery = createQuery(() => ({
+    queryKey: ['musicplayer', 'playlists'],
+    queryFn: () => controller.getPlaylists(),
+    staleTime: 5 * 60 * 1000,
+  }))
+
+  const tracksQuery = createQuery(() => ({
+    queryKey: ['musicplayer', 'tracks', selectedPlaylist?.id],
+    queryFn: async () => {
+      if (!selectedPlaylist) return []
+      return controller.getPlaylistItems(selectedPlaylist)
+    },
+    enabled: !!selectedPlaylist,
+    staleTime: 5 * 60 * 1000,
+  }))
 
   function playPause() {
     // Use play or pause based on current playback state
@@ -36,8 +52,8 @@
     }
   }
 
-  async function selectPlaylist(playlist: Playlist) {
-    fetchItems = controller.getPlaylistItems(playlist)
+  function selectPlaylist(playlist: Playlist) {
+    selectedPlaylist = playlist
   }
 </script>
 
@@ -45,29 +61,33 @@
   class="grid grid-cols-2 grid-rows-3 music-player w-full h-full overflow-hidden"
 >
   <ScrollArea scrollbarClasses="bg-transparent" orientation="vertical">
-    {#await controller.getPlaylists()}
+    {#if playlistsQuery.isPending}
       <ListSkeleton amount={20} />
-    {:then playlists}
+    {:else if playlistsQuery.isError}
+      <p class="text-sm text-red-500">
+        Error loading playlists: {playlistsQuery.error?.message}
+      </p>
+    {:else if playlistsQuery.data}
       <Playlists
-        {playlists}
+        playlists={playlistsQuery.data}
         onPlaylistPlay={(playlist) => controller.playItem(playlist)}
         onPlaylistSelected={(playlist) => selectPlaylist(playlist)}
       />
-    {:catch error}
-      <p class="text-sm text-red-500">
-        Error loading playlists: {error.message}
-      </p>
-    {/await}
+    {/if}
   </ScrollArea>
   <ScrollArea scrollbarClasses="bg-transparent" orientation="vertical">
-    {#await fetchItems}
+    {#if tracksQuery.isPending && selectedPlaylist}
       <ListSkeleton amount={20} />
-    {:then trackList}
+    {:else if tracksQuery.isError}
+      <p class="text-sm text-red-500">
+        Error loading tracks: {tracksQuery.error?.message}
+      </p>
+    {:else if tracksQuery.data}
       <TrackList
-        tracks={trackList ?? []}
+        tracks={tracksQuery.data}
         onTrackSelected={(track) => controller.playItem(track)}
       />
-    {/await}
+    {/if}
   </ScrollArea>
   <Playback
     class="col-span-2"
