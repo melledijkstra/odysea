@@ -40,7 +40,7 @@
   })
 </script>
 
-<PopPanel panelProps={{ size: 'small', class: 'flex flex-col' }}>
+<PopPanel panelProps={{ size: 'small', class: 'flex flex-col h-[300px]' }}>
   <div class="flex items-center gap-2 mb-2 border-b border-gray-200/20 pb-2">
     <button
       class="p-1 rounded transition-colors hover:bg-gray-200/20"
