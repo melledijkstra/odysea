@@ -24,6 +24,8 @@ export type SettingsState = {
     weather?: string
     google?: string
     spotify?: string
+    github_client_id?: string
+    github_client_secret?: string
   }
 }
 

@@ -4,6 +4,7 @@
   import type { HTMLButtonAttributes } from 'svelte/elements'
   import IconGoogle from '@/icons/IconGoogle.svelte'
   import IconSpotify from '@/icons/IconSpotify.svelte'
+  import IconGithub from '@/icons/IconGithub.svelte'
 
   function capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1)
@@ -15,6 +16,9 @@
     ],
     spotify: [
       'bg-spotify hover:bg-spotify/80 focus:ring-4 focus:outline-hidden focus:ring-spotify/50 dark:focus:ring-spotify/55',
+    ],
+    github: [
+      'bg-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-hidden focus:ring-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700',
     ],
   }
 
@@ -42,6 +46,8 @@
     <IconGoogle />
   {:else if provider === 'spotify'}
     <IconSpotify />
+  {:else if provider === 'github'}
+    <IconGithub />
   {/if}
   {#if children}
     {@render children()}

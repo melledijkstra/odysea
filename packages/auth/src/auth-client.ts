@@ -409,17 +409,21 @@ export class AuthClient {
       }
 
       const tokens = await this.validate(code, state)
-      if (!tokens.hasRefreshToken()) {
-        throw new Error(
-          `Provider '${this.provider.name}' did not return a refresh token.`
+
+      const refreshToken = tokens.hasRefreshToken()
+        ? tokens.refreshToken()
+        : undefined
+      let expiresIn = 31536000 // 1 year default for non-expiring tokens
+
+      try {
+        expiresIn = tokens.accessTokenExpiresInSeconds()
+      } catch {
+        this._logger.debug(
+          'No expiry found for access token, using default 1 year expiry'
         )
       }
 
-      await this.cacheAuthToken(
-        tokens.accessToken(),
-        tokens.refreshToken(),
-        tokens.accessTokenExpiresInSeconds()
-      )
+      await this.cacheAuthToken(tokens.accessToken(), refreshToken, expiresIn)
       return tokens.accessToken()
     } catch (error) {
       this._logger.error('Auth flow failed', { error })
