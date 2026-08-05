@@ -7,7 +7,28 @@ import type { ILogger } from '@/interfaces/logger.interface'
 import { Logger } from '@/logger'
 import { addNotification } from '@/stores/notifications.svelte'
 
+type GithubIssueData = {
+  owner: string
+  repo: string
+  number: number
+}
+
+export function githubDataFromId(id: string): GithubIssueData {
+  const [owner, repo, numberStr] = id.split('/')
+  return { owner, repo, number: parseInt(numberStr, 10) }
+}
+
+export function githubIdFromData(
+  owner: string,
+  repo: string,
+  number: number
+): string {
+  return `${owner}/${repo}/${number}`
+}
+
 export class GithubTasksController implements TaskControllerInterface, ILogger {
+  canCreateTask = false
+  defaultListId = 'assigned'
   logger: Logger
   public readonly auth: AuthClient
   private octokit: Octokit | null = null
@@ -59,8 +80,9 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
         const repoUrlParts = issue.repository_url.split('/')
         const repo = repoUrlParts.pop()!
         const owner = repoUrlParts.pop()!
+        const target = githubIdFromData(owner, repo, issue.number)
         return {
-          id: `${owner}/${repo}/${issue.number}`,
+          id: target,
           title: issue.title,
           status: issue.state === 'open' ? 'needsAction' : 'completed',
           webViewLink: issue.html_url,
@@ -80,12 +102,12 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
 
   async setTaskStatus(taskId: string, status: boolean): Promise<boolean> {
     if (!this.octokit) return false
-    const [owner, repo, numberStr] = taskId.split('/')
+    const target = githubDataFromId(taskId)
     try {
       await this.octokit.issues.update({
-        owner,
-        repo,
-        issue_number: parseInt(numberStr, 10),
+        owner: target.owner,
+        repo: target.repo,
+        issue_number: target.number,
         state: status ? 'closed' : 'open',
       })
       return true
@@ -98,12 +120,12 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
 
   async updateTask(task: Task): Promise<boolean> {
     if (!this.octokit) return false
-    const [owner, repo, numberStr] = task.id.split('/')
+    const target = githubDataFromId(task.id)
     try {
       await this.octokit.issues.update({
-        owner,
-        repo,
-        issue_number: parseInt(numberStr, 10),
+        owner: target.owner,
+        repo: target.repo,
+        issue_number: target.number,
         title: task.title,
       })
       return true

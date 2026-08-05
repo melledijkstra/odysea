@@ -2,6 +2,8 @@ import type { TaskControllerInterface } from '../controllers/GoogleTasksControll
 import type { Task, TaskList } from '@/interfaces/tasks'
 
 export class MockTasksController implements TaskControllerInterface {
+  canCreateTask = true
+  defaultListId = 'default'
   private tasks: Task[] = []
   private taskLists: TaskList[] = []
 

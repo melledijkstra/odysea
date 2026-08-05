@@ -23,7 +23,7 @@
   $effect(() => {
     // Make sure we update when provider changes
     if (providerId) {
-      selectedTaskList = providerId === 'google' ? '@default' : 'assigned'
+      selectedTaskList = controller.defaultListId
     }
   })
 
@@ -32,7 +32,7 @@
     queryFn: async () => {
       const lists = await controller.getTaskLists()
       if (lists.length > 0 && !selectedTaskList) {
-        selectedTaskList = providerId === 'google' ? '@default' : 'assigned'
+        selectedTaskList = controller.defaultListId
       }
       return lists
     },
@@ -90,11 +90,11 @@
   >
     {#if taskListsQuery.data}
       {#each taskListsQuery.data as list, i (list.id)}
-        {#if i === 0 && providerId === 'google'}
-          <option value="@default">{list.title}</option>
-        {:else}
-          <option value={list.id}>{list.title}</option>
-        {/if}
+        <option
+          value={i === 0 && controller.defaultListId
+            ? controller.defaultListId
+            : list.id}>{list.title}</option
+        >
       {/each}
     {/if}
   </select>
@@ -112,7 +112,7 @@
     onRemoveTask={(taskId) => deleteTaskMutation.mutate(taskId)}
   />
 </ScrollArea>
-{#if providerId === 'google'}
+{#if controller.canCreateTask}
   <input
     name="new-task-input"
     bind:value={newTaskTitle}
@@ -126,4 +126,8 @@
     type="text"
     placeholder="New task"
   />
+{:else}
+  <p class="mt-1 text-xs text-gray-400">
+    Task creation is not supported for this provider.
+  </p>
 {/if}
