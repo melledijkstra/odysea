@@ -1,32 +1,76 @@
 <script lang="ts">
   import TaskList from '@/components/atoms/tasks/TaskList.svelte'
   import type { TaskControllerInterface } from '@/controllers/GoogleTasksController'
-  import { onMount } from 'svelte'
-  import type { GoogleTasksState } from './state.svelte'
+  import {
+    createQuery,
+    createMutation,
+    useQueryClient,
+  } from '@tanstack/svelte-query'
+  import type { Task } from '@melledijkstra/api'
 
   export type TasksPanelContentProps = {
     controller: TaskControllerInterface
-    state: GoogleTasksState
   }
 
-  const { controller, state: tasksState }: TasksPanelContentProps = $props()
+  const { controller }: TasksPanelContentProps = $props()
+  const queryClient = useQueryClient()
 
-  let selectedTaskList = $state<string>()
+  let selectedTaskList = $state<string>('@default')
   let newTaskTitle = $state('')
 
-  async function loadTaskLists() {
-    const lists = await controller.getTaskLists()
-    if (lists) {
-      if (!selectedTaskList && lists.length > 0) {
+  const taskListsQuery = createQuery(() => ({
+    queryKey: ['google-tasks', 'lists'],
+    queryFn: async () => {
+      const lists = await controller.getTaskLists()
+      if (lists.length > 0 && !selectedTaskList) {
         selectedTaskList = lists[0].id
-        await controller.getTasks(selectedTaskList)
       }
-    }
-  }
+      return lists
+    },
+    staleTime: 5 * 60 * 1000,
+  }))
 
-  onMount(async () => {
-    loadTaskLists()
-  })
+  const tasksQuery = createQuery(() => ({
+    queryKey: ['google-tasks', 'tasks', selectedTaskList],
+    queryFn: () => controller.getTasks(selectedTaskList),
+    enabled: !!selectedTaskList,
+    staleTime: 5 * 60 * 1000,
+  }))
+
+  const createTaskMutation = createMutation(() => ({
+    mutationFn: (title: string) =>
+      controller.createTask(title, selectedTaskList),
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['google-tasks', 'tasks', selectedTaskList],
+      }),
+  }))
+
+  const setTaskStatusMutation = createMutation(() => ({
+    mutationFn: ({ taskId, status }: { taskId: string; status: boolean }) =>
+      controller.setTaskStatus(taskId, status, selectedTaskList),
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['google-tasks', 'tasks', selectedTaskList],
+      }),
+  }))
+
+  const updateTaskMutation = createMutation(() => ({
+    mutationFn: (task: Task) => controller.updateTask(task, selectedTaskList),
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['google-tasks', 'tasks', selectedTaskList],
+      }),
+  }))
+
+  const deleteTaskMutation = createMutation(() => ({
+    mutationFn: (taskId: string) =>
+      controller.deleteTask(taskId, selectedTaskList),
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['google-tasks', 'tasks', selectedTaskList],
+      }),
+  }))
 </script>
 
 <h3 class="mb-2 flex items-center text-lg text-black dark:text-white">
@@ -39,27 +83,32 @@
     name="task-list-selector"
     class="w-full text-black dark:text-white text-lg"
     bind:value={selectedTaskList}
-    onchange={() => controller.getTasks(selectedTaskList)}
   >
-    {#each tasksState.taskLists as list (list.id)}
-      <option value={list.id}>{list.title}</option>
-    {/each}
+    {#if taskListsQuery.data}
+      {#each taskListsQuery.data as list, i (list.id)}
+        {#if i === 0}
+          <option value="@default" selected>{list.title}</option>
+        {:else}
+          <option value={list.id}>{list.title}</option>
+        {/if}
+      {/each}
+    {/if}
   </select>
 </h3>
 <TaskList
   class="flex-1 overflow-y-auto"
-  tasks={tasksState.tasks}
+  tasks={tasksQuery.data ?? []}
   onToggleTask={(taskId, status) =>
-    controller.setTaskStatus(taskId, status, selectedTaskList)}
-  onSaveEdit={(task) => controller.updateTask(task, selectedTaskList)}
-  onRemoveTask={(taskId) => controller.deleteTask(taskId, selectedTaskList)}
+    setTaskStatusMutation.mutate({ taskId, status })}
+  onSaveEdit={(task) => updateTaskMutation.mutate(task)}
+  onRemoveTask={(taskId) => deleteTaskMutation.mutate(taskId)}
 />
 <input
   name="new-task-input"
   bind:value={newTaskTitle}
   onkeypress={(e) => {
     if (e.key === 'Enter' && newTaskTitle) {
-      controller.createTask(newTaskTitle, selectedTaskList)
+      createTaskMutation.mutate(newTaskTitle)
       newTaskTitle = ''
     }
   }}

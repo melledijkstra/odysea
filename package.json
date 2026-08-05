@@ -16,7 +16,7 @@
     "test:e2e": "turbo run test:e2e",
     "lint": "turbo run lint",
     "format": "prettier --check .",
-    "format:fix": "prettier --write .",
+    "format:fix": "prettier --list-different --write .",
     "format:root": "turbo run format",
     "typecheck": "turbo run typecheck",
     "extension": "pnpm --filter=@odysea/extension run",

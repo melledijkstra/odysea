@@ -20,7 +20,6 @@
     component: TasksPanelContent,
     args: {
       controller,
-      state,
     },
   })
 </script>
