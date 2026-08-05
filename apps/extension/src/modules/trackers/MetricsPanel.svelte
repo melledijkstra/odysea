@@ -10,18 +10,23 @@
     mdiCalendarClock,
     mdiNumeric,
     mdiBedOutline,
+    mdiDrag,
   } from '@mdi/js'
   import CountdownForm from './countdown/Form.svelte'
   import WorldClockForm from './world-clocks/Form.svelte'
   import Button from '@/components/atoms/Button.svelte'
   import Countdown from '@/components/atoms/metrics/Countdown.svelte'
-  import { setIsSleepMetricEnabled, trackers } from './state.svelte'
-  import WorldClock from '@/components/atoms/metrics/WorldClock.svelte'
+  import { trackers, type CountDown, type WorldClock, type Counter } from './state.svelte'
+  import Clock from '@/components/atoms/metrics/WorldClock.svelte'
   import { Popover } from 'bits-ui'
   import PopPanel from '@/components/atoms/PopPanel.svelte'
   import IconButton from '@/components/atoms/IconButton.svelte'
+  import { dndzone, type DndEvent } from 'svelte-dnd-action'
+  import { flip } from 'svelte/animate'
 
   type FormType = 'countdown' | 'worldclock' | 'sleep' | 'counter'
+
+  type AnyMetric = (CountDown & { type: 'countdown' }) | (WorldClock & { type: 'worldClock' }) | (Counter & { type: 'counter' }) | { id: 'sleep', type: 'sleep', pinned: boolean }
 
   let isOpen = $state(false)
 
@@ -36,8 +41,35 @@
   }
 
   function addSleepTracker() {
-    setIsSleepMetricEnabled(true)
+    trackers.setSleepEnabled(true)
+    backToMain()
   }
+
+
+
+  let items = $state<AnyMetric[]>([])
+
+  $effect(() => {
+    // Only update items if it's empty or we're not currently dragging to avoid jitter
+    // Wait, let's use a non-reactive property for dragging state
+    if (!isDragging) {
+      items = trackers.allMetrics as AnyMetric[]
+    }
+  })
+
+  let isDragging = false
+
+  function handleDndConsider(e: CustomEvent<DndEvent<AnyMetric>>) {
+    isDragging = true
+    items = e.detail.items as AnyMetric[]
+  }
+
+  function handleDndFinalize(e: CustomEvent<DndEvent<AnyMetric>>) {
+    isDragging = false
+    items = e.detail.items as AnyMetric[]
+    trackers.setMetricOrder(items.map(item => item.id))
+  }
+
 </script>
 
 <Popover.Root bind:open={isOpen}>
@@ -120,85 +152,93 @@
         </button>
       </div>
 
-      {#if trackers.countdowns.length > 0 || trackers.worldClocks.length > 0 || trackers.counters.length > 0}
+      {#if items.length > 0}
         <div class="space-y-2 mt-4 pt-4 border-t border-white/10">
           <p
             class="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2"
           >
             Active Metrics
           </p>
-          {#each trackers.countdowns as countdown, i (i)}
-            <div
-              class="flex flex-row items-center justify-between gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group/item"
-            >
-              <div class="flex-1 min-w-0">
-                <Countdown metric={countdown} />
-              </div>
+          <div
+            use:dndzone={{ items, flipDurationMs: 300, dropTargetStyle: {} }}
+            onconsider={handleDndConsider}
+            onfinalize={handleDndFinalize}
+            class="space-y-2"
+          >
+            {#each items as item (item.id)}
               <div
-                class="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity"
+                animate:flip={{ duration: 300 }}
+                class="flex flex-row items-center justify-between gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group/item"
               >
-                <IconButton
-                  icon={mdiDelete}
-                  size={18}
-                  onclick={() => trackers.deleteCountdown(i)}
-                  class="hover:text-red-400"
-                />
-              </div>
-            </div>
-          {/each}
-          {#each trackers.worldClocks as worldClock, i (i)}
-            <div
-              class="flex flex-row items-center justify-between gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group/item"
-            >
-              <div class="flex-1 min-w-0">
-                <WorldClock metric={worldClock} />
-              </div>
-              <div
-                class="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity"
-              >
-                <IconButton
-                  icon={worldClock.pinned ? mdiPin : mdiPinOff}
-                  size={18}
-                  onclick={() => trackers.pinWorldClock(i, !worldClock.pinned)}
-                  class={worldClock.pinned ? 'text-primary' : ''}
-                />
-                <IconButton
-                  icon={mdiDelete}
-                  size={18}
-                  onclick={() => trackers.deleteWorldClock(i)}
-                  class="hover:text-red-400"
-                />
-              </div>
-            </div>
-          {/each}
-          {#each trackers.counters as counter, i (i)}
-            <div
-              class="flex flex-row items-center justify-between gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group/item"
-            >
-              <div class="flex-1 min-w-0">
-                <p
-                  class="text-sm font-bold truncate leading-tight dark:text-white text-black"
+                <div class="cursor-grab active:cursor-grabbing text-white/40 hover:text-white">
+                    <Icon path={mdiDrag} size={20} />
+                </div>
+                <div class="flex-1 min-w-0">
+                  {#if item.type === 'countdown'}
+                    <Countdown metric={item} />
+                  {:else if item.type === 'worldClock'}
+                    <Clock metric={item} />
+                  {:else if item.type === 'counter'}
+                    <p
+                      class="text-sm font-bold truncate leading-tight dark:text-white text-black"
+                    >
+                      {item.name}
+                    </p>
+                    <p
+                      class="text-xs opacity-70 truncate dark:text-white text-black"
+                    >
+                      {item.value}
+                    </p>
+                  {:else if item.type === 'sleep'}
+                     <div class="text-sm font-bold truncate leading-tight dark:text-white text-black">
+                       Sleep
+                     </div>
+                  {/if}
+                </div>
+                <div
+                  class="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity"
                 >
-                  {counter.name}
-                </p>
-                <p
-                  class="text-xs opacity-70 truncate dark:text-white text-black"
-                >
-                  {counter.value}
-                </p>
+                  {#if item.type === 'worldClock'}
+                    <IconButton
+                      icon={item.pinned ? mdiPin : mdiPinOff}
+                      size={18}
+                      onclick={() => trackers.pinWorldClock(item.id, !item.pinned)}
+                      class={item.pinned ? 'text-primary' : ''}
+                    />
+                  {/if}
+                  {#if item.type === 'countdown'}
+                     <IconButton
+                        icon={mdiDelete}
+                        size={18}
+                        onclick={() => trackers.deleteCountdown(item.id)}
+                        class="hover:text-red-400"
+                      />
+                  {:else if item.type === 'worldClock'}
+                      <IconButton
+                        icon={mdiDelete}
+                        size={18}
+                        onclick={() => trackers.deleteWorldClock(item.id)}
+                        class="hover:text-red-400"
+                      />
+                  {:else if item.type === 'counter'}
+                      <IconButton
+                        icon={mdiDelete}
+                        size={18}
+                        onclick={() => trackers.deleteCounter(item.id)}
+                        class="hover:text-red-400"
+                      />
+                  {:else if item.type === 'sleep'}
+                       <IconButton
+                        icon={mdiDelete}
+                        size={18}
+                        onclick={() => trackers.setSleepEnabled(false)}
+                        class="hover:text-red-400"
+                      />
+                  {/if}
+                </div>
               </div>
-              <div
-                class="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity"
-              >
-                <IconButton
-                  icon={mdiDelete}
-                  size={18}
-                  onclick={() => trackers.deleteCounter(i)}
-                  class="hover:text-red-400"
-                />
-              </div>
-            </div>
-          {/each}
+            {/each}
+          </div>
         </div>
       {/if}
     {:else if currentForm === 'countdown'}
@@ -212,7 +252,8 @@
       <!-- Placeholder for future counter form -->
       <p>Counter form not yet implemented.</p>
     {:else if currentForm === 'sleep'}
-      <Button onclick={addSleepTracker}>Add sleep tracker</Button>
+      <h2 class="text-lg mb-3">Sleep Tracker 🛏️</h2>
+      <Button onclick={addSleepTracker} class="w-full">Enable sleep tracker</Button>
     {/if}
   </PopPanel>
 </Popover.Root>

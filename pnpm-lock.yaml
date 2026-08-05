@@ -129,6 +129,9 @@ importers:
       idb:
         specifier: ^8.0.3
         version: 8.0.3
+      svelte-dnd-action:
+        specifier: ^0.9.77
+        version: 0.9.77(svelte@5.56.8(@typescript-eslint/types@8.66.0))
     devDependencies:
       '@melledijkstra/config':
         specifier: workspace:*
@@ -4115,6 +4118,11 @@ packages:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: ^5.0.0 || ^6.0.0
 
+  svelte-dnd-action@0.9.77:
+    resolution: {integrity: sha512-HEd4gH1OKKH/MzO5HTGldNpergAU4LyhqLvP4lrcmDpzKAGWbeb0FHB+ie1H+LJ1ZRbbjBHU6T/vYQzM80HSug==}
+    peerDependencies:
+      svelte: '>=3.23.0 || ^5.0.0-next.0'
+
   svelte-eslint-parser@1.8.0:
     resolution: {integrity: sha512-mikR1qwIVy3t5WthUoAXkMwxkXvabZP9FJgdx35Ei7EbGWmctva1Pih16Koeor/bdNNq8NXHlwKGS6NkYTawLg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0, pnpm: 10.34.1}
@@ -7863,6 +7871,10 @@ snapshots:
       typescript: 6.0.3
     transitivePeerDependencies:
       - picomatch
+
+  svelte-dnd-action@0.9.77(svelte@5.56.8(@typescript-eslint/types@8.66.0)):
+    dependencies:
+      svelte: 5.56.8(@typescript-eslint/types@8.66.0)
 
   svelte-eslint-parser@1.8.0(svelte@5.56.8(@typescript-eslint/types@8.66.0)):
     dependencies:
