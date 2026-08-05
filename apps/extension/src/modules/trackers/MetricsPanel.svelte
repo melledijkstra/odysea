@@ -61,12 +61,12 @@
 
   function handleDndConsider(e: CustomEvent<DndEvent<AnyMetric>>) {
     isDragging = true
-    items = e.detail.items
+    items = e.detail.items as AnyMetric[]
   }
 
   function handleDndFinalize(e: CustomEvent<DndEvent<AnyMetric>>) {
     isDragging = false
-    items = e.detail.items
+    items = e.detail.items as AnyMetric[]
     trackers.setMetricOrder(items.map(item => item.id))
   }
 

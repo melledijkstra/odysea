@@ -23,9 +23,9 @@
     'rounded-xl shadow-md backdrop-blur-xs overflow-y-auto',
     'z-40',
     // size
-    size === 'small' && 'w-[300px] max-h-[300px]',
-    size === 'medium' && 'w-[500px] h-[400px]',
-    size === 'large' && 'w-[650px] h-[500px]',
+    size === 'small' && 'w-75 max-h-75',
+    size === 'medium' && 'w-125 h-100',
+    size === 'large' && 'w-162 h-125',
     !nopadding && 'p-4',
     // light theme
     'bg-white/40 text-black',

@@ -1,6 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import TasksPanelContent from '@/modules/google-tasks/TasksPanelContent.svelte'
+  import TasksPanelContent from '@/modules/tasks/TasksPanelContent.svelte'
   import { MockTasksController } from '@/mocks/MockTasksController'
   import Panel from '@/components/atoms/Panel.svelte'
   import type { ComponentProps } from 'svelte'
@@ -16,10 +16,11 @@
   const controller = new MockTasksController(state)
 
   const { Story } = defineMeta({
-    title: 'Modules/GoogleTasks',
+    title: 'Modules/Tasks',
     component: TasksPanelContent,
     args: {
       controller,
+      providerId: 'google',
     },
   })
 </script>

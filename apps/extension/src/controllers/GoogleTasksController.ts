@@ -1,12 +1,14 @@
-import type { Task, TaskList } from '@melledijkstra/api'
 import { GoogleTasksApiClient } from '@melledijkstra/api'
 import type { ILogger } from '@/interfaces/logger.interface'
 import { Logger } from '@/logger'
 import { AuthClient } from '@melledijkstra/extension'
 import { GoogleAuthProvider } from '@/oauth2/providers'
 import { addNotification } from '@/stores/notifications.svelte'
+import type { Task, TaskList } from '@/interfaces/tasks'
 
 export type TaskControllerInterface = {
+  canCreateTask: boolean
+  defaultListId: string
   getTasks: (taskListId?: string) => Promise<Task[]>
   getTaskLists: () => Promise<TaskList[]>
   createTask: (taskTitle: string, taskListId?: string) => Promise<boolean>
@@ -20,6 +22,8 @@ export type TaskControllerInterface = {
 }
 
 export class GoogleTasksController implements TaskControllerInterface, ILogger {
+  canCreateTask = true
+  defaultListId = '@default'
   logger: Logger
   public readonly auth: AuthClient
   private readonly api: GoogleTasksApiClient

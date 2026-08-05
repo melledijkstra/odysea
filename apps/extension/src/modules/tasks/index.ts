@@ -11,7 +11,7 @@ export default {
     const auth = new AuthClient(new GoogleAuthProvider())
     const client = new GoogleTasksApiClient(auth)
     await queryClient.prefetchQuery({
-      queryKey: ['google-tasks', 'lists'],
+      queryKey: ['tasks', 'google', 'lists'],
       queryFn: () => client.getTaskLists(),
     })
   },
