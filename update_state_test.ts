@@ -1,4 +1,6 @@
+import fs from 'fs'
 
+const code = `
 export type Counter = {
   id: string
   name: string
@@ -243,3 +245,6 @@ export const getIsSleepMetricEnabled = () => {
 export const setIsSleepMetricEnabled = (value: boolean) => {
   trackers.setSleepEnabled(value)
 }
+`
+
+fs.writeFileSync('apps/extension/src/modules/trackers/state.svelte.ts', code)

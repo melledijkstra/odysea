@@ -1,4 +1,5 @@
-<script lang="ts">
+import fs from 'fs'
+const code = `<script lang="ts">
   import { WebLocalStorage } from '@melledijkstra/storage'
   import { trackers } from '@/modules/trackers/state.svelte'
   import Clock from '@/components/atoms/metrics/WorldClock.svelte'
@@ -79,3 +80,5 @@
     {/each}
   </div>
 {/if}
+`
+fs.writeFileSync('apps/extension/src/components/topbar/MetricsBar.svelte', code)

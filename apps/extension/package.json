@@ -50,6 +50,7 @@
     "@tanstack/svelte-query": "^6.1.38",
     "@tanstack/svelte-query-devtools": "^6.1.38",
     "bits-ui": "^2.18.1",
-    "idb": "^8.0.3"
+    "idb": "^8.0.3",
+    "svelte-dnd-action": "^0.9.77"
   }
 }

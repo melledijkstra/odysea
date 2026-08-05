@@ -1,4 +1,5 @@
-<script lang="ts">
+import fs from 'fs'
+const code = `<script lang="ts">
   import Icon from '@/components/atoms/Icon.svelte'
   import {
     mdiArrowLeft,
@@ -16,8 +17,9 @@
   import WorldClockForm from './world-clocks/Form.svelte'
   import Button from '@/components/atoms/Button.svelte'
   import Countdown from '@/components/atoms/metrics/Countdown.svelte'
-  import { trackers, type CountDown, type WorldClock, type Counter } from './state.svelte'
-  import Clock from '@/components/atoms/metrics/WorldClock.svelte'
+  import { trackers } from './state.svelte'
+  import WorldClock from '@/components/atoms/metrics/WorldClock.svelte'
+  import Sleep from '@/components/atoms/metrics/Sleep.svelte'
   import { Popover } from 'bits-ui'
   import PopPanel from '@/components/atoms/PopPanel.svelte'
   import IconButton from '@/components/atoms/IconButton.svelte'
@@ -25,8 +27,6 @@
   import { flip } from 'svelte/animate'
 
   type FormType = 'countdown' | 'worldclock' | 'sleep' | 'counter'
-
-  type AnyMetric = (CountDown & { type: 'countdown' }) | (WorldClock & { type: 'worldClock' }) | (Counter & { type: 'counter' }) | { id: 'sleep', type: 'sleep', pinned: boolean }
 
   let isOpen = $state(false)
 
@@ -45,27 +45,17 @@
     backToMain()
   }
 
-
-
-  let items = $state<AnyMetric[]>([])
+  let items = $state(trackers.allMetrics)
 
   $effect(() => {
-    // Only update items if it's empty or we're not currently dragging to avoid jitter
-    // Wait, let's use a non-reactive property for dragging state
-    if (!isDragging) {
-      items = trackers.allMetrics as AnyMetric[]
-    }
+    items = trackers.allMetrics
   })
 
-  let isDragging = false
-
-  function handleDndConsider(e: CustomEvent<DndEvent<AnyMetric>>) {
-    isDragging = true
+  function handleDndConsider(e: CustomEvent<DndEvent<any>>) {
     items = e.detail.items
   }
 
-  function handleDndFinalize(e: CustomEvent<DndEvent<AnyMetric>>) {
-    isDragging = false
+  function handleDndFinalize(e: CustomEvent<DndEvent<any>>) {
     items = e.detail.items
     trackers.setMetricOrder(items.map(item => item.id))
   }
@@ -177,7 +167,7 @@
                   {#if item.type === 'countdown'}
                     <Countdown metric={item} />
                   {:else if item.type === 'worldClock'}
-                    <Clock metric={item} />
+                    <WorldClock metric={item} />
                   {:else if item.type === 'counter'}
                     <p
                       class="text-sm font-bold truncate leading-tight dark:text-white text-black"
@@ -257,3 +247,5 @@
     {/if}
   </PopPanel>
 </Popover.Root>
+`
+fs.writeFileSync('apps/extension/src/modules/trackers/MetricsPanel.svelte', code)

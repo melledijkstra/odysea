@@ -20,6 +20,7 @@
   name="Amsterdam"
   args={{
     metric: {
+      id: '1',
       name: 'Amsterdam',
       pinned: true,
       timeZone: 'Europe/Amsterdam',
@@ -31,6 +32,7 @@
   name="Tokyo"
   args={{
     metric: {
+      id: '2',
       name: 'Tokyo',
       pinned: true,
       timeZone: 'Asia/Tokyo',
