@@ -1,37 +1,20 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-  import { WeatherClient } from '@/api/weather'
+  import { usePositionQuery, useWeatherQuery } from '@/api/weather'
   import { mdiCloudOff } from '@mdi/js'
   import IconButton from '@/components/atoms/IconButton.svelte'
-  import { createWeatherState } from './state.svelte'
   import WeatherInfo from './WeatherInfo.svelte'
-  import { settingsStore } from '@/settings/index.svelte'
 
-  const { currentWeather, setCurrentWeather } = createWeatherState()
-  const client = $state<WeatherClient>(
-    new WeatherClient(() => settingsStore.apiKeys.weather || '')
-  )
-
-  async function retrieveWeather() {
-    const weather = await client.getWeather()
-
-    if (weather) {
-      setCurrentWeather(weather)
-    }
-  }
-
-  onMount(async () => {
-    retrieveWeather()
-  })
+  const positionQuery = usePositionQuery()
+  const weatherQuery = useWeatherQuery(positionQuery)
 </script>
 
-{#if currentWeather.data}
+{#if weatherQuery?.data}
   <WeatherInfo
-    iconId={currentWeather.data.icon}
-    temperatureKelvin={currentWeather.data.temperature}
+    iconId={weatherQuery.data.icon}
+    temperatureKelvin={weatherQuery.data.temperature}
     displayUnit="C"
-    location={currentWeather.data.location}
+    location={weatherQuery.data.location}
   />
-{:else}
-  <IconButton icon={mdiCloudOff} onclick={retrieveWeather} />
+{:else if weatherQuery?.isError}
+  <IconButton icon={mdiCloudOff} onclick={() => weatherQuery.refetch()} />
 {/if}

@@ -3,13 +3,30 @@
   import { storeUsername, clearUsername, retrieveUsername } from '@/browser'
   import Clock from '@/components/Clock.svelte'
   import Welcome from '@/components/Welcome.svelte'
-  import { onMount, type Snippet } from 'svelte'
+  import { GoogleAuthProvider } from '@/oauth2/providers'
+  import { settingsStore } from '@/settings/index.svelte'
+  import { GoogleTasksApiClient } from '@melledijkstra/api'
+  import { AuthClient } from '@melledijkstra/extension'
+  import { createQuery } from '@tanstack/svelte-query'
+  import { onMount } from 'svelte'
 
-  interface Props {
-    renderCurrentTask: Snippet
-  }
+  const taskListId = '@default'
 
-  const { renderCurrentTask }: Props = $props()
+  const tasksQuery = createQuery(() => ({
+    queryKey: ['google-tasks', 'tasks', taskListId],
+    queryFn: async () => {
+      const auth = new AuthClient(new GoogleAuthProvider())
+      const isAuthenticated = await auth.isAuthenticated()
+      if (!isAuthenticated) return []
+      const client = new GoogleTasksApiClient(auth)
+      return (await client.fetchTasks(taskListId)) ?? []
+    },
+    staleTime: 5 * 60 * 1000,
+  }))
+
+  const currentTask = $derived(
+    tasksQuery.data?.find((task) => task.status === 'needsAction')
+  )
 
   function onUsernameChange(name: string) {
     storeUsername(name)
@@ -37,4 +54,13 @@
 {#if appState?.user}
   <Welcome user={appState.user} {onUsernameChange} {onClearUsername} />
 {/if}
-{@render renderCurrentTask()}
+
+<div class="mt-4 text-lg empty:h-7">
+  {#if settingsStore.ui.showCurrentTask && currentTask}
+    <input type="checkbox" class="scale-150 text-white mr-1" disabled />
+    <span
+      class="text-white text-lg antialiased drop-shadow-md text-shadow-lg/20"
+      >{currentTask.title}</span
+    >
+  {/if}
+</div>

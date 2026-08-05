@@ -44,7 +44,7 @@ export class GoogleTasksApiClient extends TokenBaseClient {
     return response?.items ?? []
   }
 
-  async getTaskLists(): Promise<TaskList[] | undefined> {
+  async getTaskLists(): Promise<TaskList[]> {
     const response = await this.safeRequest<{ items: TaskList[] }>(
       '/users/@me/lists'
     )

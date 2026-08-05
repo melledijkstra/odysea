@@ -1,21 +1,26 @@
-import type { GoogleTasksState } from '@/modules/google-tasks/state.svelte'
 import type { TaskControllerInterface } from '../controllers/GoogleTasksController'
 import type { Task, TaskList } from '@melledijkstra/api'
 
 export class MockTasksController implements TaskControllerInterface {
-  constructor(private readonly state: GoogleTasksState) {}
+  private tasks: Task[] = []
+  private taskLists: TaskList[] = []
+
+  constructor(initialData?: { tasks?: Task[]; taskLists?: TaskList[] }) {
+    if (initialData?.tasks) this.tasks = initialData.tasks
+    if (initialData?.taskLists) this.taskLists = initialData.taskLists
+  }
 
   async getTasks(): Promise<Task[]> {
-    return this.state.tasks
+    return this.tasks
   }
 
   async getTaskLists(): Promise<TaskList[]> {
-    return this.state.taskLists
+    return this.taskLists
   }
 
   async createTask(taskTitle: string): Promise<boolean> {
-    const id = (this.state.tasks.length + 1).toString()
-    this.state.tasks.push({
+    const id = (this.tasks.length + 1).toString()
+    this.tasks.push({
       id,
       title: taskTitle,
       status: 'needsAction',
@@ -24,33 +29,33 @@ export class MockTasksController implements TaskControllerInterface {
   }
 
   getTask(taskId: string): Task | undefined {
-    return this.state.tasks.find((task) => task.id === taskId)
+    return this.tasks.find((task) => task.id === taskId)
   }
 
   async setTaskStatus(taskId: string, status: boolean): Promise<boolean> {
-    const idx = this.state.tasks.findIndex((task) => task.id === taskId)
+    const idx = this.tasks.findIndex((task) => task.id === taskId)
     const updatedTask: Task = {
-      ...this.state.tasks[idx],
+      ...this.tasks[idx],
       status: status ? 'completed' : 'needsAction',
     }
     if (idx !== -1) {
-      this.state.tasks[idx] = updatedTask
+      this.tasks[idx] = updatedTask
     }
     return true
   }
 
   async deleteTask(taskId: string): Promise<boolean> {
-    const idx = this.state.tasks.findIndex((task) => task.id === taskId)
+    const idx = this.tasks.findIndex((task) => task.id === taskId)
     if (idx !== -1) {
-      this.state.tasks.splice(idx, 1)
+      this.tasks.splice(idx, 1)
     }
     return true
   }
 
   async updateTask(editedTask: Task): Promise<boolean> {
-    const idx = this.state.tasks.findIndex((task) => task.id === editedTask.id)
+    const idx = this.tasks.findIndex((task) => task.id === editedTask.id)
     if (idx !== -1) {
-      this.state.tasks[idx] = editedTask
+      this.tasks[idx] = editedTask
     }
     return true
   }

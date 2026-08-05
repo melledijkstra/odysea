@@ -2,46 +2,48 @@ import {
   WeatherClient as BaseWeatherClient,
   getCurrentPosition,
   type WeatherInfo,
-  type GeoPosition,
+  type GeoPositionResponse,
 } from '@melledijkstra/api'
-import { WebLocalStorage, minutes } from '@melledijkstra/storage'
-import { Logger } from '@/logger'
 import { appState } from '@/app-state.svelte'
+import { settingsStore } from '@/settings/index.svelte'
+import { createQuery } from '@tanstack/svelte-query'
 
-const logger = new Logger('weather')
-const cache = new WebLocalStorage()
-
-export class WeatherClient extends BaseWeatherClient {
-  async getWeather(position?: GeoPosition): Promise<WeatherInfo | undefined> {
-    const data = await cache.get<WeatherInfo>('weather')
-    if (data) {
-      logger.log('weather data from cache')
-      return data
-    }
-
-    let lat: number
-    let lon: number
-
-    if (position) {
-      lat = position.lat
-      lon = position.lon
-    } else {
+export function usePositionQuery() {
+  return createQuery<GeoPositionResponse | null>(() => ({
+    queryKey: ['position'],
+    queryFn: async () => {
       const pos = await getCurrentPosition()
-      if (!pos) return
-
-      lat = pos.lat
-      lon = pos.lon
-      if (pos.locationInfo) {
+      if (pos?.locationInfo) {
         appState.geolocation = pos.locationInfo
       }
-    }
+      return pos || null
+    },
+    staleTime: 60 * 60 * 1000, // 1 hour
+  }))
+}
 
-    const info = await super.getWeather({ lat, lon })
+export function useWeatherQuery(
+  positionQuery: ReturnType<typeof usePositionQuery>
+) {
+  return createQuery(() => ({
+    queryKey: ['weather', positionQuery?.data],
+    queryFn: async (): Promise<WeatherInfo | null> => {
+      const position = positionQuery?.data
+      if (!position) {
+        return null
+      }
 
-    if (info) {
-      logger.log('retrieved weather data from API, storing in cache')
-      await cache.set('weather', info, minutes(10))
-      return info
-    }
-  }
+      const client = new BaseWeatherClient(
+        () => settingsStore.apiKeys.weather || ''
+      )
+      const info = await client.getWeather({
+        lat: position.lat,
+        lon: position.lon,
+      })
+
+      return info || null
+    },
+    enabled: Boolean(positionQuery?.data),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  }))
 }
