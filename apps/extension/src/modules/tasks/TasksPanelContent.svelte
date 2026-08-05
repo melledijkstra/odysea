@@ -6,24 +6,32 @@
     createMutation,
     useQueryClient,
   } from '@tanstack/svelte-query'
-  import type { Task } from '@melledijkstra/api'
+  import type { Task } from '@/interfaces/tasks'
 
   export type TasksPanelContentProps = {
     controller: TaskControllerInterface
+    providerId: string
   }
 
-  const { controller }: TasksPanelContentProps = $props()
+  const { controller, providerId }: TasksPanelContentProps = $props()
   const queryClient = useQueryClient()
 
-  let selectedTaskList = $state<string>('@default')
+  let selectedTaskList = $state<string>('')
   let newTaskTitle = $state('')
 
+  $effect(() => {
+    // Make sure we update when provider changes
+    if (providerId) {
+      selectedTaskList = providerId === 'google' ? '@default' : 'assigned'
+    }
+  })
+
   const taskListsQuery = createQuery(() => ({
-    queryKey: ['google-tasks', 'lists'],
+    queryKey: ['tasks', providerId, 'lists'],
     queryFn: async () => {
       const lists = await controller.getTaskLists()
       if (lists.length > 0 && !selectedTaskList) {
-        selectedTaskList = lists[0].id
+        selectedTaskList = providerId === 'google' ? '@default' : 'assigned'
       }
       return lists
     },
@@ -31,7 +39,7 @@
   }))
 
   const tasksQuery = createQuery(() => ({
-    queryKey: ['google-tasks', 'tasks', selectedTaskList],
+    queryKey: ['tasks', providerId, 'tasks', selectedTaskList],
     queryFn: () => controller.getTasks(selectedTaskList),
     enabled: !!selectedTaskList,
     staleTime: 5 * 60 * 1000,
@@ -42,7 +50,7 @@
       controller.createTask(title, selectedTaskList),
     onSuccess: () =>
       queryClient.invalidateQueries({
-        queryKey: ['google-tasks', 'tasks', selectedTaskList],
+        queryKey: ['tasks', providerId, 'tasks', selectedTaskList],
       }),
   }))
 
@@ -51,7 +59,7 @@
       controller.setTaskStatus(taskId, status, selectedTaskList),
     onSuccess: () =>
       queryClient.invalidateQueries({
-        queryKey: ['google-tasks', 'tasks', selectedTaskList],
+        queryKey: ['tasks', providerId, 'tasks', selectedTaskList],
       }),
   }))
 
@@ -59,7 +67,7 @@
     mutationFn: (task: Task) => controller.updateTask(task, selectedTaskList),
     onSuccess: () =>
       queryClient.invalidateQueries({
-        queryKey: ['google-tasks', 'tasks', selectedTaskList],
+        queryKey: ['tasks', providerId, 'tasks', selectedTaskList],
       }),
   }))
 
@@ -68,26 +76,21 @@
       controller.deleteTask(taskId, selectedTaskList),
     onSuccess: () =>
       queryClient.invalidateQueries({
-        queryKey: ['google-tasks', 'tasks', selectedTaskList],
+        queryKey: ['tasks', providerId, 'tasks', selectedTaskList],
       }),
   }))
 </script>
 
 <h3 class="mb-2 flex items-center text-lg text-black dark:text-white">
-  <img
-    class="mr-2 size-5"
-    src="icons/google-tasks.svg"
-    alt="google task icon"
-  />
   <select
     name="task-list-selector"
-    class="w-full text-black dark:text-white text-lg"
+    class="w-full text-black dark:text-white text-lg bg-transparent border-none focus:outline-hidden"
     bind:value={selectedTaskList}
   >
     {#if taskListsQuery.data}
       {#each taskListsQuery.data as list, i (list.id)}
-        {#if i === 0}
-          <option value="@default" selected>{list.title}</option>
+        {#if i === 0 && providerId === 'google'}
+          <option value="@default">{list.title}</option>
         {:else}
           <option value={list.id}>{list.title}</option>
         {/if}
@@ -103,16 +106,18 @@
   onSaveEdit={(task) => updateTaskMutation.mutate(task)}
   onRemoveTask={(taskId) => deleteTaskMutation.mutate(taskId)}
 />
-<input
-  name="new-task-input"
-  bind:value={newTaskTitle}
-  onkeypress={(e) => {
-    if (e.key === 'Enter' && newTaskTitle) {
-      createTaskMutation.mutate(newTaskTitle)
-      newTaskTitle = ''
-    }
-  }}
-  class="mt-1 border-none outline-hidden text-sm bg-transparent dark:text-white"
-  type="text"
-  placeholder="New task"
-/>
+{#if providerId === 'google'}
+  <input
+    name="new-task-input"
+    bind:value={newTaskTitle}
+    onkeypress={(e) => {
+      if (e.key === 'Enter' && newTaskTitle) {
+        createTaskMutation.mutate(newTaskTitle)
+        newTaskTitle = ''
+      }
+    }}
+    class="mt-1 border-none outline-hidden text-sm bg-transparent dark:text-white"
+    type="text"
+    placeholder="New task"
+  />
+{/if}

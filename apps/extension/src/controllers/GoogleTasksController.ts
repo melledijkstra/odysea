@@ -1,10 +1,10 @@
-import type { Task, TaskList } from '@melledijkstra/api'
 import { GoogleTasksApiClient } from '@melledijkstra/api'
 import type { ILogger } from '@/interfaces/logger.interface'
 import { Logger } from '@/logger'
 import { AuthClient } from '@melledijkstra/extension'
 import { GoogleAuthProvider } from '@/oauth2/providers'
 import { addNotification } from '@/stores/notifications.svelte'
+import type { Task, TaskList } from '@/interfaces/tasks'
 
 export type TaskControllerInterface = {
   getTasks: (taskListId?: string) => Promise<Task[]>
