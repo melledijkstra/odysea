@@ -40,13 +40,13 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
       return []
     }
 
-    let query = 'is:issue'
+    let query = 'is:issue is:open archived:false'
     if (taskListId === 'assigned') {
-      query = 'is:issue assignee:@me'
+      query += ' assignee:@me'
     } else if (taskListId === 'created') {
-      query = 'is:issue author:@me'
+      query += ' author:@me'
     } else if (taskListId === 'mentioned') {
-      query = 'is:issue mentions:@me'
+      query += ' mentions:@me'
     }
 
     try {
