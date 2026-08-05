@@ -10,6 +10,9 @@
   import Footer from './components/Footer.svelte'
   import DefaultModeContent from './components/DefaultModeContent.svelte'
 
+  import { QueryClientProvider } from '@tanstack/svelte-query'
+  import { queryClient } from '@/queryClient'
+
   const currentTask = $derived(
     tasksState.tasks.find((task) => task.status === 'needsAction')
   )
@@ -44,21 +47,23 @@
 {/snippet}
 
 {#await settings.initialize() then}
-  <ModulesInitializer />
+  <QueryClientProvider client={queryClient}>
+    <ModulesInitializer />
 
-  <NotificationCenter position="bottom-right" />
+    <NotificationCenter position="bottom-right" />
 
-  <Layout mode={appState.mode}>
-    {#snippet top()}
-      <TopBar />
-    {/snippet}
+    <Layout mode={appState.mode}>
+      {#snippet top()}
+        <TopBar />
+      {/snippet}
 
-    {#snippet middle()}
-      {@render middleSnippet()}
-    {/snippet}
+      {#snippet middle()}
+        {@render middleSnippet()}
+      {/snippet}
 
-    {#snippet bottom()}
-      <Footer />
-    {/snippet}
-  </Layout>
+      {#snippet bottom()}
+        <Footer />
+      {/snippet}
+    </Layout>
+  </QueryClientProvider>
 {/await}
