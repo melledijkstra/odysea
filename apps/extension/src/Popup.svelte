@@ -4,6 +4,7 @@
   import { getPomodoroState } from './modules/focus/messages'
   import type { PomodoroState } from './modules/focus/types'
   import { Timer } from '@melledijkstra/toolbox'
+  import Spinner from '@/components/atoms/Spinner.svelte'
 
   let pomodoroState = $state<PomodoroState>()
 
@@ -19,7 +20,9 @@
   <p>App mode: {appState.mode}</p>
   <h2 class="text-1xl font-bold">Pomodoro</h2>
   {#if !pomodoroState}
-    <p>Loading...</p>
+    <div class="flex p-4">
+      <Spinner class="text-gray-400" />
+    </div>
   {:else}
     <p>Running?: {pomodoroState.isRunning}</p>
     <p>mode: {pomodoroState.mode}</p>

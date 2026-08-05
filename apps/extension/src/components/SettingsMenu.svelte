@@ -9,6 +9,7 @@
   import GeneralTab from '@/components/settings-tabs/GeneralTab.svelte'
   import type { HTMLAttributes } from 'svelte/elements'
   import { Separator, Tabs } from 'bits-ui'
+  import Spinner from '@/components/atoms/Spinner.svelte'
 
   const sections = [
     'general',
@@ -67,7 +68,9 @@
   {#each sections as sectionName (sectionName)}
     <Tabs.Content value={sectionName} class="flex-1 p-5 overflow-y-auto">
       {#if sectionName === 'general' && !settingsStore.loaded}
-        <div>Loading...</div>
+        <div class="flex justify-center p-4">
+          <Spinner class="text-gray-400" />
+        </div>
       {/if}
       {#if sectionName === 'general'}
         <GeneralTab />

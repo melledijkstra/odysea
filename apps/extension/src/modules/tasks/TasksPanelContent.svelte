@@ -110,6 +110,7 @@
       setTaskStatusMutation.mutate({ taskId, status })}
     onSaveEdit={(task) => updateTaskMutation.mutate(task)}
     onRemoveTask={(taskId) => deleteTaskMutation.mutate(taskId)}
+    isLoading={tasksQuery.isFetching}
   />
 </ScrollArea>
 {#if controller.canCreateTask}

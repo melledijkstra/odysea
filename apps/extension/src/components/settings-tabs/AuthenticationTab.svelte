@@ -9,6 +9,7 @@
     type OauthProvider,
   } from '@/oauth2/providers'
   import Input from '@/components/atoms/Input.svelte'
+  import Spinner from '@/components/atoms/Spinner.svelte'
   import { onMount, onDestroy } from 'svelte'
   import browser from 'webextension-polyfill'
   import { Logger } from '@/logger'
@@ -99,7 +100,9 @@
 
 <h1 class="text-xl mb-3">Authentication</h1>
 {#await retrieveAuthState()}
-  <p class="text-base">Loading...</p>
+  <div class="flex p-4">
+    <Spinner class="text-gray-400" />
+  </div>
 {:then}
   <div class="flex flex-col gap-3">
     <p class="text-sm">
