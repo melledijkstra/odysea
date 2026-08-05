@@ -1,9 +1,11 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   GithubTasksController,
   githubDataFromId,
   githubIdFromData,
 } from './GithubTasksController'
+
+vi.mock('@melledijkstra/extension')
 
 describe('GithubTasksController', () => {
   describe('GithubIssueTarget', () => {
