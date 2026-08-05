@@ -9,7 +9,7 @@
   import ModuleLoader from './components/ModuleLoader.svelte'
   import Footer from './components/Footer.svelte'
   import DefaultModeContent from './components/DefaultModeContent.svelte'
-
+  import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools'
   import { QueryClientProvider } from '@tanstack/svelte-query'
   import { queryClient } from '@/queryClient'
 
@@ -48,6 +48,7 @@
 
 {#await settings.initialize() then}
   <QueryClientProvider client={queryClient}>
+    <SvelteQueryDevtools />
     <ModulesInitializer />
 
     <NotificationCenter position="bottom-right" />
