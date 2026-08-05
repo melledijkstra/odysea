@@ -1,5 +1,6 @@
 <script lang="ts">
   import TaskList from '@/components/atoms/tasks/TaskList.svelte'
+  import ScrollArea from '@/components/atoms/ScrollArea.svelte'
   import type { TaskControllerInterface } from '@/controllers/GoogleTasksController'
   import {
     createQuery,
@@ -98,14 +99,19 @@
     {/if}
   </select>
 </h3>
-<TaskList
-  class="flex-1 overflow-y-auto"
-  tasks={tasksQuery.data ?? []}
-  onToggleTask={(taskId, status) =>
-    setTaskStatusMutation.mutate({ taskId, status })}
-  onSaveEdit={(task) => updateTaskMutation.mutate(task)}
-  onRemoveTask={(taskId) => deleteTaskMutation.mutate(taskId)}
-/>
+<ScrollArea
+  class="flex-1"
+  scrollbarClasses="bg-transparent"
+  orientation="vertical"
+>
+  <TaskList
+    tasks={tasksQuery.data ?? []}
+    onToggleTask={(taskId, status) =>
+      setTaskStatusMutation.mutate({ taskId, status })}
+    onSaveEdit={(task) => updateTaskMutation.mutate(task)}
+    onRemoveTask={(taskId) => deleteTaskMutation.mutate(taskId)}
+  />
+</ScrollArea>
 {#if providerId === 'google'}
   <input
     name="new-task-input"

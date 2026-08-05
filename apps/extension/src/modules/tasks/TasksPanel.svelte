@@ -6,7 +6,14 @@
   import TasksPanelContent from './TasksPanelContent.svelte'
 
   type Provider = 'google' | 'github'
-  let activeProvider = $state<Provider>('google')
+  const STORAGE_KEY = 'tasks::activeProvider'
+  let activeProvider = $state<Provider>(
+    (localStorage.getItem(STORAGE_KEY) as Provider) ?? 'google'
+  )
+
+  $effect(() => {
+    localStorage.setItem(STORAGE_KEY, activeProvider)
+  })
 
   const googleController = new GoogleTasksController()
   const githubController = new GithubTasksController()
