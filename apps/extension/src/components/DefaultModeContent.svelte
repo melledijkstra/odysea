@@ -13,7 +13,7 @@
   const taskListId = '@default'
 
   const tasksQuery = createQuery(() => ({
-    queryKey: ['google-tasks', 'tasks', taskListId],
+    queryKey: ['tasks', 'google', 'tasks', taskListId],
     queryFn: async () => {
       const auth = new AuthClient(new GoogleAuthProvider())
       const isAuthenticated = await auth.isAuthenticated()

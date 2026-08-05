@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Task } from '@melledijkstra/api'
+  import type { Task } from '@/interfaces/tasks'
   import TaskItem from './TaskItem.svelte'
   import type { HTMLAttributes } from 'svelte/elements'
 

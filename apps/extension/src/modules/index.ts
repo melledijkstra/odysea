@@ -23,7 +23,7 @@ export const MODULE_CONFIG = [
   {
     id: 'google_tasks',
     title: 'Google Tasks',
-    import: () => import('./google-tasks/index.ts'),
+    import: () => import('./tasks/index.ts'),
   },
   {
     id: 'notes',

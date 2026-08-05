@@ -287,7 +287,7 @@ describe('AuthClient', () => {
       expect(token).toBe('new-access-token')
     })
 
-    it('should throw when provider does not return a refresh token during initial auth flow', async () => {
+    it('should accept when provider does not return a refresh token during initial auth flow', async () => {
       vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue(
         undefined
       )
@@ -308,7 +308,7 @@ describe('AuthClient', () => {
 
       // The error is caught internally and logged; getAuthToken returns undefined
       const token = await client.getAuthToken(true)
-      expect(token).toBeUndefined()
+      expect(token).toBe('new-access-token')
     })
   })
 

@@ -5,6 +5,7 @@
   import {
     GoogleAuthProvider,
     SpotifyAuthProvider,
+    GithubAuthProvider,
     type OauthProvider,
   } from '@/oauth2/providers'
   import Input from '@/components/atoms/Input.svelte'
@@ -17,11 +18,13 @@
   const clients = {
     google: new AuthClient(new GoogleAuthProvider()),
     spotify: new AuthClient(new SpotifyAuthProvider()),
+    github: new AuthClient(new GithubAuthProvider()),
   } as const
 
   const authState = $state({
     google: false,
     spotify: false,
+    github: false,
   })
 
   function handleStorageChange(
@@ -48,6 +51,7 @@
     logger.log('Retrieving authentication state from all providers...')
     authState.google = await clients.google.isAuthenticated()
     authState.spotify = await clients.spotify.isAuthenticated()
+    authState.github = await clients.github.isAuthenticated()
   }
 
   async function authenticate(provider: OauthProvider) {
@@ -80,6 +84,17 @@
     bind:value={settingsStore.apiKeys.spotify}
     onchange={() => settings.saveSettingsToStorage()}
   />
+  <Input
+    label="GitHub Client ID"
+    bind:value={settingsStore.apiKeys.github_client_id}
+    onchange={() => settings.saveSettingsToStorage()}
+  />
+  <Input
+    type="password"
+    label="GitHub Client Secret"
+    bind:value={settingsStore.apiKeys.github_client_secret}
+    onchange={() => settings.saveSettingsToStorage()}
+  />
 </div>
 
 <h1 class="text-xl mb-3">Authentication</h1>
@@ -109,6 +124,17 @@
           authState.spotify
             ? deauthenticate('spotify')
             : authenticate('spotify')}
+      />
+    </p>
+    <p class="text-sm">
+      <strong>GitHub:</strong>
+      <span class="text-gray-400">{authState.github}</span>
+      <AuthButton
+        class="mt-2"
+        authenticated={authState.github}
+        provider="github"
+        onclick={() =>
+          authState.github ? deauthenticate('github') : authenticate('github')}
       />
     </p>
   </div>

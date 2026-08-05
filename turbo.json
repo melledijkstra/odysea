@@ -35,9 +35,9 @@
     "//#format:fix": {
       "cache": false
     },
-    "test": {
-      "dependsOn": [],
-      "outputs": ["coverage/**"]
+    "//#test": {
+      "dependsOn": ["^build"],
+      "outputs": []
     },
     "test:e2e": {
       "dependsOn": ["^build", "^test:e2e"],

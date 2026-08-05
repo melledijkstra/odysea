@@ -1,8 +1,24 @@
 import manifest from '../../manifest.json' with { type: 'json' }
 import { settingsStore } from '@/settings/index.svelte'
-import { GoogleAuthConfig, SpotifyAuthConfig } from '@melledijkstra/auth'
+import {
+  GoogleAuthConfig,
+  SpotifyAuthConfig,
+  GithubAuthConfig,
+} from '@melledijkstra/auth'
 
-export type OauthProvider = 'google' | 'spotify'
+export type OauthProvider = 'google' | 'spotify' | 'github'
+
+export class GithubAuthProvider extends GithubAuthConfig {
+  get clientId() {
+    return settingsStore.apiKeys.github_client_id || ''
+  }
+
+  get clientSecret() {
+    return settingsStore.apiKeys.github_client_secret || ''
+  }
+
+  scopes = ['repo']
+}
 
 export class GoogleAuthProvider extends GoogleAuthConfig {
   get clientId() {

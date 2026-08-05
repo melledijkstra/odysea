@@ -47,6 +47,7 @@
     "@melledijkstra/extension": "workspace:*",
     "@melledijkstra/storage": "workspace:*",
     "@melledijkstra/toolbox": "workspace:*",
+    "@octokit/rest": "^22.0.1",
     "@tanstack/svelte-query": "^6.1.38",
     "@tanstack/svelte-query-devtools": "^6.1.38",
     "bits-ui": "^2.18.1",

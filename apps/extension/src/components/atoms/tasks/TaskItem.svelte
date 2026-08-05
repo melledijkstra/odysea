@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Task } from '@melledijkstra/api'
+  import type { Task } from '@/interfaces/tasks'
   import ContextMenu from '@/components/atoms/ContextMenu.svelte'
   import Icon from '@/components/atoms/Icon.svelte'
-  import { mdiDotsVertical } from '@mdi/js'
+  import { mdiDotsVertical, mdiOpenInNew } from '@mdi/js'
   import DropdownMenu from '../DropdownMenu.svelte'
 
   export type TaskItemProps = {
@@ -63,6 +63,17 @@
       >
         {task.title}
       </button>
+    {/if}
+    {#if task.webViewLink}
+      <a
+        href={task.webViewLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-gray-400 hover:text-white ml-auto invisible group-hover/task:visible p-1"
+        title="Open link"
+      >
+        <Icon path={mdiOpenInNew} size={16} />
+      </a>
     {/if}
     <DropdownMenu
       items={menuItems}
