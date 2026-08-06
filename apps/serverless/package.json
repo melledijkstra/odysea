@@ -18,8 +18,8 @@
     "cloud"
   ],
   "dependencies": {
-    "deno": "^2.9.3",
-    "hono": "jsr:@hono/hono@^4.12.30"
+    "deno": "^2.9.4",
+    "hono": "jsr:@hono/hono@^4.13.0"
   },
   "devDependencies": {
     "eslint": "catalog:"

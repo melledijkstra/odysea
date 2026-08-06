@@ -18,17 +18,17 @@
     "@eslint/js": "^10.0.1",
     "@eslint/json": "^2.0.1",
     "@types/node": "catalog:",
-    "@typescript-eslint/parser": "^8.65.0",
+    "@typescript-eslint/parser": "^8.66.0",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "eslint-plugin-svelte": "^3.22.0",
     "eslint-plugin-turbo": "catalog:",
-    "globals": "^17.7.0",
+    "globals": "^17.9.0",
     "prettier": "catalog:",
     "rollup-plugin-visualizer": "^6.0.11",
     "svelte-eslint-parser": "^1.8.0",
     "typescript": "catalog:",
-    "typescript-eslint": "^8.65.0"
+    "typescript-eslint": "^8.66.0"
   },
   "peerDependencies": {
     "prettier": "catalog:"
