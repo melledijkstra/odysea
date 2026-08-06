@@ -1,5 +1,7 @@
 import { loadEnv } from 'vite'
 import { defineConfig, defineProject } from 'vitest/config'
+import type { PluginOption } from 'vite'
+import { analyzer } from 'vite-bundle-analyzer'
 import tailwindcss from '@tailwindcss/vite'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
@@ -15,8 +17,8 @@ function manifestTransformer(content: string, mode: string) {
   return content
 }
 
-const defaultConfig = defineConfig(({ mode }) => ({
-  plugins: [
+const determinePlugins = (mode: string): PluginOption[] => {
+  const plugins: PluginOption[] = [
     tailwindcss(),
     svelte(),
     viteStaticCopy({
@@ -28,7 +30,21 @@ const defaultConfig = defineConfig(({ mode }) => ({
         },
       ],
     }),
-  ],
+  ]
+
+  if (process.env.ANALYZE === 'true') {
+    plugins.push(
+      analyzer({
+        openAnalyzer: true,
+      })
+    )
+  }
+
+  return plugins
+}
+
+const defaultConfig = defineConfig(({ mode }) => ({
+  plugins: determinePlugins(mode),
   build: {
     minify: mode === 'production',
     rollupOptions: {
