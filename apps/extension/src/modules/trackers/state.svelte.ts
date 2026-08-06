@@ -1,153 +1,141 @@
-export type Counter = {
+export type BaseMetric = {
+  id: string
+  type: string
+  pinned: boolean
+}
+
+export type CounterMetric = BaseMetric & {
+  type: 'counter'
   name: string
   value: number
-  pinned: boolean
 }
 
-export type CountDown = {
+export type CountdownMetric = BaseMetric & {
+  type: 'countdown'
   name: string
   date: number
-  pinned: boolean
 }
 
-export type WorldClock = {
+export type WorldClockMetric = BaseMetric & {
+  type: 'worldClock'
   name: string
   timeZone: string
-  pinned: boolean
 }
 
+export type SleepMetric = BaseMetric & {
+  type: 'sleep'
+  id: 'sleep'
+}
+
+export type AnyMetric =
+  CounterMetric | CountdownMetric | WorldClockMetric | SleepMetric
+
 const STORAGE_KEYS = {
-  counters: 'counters',
-  countdowns: 'countdowns',
-  worldClocks: 'worldClocks',
+  metrics: 'metrics',
 } as const
 
-class Trackers {
-  counters = $state<Counter[]>([])
-  countdowns = $state<CountDown[]>([])
-  worldClocks = $state<WorldClock[]>([])
+export class Trackers {
+  metrics = $state<AnyMetric[]>([])
 
   constructor() {
-    this.loadCounters()
-    this.loadCountdowns()
-    this.loadClocks()
+    this.loadMetrics()
   }
 
-  private setCountdowns(countdowns: CountDown[]) {
-    this.storeCountdowns(countdowns)
-    this.countdowns = countdowns
+  get allMetrics() {
+    return this.metrics
   }
 
-  public setCounters(counters: Counter[]) {
-    this.storeCounters(counters)
-    this.counters = counters
-  }
-
-  private setWorldClocks(worldClocks: WorldClock[]) {
-    this.storeWorldClocks(worldClocks)
-    this.worldClocks = worldClocks
-  }
-
-  private storeCountdowns(counters: CountDown[]) {
-    localStorage.setItem(STORAGE_KEYS.countdowns, JSON.stringify(counters))
-  }
-
-  private storeCounters(counters: Counter[]) {
-    localStorage.setItem(STORAGE_KEYS.counters, JSON.stringify(counters))
-  }
-
-  private storeWorldClocks(worldClocks: WorldClock[]) {
-    localStorage.setItem(STORAGE_KEYS.worldClocks, JSON.stringify(worldClocks))
-  }
-
-  private loadCounters() {
-    const stored = localStorage.getItem(STORAGE_KEYS.counters)
+  private loadMetrics() {
+    const stored = localStorage.getItem(STORAGE_KEYS.metrics)
     try {
       if (stored) {
-        this.counters = JSON.parse(stored) as Counter[]
+        this.metrics = JSON.parse(stored) as AnyMetric[]
       }
     } catch {
-      this.counters = []
-      localStorage.removeItem(STORAGE_KEYS.counters) // clear invalid data
+      this.metrics = []
+      localStorage.removeItem(STORAGE_KEYS.metrics)
     }
   }
 
-  private loadCountdowns() {
-    const stored = localStorage.getItem(STORAGE_KEYS.countdowns)
-    try {
-      if (stored) {
-        this.countdowns = JSON.parse(stored) as CountDown[]
-      }
-    } catch {
-      this.countdowns = []
-      localStorage.removeItem(STORAGE_KEYS.countdowns) // clear invalid data
-    }
+  private storeMetrics(metrics: AnyMetric[]) {
+    localStorage.setItem(STORAGE_KEYS.metrics, JSON.stringify(metrics))
   }
 
-  private loadClocks() {
-    const stored = localStorage.getItem(STORAGE_KEYS.worldClocks)
-    try {
-      if (stored) {
-        this.worldClocks = JSON.parse(stored) as WorldClock[]
-      }
-    } catch {
-      this.worldClocks = []
-      localStorage.removeItem(STORAGE_KEYS.worldClocks) // clear invalid data
-    }
+  public setMetrics(metrics: AnyMetric[]) {
+    this.metrics = metrics
+    this.storeMetrics(metrics)
   }
 
   addCountdown(name: string, date: string, pinned: boolean) {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const countdownDate = new Date(date)
-    const newCountdown: CountDown = {
+    const newCountdown: CountdownMetric = {
+      id: crypto.randomUUID(),
+      type: 'countdown',
       name,
       date: countdownDate.valueOf(),
       pinned,
     }
-    this.setCountdowns([...this.countdowns, newCountdown])
+    this.setMetrics([...this.metrics, newCountdown])
   }
 
   addCounter(name: string, value: number, pinned: boolean) {
-    const newCounter: Counter = { name, value, pinned }
-    this.setCounters([...this.counters, newCounter])
+    const newCounter: CounterMetric = {
+      id: crypto.randomUUID(),
+      type: 'counter',
+      name,
+      value,
+      pinned,
+    }
+    this.setMetrics([...this.metrics, newCounter])
   }
 
   addWorldClock(name: string, timeZone: string, pinned: boolean) {
-    const newWorldClock: WorldClock = { name, timeZone, pinned }
-    this.setWorldClocks([...this.worldClocks, newWorldClock])
+    const newWorldClock: WorldClockMetric = {
+      id: crypto.randomUUID(),
+      type: 'worldClock',
+      name,
+      timeZone,
+      pinned,
+    }
+    this.setMetrics([...this.metrics, newWorldClock])
   }
 
-  deleteCounter(index: number) {
-    const newCounters = this.counters.filter((_, i) => i !== index)
-    this.setCounters(newCounters)
-  }
-
-  deleteCountdown(index: number) {
-    const newCountdowns = this.countdowns.filter((_, i) => i !== index)
-    this.setCountdowns(newCountdowns)
-  }
-
-  deleteWorldClock(index: number) {
-    const newWorldClocks = this.worldClocks.filter((_, i) => i !== index)
-    this.setWorldClocks(newWorldClocks)
-  }
-
-  pinWorldClock(index: number, pinned: boolean) {
-    const newWorldClocks = this.worldClocks.map((clock, i) => {
-      if (i === index) {
-        return { ...clock, pinned }
+  setSleepEnabled(enabled: boolean) {
+    const hasSleep = this.metrics.some((m) => m.type === 'sleep')
+    if (enabled && !hasSleep) {
+      const sleepMetric: SleepMetric = {
+        id: 'sleep',
+        type: 'sleep',
+        pinned: true,
       }
-      return clock
+      this.setMetrics([...this.metrics, sleepMetric])
+    } else if (!enabled && hasSleep) {
+      this.setMetrics(this.metrics.filter((m) => m.type !== 'sleep'))
+    }
+  }
+
+  get sleepEnabled() {
+    return this.metrics.some((m) => m.type === 'sleep')
+  }
+
+  deleteMetric(id: string) {
+    this.setMetrics(this.metrics.filter((m) => m.id !== id))
+  }
+
+  updateMetric(id: string, payload: Partial<AnyMetric>) {
+    const newMetrics = this.metrics.map((metric) => {
+      if (metric.id === id) {
+        return { ...metric, ...payload } as AnyMetric
+      }
+      return metric
     })
-    this.setWorldClocks(newWorldClocks)
+    this.setMetrics(newMetrics)
+  }
+
+  pinMetric(id: string, pinned: boolean) {
+    this.updateMetric(id, { pinned })
   }
 }
 
 export const trackers = new Trackers()
-
-export const getIsSleepMetricEnabled = () => {
-  return localStorage.getItem('sleepMetricEnabled') === 'true'
-}
-
-export const setIsSleepMetricEnabled = (value: boolean) => {
-  localStorage.setItem('sleepMetricEnabled', value.toString())
-}
