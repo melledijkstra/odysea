@@ -29,7 +29,7 @@ Mizu is a personal homepage extension that enhances your new tab page with a var
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/melledijkstra/mizu.git
+git clone https://github.com/melledijkstra/odysea.git
 ```
 
 2. Install and build:

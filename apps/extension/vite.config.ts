@@ -3,7 +3,7 @@ import { defineConfig, defineProject } from 'vitest/config'
 import tailwindcss from '@tailwindcss/vite'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
-import packageJson from './package.json'
+import packageJson from './package.json' with { type: 'json' }
 import path from 'node:path'
 
 const ENABLE_DEBUG = process.env.NODE_ENV === 'development'
@@ -52,7 +52,7 @@ const defaultConfig = defineConfig(({ mode }) => ({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '/src'),
+      '@': path.resolve(import.meta.dirname, '/src'),
     },
   },
   ...defineProject({
