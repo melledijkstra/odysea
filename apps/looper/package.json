@@ -18,7 +18,7 @@
     "@melledijkstra/auth": "workspace:*",
     "@melledijkstra/storage": "workspace:*",
     "@melledijkstra/toolbox": "workspace:*",
-    "better-sqlite3": "^12.11.1",
+    "better-sqlite3": "^13.0.2",
     "chokidar": "^3.6.0",
     "cron-parser": "^5.7.0",
     "cron-translate": "^2.1.0",
