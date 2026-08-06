@@ -1,0 +1,12 @@
+{
+  "extends": "@melledijkstra/config/tsconfig/base.json",
+  "compilerOptions": {
+    "moduleDetection": "force",
+    "module": "ESNext",
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "types": ["node"]
+  },
+  "include": ["."],
+  "exclude": ["dist", "node_modules", ".turbo"]
+}

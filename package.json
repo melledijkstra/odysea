@@ -22,6 +22,7 @@
     "extension": "pnpm --filter=@odysea/extension run",
     "server": "pnpm --filter=@odysea/server run",
     "serverless": "pnpm --filter=@odysea/serverless run",
+    "scraper": "pnpm --filter=@odysea/scraper run",
     "packages": "pnpm --filter=@melledijkstra/* run",
     "cli": "pnpm --filter=@odysea/cli run",
     "storybook:build": "pnpm --filter=@odysea/extension run storybook:build",
