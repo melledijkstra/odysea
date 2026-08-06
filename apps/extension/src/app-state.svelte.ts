@@ -23,9 +23,15 @@ export const appState = $state<AppState>({
   title: 'New Tab',
 })
 
+// Trigger to let components know to close popovers/panels when home is clicked
+export const homeClickTrigger = $state({ count: 0 })
+
 export function switchAppMode(mode: AppMode) {
   appState.mode = mode
   localStorage.setItem(STORAGE_KEY, mode)
+  if (mode === 'default') {
+    homeClickTrigger.count++
+  }
 }
 
 export function setTitle(title: string) {

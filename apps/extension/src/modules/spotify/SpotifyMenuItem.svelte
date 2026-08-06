@@ -5,11 +5,23 @@
   import SpotifyPanel from './SpotifyPanel.svelte'
   import { SpotifyController } from '@/controllers/SpotifyController'
   import { MPState } from '@/components/musicplayer/state.svelte'
+  import { homeClickTrigger } from '@/app-state.svelte'
+  import { untrack } from 'svelte'
 
   const controller = $state<SpotifyController>(new SpotifyController(MPState))
+  let isOpen = $state(false)
+
+  $effect(() => {
+    // depend on homeClickTrigger.count
+    if (homeClickTrigger.count > 0) {
+      untrack(() => {
+        isOpen = false
+      })
+    }
+  })
 </script>
 
-<Popover.Root>
+<Popover.Root bind:open={isOpen}>
   <Popover.Trigger
     class={[
       'dark:text-white/70 dark:hover:text-white text-zinc-500 hover:text-zinc-700',
