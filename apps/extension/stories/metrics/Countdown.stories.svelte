@@ -16,6 +16,7 @@
     args: {
       metric: {
         id: '1',
+        type: 'countdown',
         name: '5 days until vacation',
         pinned: true,
         date: Date.now() + 1000 * 60 * 60 * 24 * 5, // 5 days from now

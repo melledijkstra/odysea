@@ -1,245 +1,141 @@
-
-export type Counter = {
+export type BaseMetric = {
   id: string
+  type: string
+  pinned: boolean
+}
+
+export type CounterMetric = BaseMetric & {
+  type: 'counter'
   name: string
   value: number
-  pinned: boolean
 }
 
-export type CountDown = {
-  id: string
+export type CountdownMetric = BaseMetric & {
+  type: 'countdown'
   name: string
   date: number
-  pinned: boolean
 }
 
-export type WorldClock = {
-  id: string
+export type WorldClockMetric = BaseMetric & {
+  type: 'worldClock'
   name: string
   timeZone: string
-  pinned: boolean
 }
 
+export type SleepMetric = BaseMetric & {
+  type: 'sleep'
+  id: 'sleep'
+}
+
+export type AnyMetric =
+  CounterMetric | CountdownMetric | WorldClockMetric | SleepMetric
+
 const STORAGE_KEYS = {
-  counters: 'counters',
-  countdowns: 'countdowns',
-  worldClocks: 'worldClocks',
-  metricOrder: 'metricOrder',
-  sleepMetricEnabled: 'sleepMetricEnabled',
+  metrics: 'metrics',
 } as const
 
-class Trackers {
-  counters = $state<Counter[]>([])
-  countdowns = $state<CountDown[]>([])
-  worldClocks = $state<WorldClock[]>([])
-  metricOrder = $state<string[]>([])
-  sleepEnabled = $state<boolean>(false)
+export class Trackers {
+  metrics = $state<AnyMetric[]>([])
 
   constructor() {
-    this.loadCounters()
-    this.loadCountdowns()
-    this.loadClocks()
-    this.loadMetricOrder()
-    this.loadSleepEnabled()
+    this.loadMetrics()
   }
 
   get allMetrics() {
-    const sleepMetric = this.sleepEnabled ? [{ id: 'sleep', type: 'sleep' as const, pinned: true }] : []
-
-    const combined = [
-      ...this.countdowns.map(c => ({ ...c, type: 'countdown' as const })),
-      ...this.worldClocks.map(c => ({ ...c, type: 'worldClock' as const })),
-      ...this.counters.map(c => ({ ...c, type: 'counter' as const })),
-      ...sleepMetric
-    ]
-
-    const order = this.metricOrder;
-    return combined.sort((a, b) => {
-      let indexA = order.indexOf(a.id);
-      let indexB = order.indexOf(b.id);
-      if (indexA === -1) indexA = 999;
-      if (indexB === -1) indexB = 999;
-      return indexA - indexB;
-    });
+    return this.metrics
   }
 
-  private loadMetricOrder() {
-    const stored = localStorage.getItem(STORAGE_KEYS.metricOrder)
+  private loadMetrics() {
+    const stored = localStorage.getItem(STORAGE_KEYS.metrics)
     try {
       if (stored) {
-        this.metricOrder = JSON.parse(stored)
+        this.metrics = JSON.parse(stored) as AnyMetric[]
       }
     } catch {
-      this.metricOrder = []
+      this.metrics = []
+      localStorage.removeItem(STORAGE_KEYS.metrics)
     }
   }
 
-  public setMetricOrder(order: string[]) {
-    this.metricOrder = order
-    localStorage.setItem(STORAGE_KEYS.metricOrder, JSON.stringify(order))
+  private storeMetrics(metrics: AnyMetric[]) {
+    localStorage.setItem(STORAGE_KEYS.metrics, JSON.stringify(metrics))
   }
 
-  private loadSleepEnabled() {
-    this.sleepEnabled = localStorage.getItem(STORAGE_KEYS.sleepMetricEnabled) === 'true'
-  }
-
-  public setSleepEnabled(enabled: boolean) {
-    this.sleepEnabled = enabled
-    localStorage.setItem(STORAGE_KEYS.sleepMetricEnabled, enabled.toString())
-    if (enabled && !this.metricOrder.includes('sleep')) {
-      this.setMetricOrder([...this.metricOrder, 'sleep'])
-    }
-  }
-
-  private setCountdowns(countdowns: CountDown[]) {
-    this.storeCountdowns(countdowns)
-    this.countdowns = countdowns
-  }
-
-  public setCounters(counters: Counter[]) {
-    this.storeCounters(counters)
-    this.counters = counters
-  }
-
-  private setWorldClocks(worldClocks: WorldClock[]) {
-    this.storeWorldClocks(worldClocks)
-    this.worldClocks = worldClocks
-  }
-
-  private storeCountdowns(counters: CountDown[]) {
-    localStorage.setItem(STORAGE_KEYS.countdowns, JSON.stringify(counters))
-  }
-
-  private storeCounters(counters: Counter[]) {
-    localStorage.setItem(STORAGE_KEYS.counters, JSON.stringify(counters))
-  }
-
-  private storeWorldClocks(worldClocks: WorldClock[]) {
-    localStorage.setItem(STORAGE_KEYS.worldClocks, JSON.stringify(worldClocks))
-  }
-
-  private loadCounters() {
-    const stored = localStorage.getItem(STORAGE_KEYS.counters)
-    try {
-      if (stored) {
-        let parsed = JSON.parse(stored) as Counter[]
-        let modified = false
-        parsed = parsed.map(p => {
-          if (!p.id) {
-            modified = true
-            return { ...p, id: crypto.randomUUID() }
-          }
-          return p
-        })
-        this.counters = parsed
-        if (modified) this.storeCounters(this.counters)
-      }
-    } catch {
-      this.counters = []
-      localStorage.removeItem(STORAGE_KEYS.counters)
-    }
-  }
-
-  private loadCountdowns() {
-    const stored = localStorage.getItem(STORAGE_KEYS.countdowns)
-    try {
-      if (stored) {
-        let parsed = JSON.parse(stored) as CountDown[]
-        let modified = false
-        parsed = parsed.map(p => {
-          if (!p.id) {
-            modified = true
-            return { ...p, id: crypto.randomUUID() }
-          }
-          return p
-        })
-        this.countdowns = parsed
-        if (modified) this.storeCountdowns(this.countdowns)
-      }
-    } catch {
-      this.countdowns = []
-      localStorage.removeItem(STORAGE_KEYS.countdowns)
-    }
-  }
-
-  private loadClocks() {
-    const stored = localStorage.getItem(STORAGE_KEYS.worldClocks)
-    try {
-      if (stored) {
-        let parsed = JSON.parse(stored) as WorldClock[]
-        let modified = false
-        parsed = parsed.map(p => {
-          if (!p.id) {
-            modified = true
-            return { ...p, id: crypto.randomUUID() }
-          }
-          return p
-        })
-        this.worldClocks = parsed
-        if (modified) this.storeWorldClocks(this.worldClocks)
-      }
-    } catch {
-      this.worldClocks = []
-      localStorage.removeItem(STORAGE_KEYS.worldClocks)
-    }
+  public setMetrics(metrics: AnyMetric[]) {
+    this.metrics = metrics
+    this.storeMetrics(metrics)
   }
 
   addCountdown(name: string, date: string, pinned: boolean) {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const countdownDate = new Date(date)
-    const newCountdown: CountDown = {
+    const newCountdown: CountdownMetric = {
       id: crypto.randomUUID(),
+      type: 'countdown',
       name,
       date: countdownDate.valueOf(),
       pinned,
     }
-    this.setCountdowns([...this.countdowns, newCountdown])
-    this.setMetricOrder([...this.metricOrder, newCountdown.id])
+    this.setMetrics([...this.metrics, newCountdown])
   }
 
   addCounter(name: string, value: number, pinned: boolean) {
-    const newCounter: Counter = { id: crypto.randomUUID(), name, value, pinned }
-    this.setCounters([...this.counters, newCounter])
-    this.setMetricOrder([...this.metricOrder, newCounter.id])
+    const newCounter: CounterMetric = {
+      id: crypto.randomUUID(),
+      type: 'counter',
+      name,
+      value,
+      pinned,
+    }
+    this.setMetrics([...this.metrics, newCounter])
   }
 
   addWorldClock(name: string, timeZone: string, pinned: boolean) {
-    const newWorldClock: WorldClock = { id: crypto.randomUUID(), name, timeZone, pinned }
-    this.setWorldClocks([...this.worldClocks, newWorldClock])
-    this.setMetricOrder([...this.metricOrder, newWorldClock.id])
+    const newWorldClock: WorldClockMetric = {
+      id: crypto.randomUUID(),
+      type: 'worldClock',
+      name,
+      timeZone,
+      pinned,
+    }
+    this.setMetrics([...this.metrics, newWorldClock])
   }
 
-  deleteCounter(id: string) {
-    const newCounters = this.counters.filter((c) => c.id !== id)
-    this.setCounters(newCounters)
-  }
-
-  deleteCountdown(id: string) {
-    const newCountdowns = this.countdowns.filter((c) => c.id !== id)
-    this.setCountdowns(newCountdowns)
-  }
-
-  deleteWorldClock(id: string) {
-    const newWorldClocks = this.worldClocks.filter((c) => c.id !== id)
-    this.setWorldClocks(newWorldClocks)
-  }
-
-  pinWorldClock(id: string, pinned: boolean) {
-    const newWorldClocks = this.worldClocks.map((clock) => {
-      if (clock.id === id) {
-        return { ...clock, pinned }
+  setSleepEnabled(enabled: boolean) {
+    const hasSleep = this.metrics.some((m) => m.type === 'sleep')
+    if (enabled && !hasSleep) {
+      const sleepMetric: SleepMetric = {
+        id: 'sleep',
+        type: 'sleep',
+        pinned: true,
       }
-      return clock
+      this.setMetrics([...this.metrics, sleepMetric])
+    } else if (!enabled && hasSleep) {
+      this.setMetrics(this.metrics.filter((m) => m.type !== 'sleep'))
+    }
+  }
+
+  get sleepEnabled() {
+    return this.metrics.some((m) => m.type === 'sleep')
+  }
+
+  deleteMetric(id: string) {
+    this.setMetrics(this.metrics.filter((m) => m.id !== id))
+  }
+
+  updateMetric(id: string, payload: Partial<AnyMetric>) {
+    const newMetrics = this.metrics.map((metric) => {
+      if (metric.id === id) {
+        return { ...metric, ...payload } as AnyMetric
+      }
+      return metric
     })
-    this.setWorldClocks(newWorldClocks)
+    this.setMetrics(newMetrics)
+  }
+
+  pinMetric(id: string, pinned: boolean) {
+    this.updateMetric(id, { pinned })
   }
 }
 
 export const trackers = new Trackers()
-
-export const getIsSleepMetricEnabled = () => {
-  return trackers.sleepEnabled
-}
-
-export const setIsSleepMetricEnabled = (value: boolean) => {
-  trackers.setSleepEnabled(value)
-}

@@ -21,6 +21,7 @@
   args={{
     metric: {
       id: '1',
+      type: 'worldClock',
       name: 'Amsterdam',
       pinned: true,
       timeZone: 'Europe/Amsterdam',
@@ -33,6 +34,7 @@
   args={{
     metric: {
       id: '2',
+      type: 'worldClock',
       name: 'Tokyo',
       pinned: true,
       timeZone: 'Asia/Tokyo',
