@@ -4,8 +4,14 @@ coverage
 storybook-static
 playwright-report
 test-results
+.turbo
 
 pnpm-lock.yaml
 
 # looper project specific files
 .tokens.json
+
+# scraper project specific files
+apps/scraper/temp
+apps/scraper/processing
+apps/scraper/storage

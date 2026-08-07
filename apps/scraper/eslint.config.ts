@@ -4,5 +4,5 @@ import nodeConfig from '@melledijkstra/config/eslint/node.ts'
 export default {
   ...nodeConfig,
   // ignore web scripts
-  ...globalIgnores(['scripts/web/**']),
+  ...globalIgnores(['scripts/web/**', 'temp/**']),
 }
