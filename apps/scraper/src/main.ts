@@ -18,7 +18,7 @@ const crawler = new PlaywrightCrawler({
   // sameDomainDelaySecs: 5,
 
   // You can set this to false to see the browser when debugging.
-  headless: false,
+  headless: true,
 
   async requestHandler({ page, request, log, enqueueLinks, pushData }) {
     // Wait for the title to be loaded

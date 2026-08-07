@@ -11,12 +11,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "crawlee": "^3.12.1",
-    "playwright": "catalog:"
+    "crawlee": "^3.18.0",
+    "playwright": "catalog:",
+    "turndown": "^7.2.4"
   },
   "devDependencies": {
     "@melledijkstra/config": "workspace:*",
     "@types/node": "catalog:",
+    "@types/turndown": "^5.0.6",
     "eslint": "catalog:",
     "tsx": "catalog:"
   }
