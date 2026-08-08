@@ -17,18 +17,6 @@
   <title>{appState.title}</title>
 </svelte:head>
 
-{#snippet middleSnippet()}
-  {#if appState.mode === 'default'}
-    <DefaultModeContent />
-  {:else if appState.mode === 'breathing'}
-    <ModuleLoader id="well_being" type="scene" />
-  {:else if appState.mode === 'focus'}
-    <ModuleLoader id="focus" type="scene" />
-  {:else}
-    <p class="text-white text-lg">Not yet implemented!</p>
-  {/if}
-{/snippet}
-
 {#await settings.initialize() then}
   <QueryClientProvider client={queryClient}>
     <SvelteQueryDevtools buttonPosition="top-right" />
@@ -42,7 +30,15 @@
       {/snippet}
 
       {#snippet middle()}
-        {@render middleSnippet()}
+        {#if appState.mode === 'default'}
+          <DefaultModeContent />
+        {:else if appState.mode === 'breathing'}
+          <ModuleLoader id="well_being" type="scene" />
+        {:else if appState.mode === 'focus'}
+          <ModuleLoader id="focus" type="scene" />
+        {:else}
+          <p class="text-white text-lg">Not yet implemented!</p>
+        {/if}
       {/snippet}
 
       {#snippet bottom()}

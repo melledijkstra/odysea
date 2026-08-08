@@ -5,9 +5,11 @@ type SpotifyState = {
   devices: Device[] // List of available devices
   deviceId?: string // Device ID of Web SDK Player
   isAuthenticated: boolean
+  isPanelOpen: boolean
 }
 
 export const spotifyState = $state<SpotifyState>({
   devices: [],
   isAuthenticated: false,
+  isPanelOpen: false,
 })

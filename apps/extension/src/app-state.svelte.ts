@@ -26,6 +26,7 @@ export const appState = $state<AppState>({
 export function switchAppMode(mode: AppMode) {
   appState.mode = mode
   localStorage.setItem(STORAGE_KEY, mode)
+  window.dispatchEvent(new CustomEvent('app:close-panels'))
 }
 
 export function setTitle(title: string) {

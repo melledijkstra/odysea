@@ -12,7 +12,7 @@
 </script>
 
 <Popover.Content sideOffset={8} collisionPadding={8} {...props}>
-  {#snippet child({ wrapperProps, props, open })}
+  {#snippet child({ wrapperProps, props: contentProps, open })}
     {#if open}
       <div {...wrapperProps}>
         <Popover.Arrow
@@ -21,7 +21,7 @@
             'dark:text-black/40 text-white/40',
           ]}
         />
-        <Panel {...panelProps} {...props}>
+        <Panel {...panelProps} {...contentProps}>
           {@render children()}
         </Panel>
       </div>
