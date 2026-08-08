@@ -1,0 +1,25 @@
+{
+  "name": "@odysea/scraper",
+  "version": "0.0.1",
+  "description": "Reusable web scraper skeleton using Crawlee",
+  "type": "module",
+  "main": "src/main.ts",
+  "scripts": {
+    "start": "tsx src/main.ts",
+    "dev": "tsx watch src/main.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "crawlee": "^3.18.0",
+    "playwright": "catalog:",
+    "turndown": "^7.2.4"
+  },
+  "devDependencies": {
+    "@melledijkstra/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/turndown": "^5.0.6",
+    "eslint": "catalog:",
+    "tsx": "catalog:"
+  }
+}

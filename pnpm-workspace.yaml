@@ -17,6 +17,7 @@ catalog:
   eslint-config-prettier: ^10.1.8
   tsx: ^4.23.7
   vitest: ^4.1.10
+  playwright: ^1.49.1
 
 allowBuilds:
   better-sqlite3: true

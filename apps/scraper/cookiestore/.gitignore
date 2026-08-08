@@ -1,0 +1,6 @@
+# ignore all cookie stores for protection
+*
+
+# but allow example.com.ts to show as example
+!example.com.ts
+!.gitignore

@@ -1,0 +1,5 @@
+
+# Ignore scraped storage
+storage/
+
+processing/
