@@ -13,6 +13,7 @@
     "dev:cli": "turbo run dev --ui=tui --filter=@odysea/cli...",
     "build": "turbo run build",
     "test": "vitest",
+    "test:coverage": "vitest run --coverage",
     "test:e2e": "turbo run test:e2e",
     "lint": "turbo run lint",
     "format": "prettier --check .",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@melledijkstra/config": "workspace:*",
+    "@vitest/coverage-v8": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-svelte": "catalog:",
     "prettier-plugin-tailwindcss": "catalog:",

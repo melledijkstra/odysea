@@ -10,6 +10,8 @@ node_modules/
 
 debug_storybook
 
+coverage/
+
 # rollup visualizer file
 stats.html
 stats-*.html
