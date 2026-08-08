@@ -23,7 +23,7 @@
   class={[
     'w-full p-6',
     // add vignette effect from top to bottom
-    'bg-gradient-to-b from-zinc-600/60 to-80% to-transparent',
+    'bg-linear-to-b from-zinc-600/60 to-80% to-transparent',
   ]}
 >
   <div

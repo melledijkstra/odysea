@@ -8,19 +8,21 @@
     tooltip?: string
   } & TooltipType.TriggerProps
 
-  const { mdiIcon, tooltip, ...props }: MenuButtonProps = $props()
+  const { mdiIcon, tooltip, ...triggerProps }: MenuButtonProps = $props()
 </script>
 
-<Tooltip disabled={!tooltip} triggerProps={props}>
+<Tooltip
+  disabled={!tooltip}
+  triggerProps={{
+    class: [
+      'text-white/70 hover:text-white',
+      'block cursor-pointer transition-colors',
+    ],
+    ...triggerProps,
+  }}
+>
   {#snippet trigger()}
-    <button
-      class={[
-        'text-white/70 hover:text-white',
-        'block cursor-pointer transition-colors',
-      ]}
-    >
-      <Icon path={mdiIcon} size={36} />
-    </button>
+    <Icon path={mdiIcon} size={36} />
   {/snippet}
 
   {tooltip}
