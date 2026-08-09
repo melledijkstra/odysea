@@ -1,8 +1,8 @@
 <script lang="ts">
   import Pomodoro from './Pomodoro.svelte'
   import CountUp from './CountUp.svelte'
-  import Input from '@/components/atoms/Input.svelte'
-  import Button from '@/components/atoms/Button.svelte'
+  import Input from '@melledijkstra/ui/svelte/Input.svelte'
+  import Button from '@melledijkstra/ui/svelte/Button.svelte'
 
   type TimerMode = 'count-up' | 'pomodoro'
 

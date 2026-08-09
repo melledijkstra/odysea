@@ -6,18 +6,20 @@
   import Icon from './Icon.svelte'
   import { mdiClose } from '@mdi/js'
 
+  export type TagInputProps = {
+    tags?: string[]
+    label?: string | null
+    labelProps?: HTMLLabelAttributes
+    ontagschange?: (tags: string[]) => void
+  } & HTMLInputAttributes
+
   let {
     tags = $bindable<string[]>([]),
     label = null,
     labelProps = {},
     ontagschange,
     ...props
-  }: {
-    tags?: string[]
-    label?: string | null
-    labelProps?: HTMLLabelAttributes
-    ontagschange?: (tags: string[]) => void
-  } & HTMLInputAttributes = $props()
+  }: TagInputProps = $props()
 
   let inputValue = $state('')
 

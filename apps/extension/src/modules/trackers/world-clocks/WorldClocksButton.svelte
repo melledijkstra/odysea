@@ -1,6 +1,6 @@
 <script lang="ts">
   import { mdiWebClock } from '@mdi/js'
-  import IconButton from '@/components/atoms/IconButton.svelte'
+  import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
   import Form from './Form.svelte'
 
   let open: boolean = $state(false)

@@ -2,7 +2,7 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import NotesPanelContent from '@/modules/notes/NotesPanelContent.svelte'
   import type { Note } from '@/db/notes'
-  import Panel from '@/components/atoms/Panel.svelte'
+  import Panel from '@melledijkstra/ui/svelte/Panel.svelte'
   import type { ComponentProps } from 'svelte'
 
   type NotesPanelContentProps = ComponentProps<typeof NotesPanelContent>

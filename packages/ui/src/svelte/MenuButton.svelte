@@ -3,7 +3,7 @@
   import Tooltip from './Tooltip.svelte'
   import Icon from './Icon.svelte'
 
-  type MenuButtonProps = {
+  export type MenuButtonProps = {
     mdiIcon: string
     tooltip?: string
   } & TooltipType.TriggerProps

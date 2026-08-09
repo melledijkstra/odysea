@@ -2,7 +2,7 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import TasksPanelContent from '@/modules/tasks/TasksPanelContent.svelte'
   import { MockTasksController } from '@/mocks/MockTasksController'
-  import Panel from '@/components/atoms/Panel.svelte'
+  import Panel from '@melledijkstra/ui/svelte/Panel.svelte'
   import type { ComponentProps } from 'svelte'
   import { mockTaskLists, mockTasks } from '@/fixtures/tasks'
 

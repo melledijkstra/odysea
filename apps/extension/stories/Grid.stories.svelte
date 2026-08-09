@@ -1,8 +1,8 @@
 <script module lang="ts">
-  import Card from '@/components/atoms/Card.svelte'
-  import Icon from '@/components/atoms/Icon.svelte'
-  import Status from '@/components/atoms/Status.svelte'
-  import Toggle from '@/components/atoms/Toggle.svelte'
+  import Card from '@melledijkstra/ui/svelte/Card.svelte'
+  import Icon from '@melledijkstra/ui/svelte/Icon.svelte'
+  import Status from '@melledijkstra/ui/svelte/Status.svelte'
+  import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
   import {
     mdiPlay,
     mdiRepeat,

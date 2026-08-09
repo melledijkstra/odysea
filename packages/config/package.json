@@ -17,6 +17,7 @@
     "@eslint/css": "^1.4.0",
     "@eslint/js": "^10.0.1",
     "@eslint/json": "^2.0.1",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
     "@types/node": "catalog:",
     "@typescript-eslint/parser": "^8.66.0",
     "eslint": "catalog:",

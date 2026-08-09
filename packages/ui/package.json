@@ -8,21 +8,43 @@
   ],
   "scripts": {
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json",
+    "storybook": "storybook dev -p 6006",
+    "storybook:build": "storybook build",
+    "storybook:start": "storybook start"
   },
   "exports": {
-    "./svelte": "./src/svelte",
-    "./react": "./src/react"
+    "./svelte": "./src/svelte/index.ts",
+    "./svelte/*": "./src/svelte/*",
+    "./react": "./src/react/index.ts",
+    "./react/*": "./src/react/*",
+    "./styles.css": "./src/styles.css"
   },
   "peerDependencies": {
     "react": "catalog:",
     "react-dom": "catalog:",
     "svelte": "^5.47.1"
   },
+  "dependencies": {
+    "@mdi/js": "catalog:",
+    "bits-ui": "catalog:"
+  },
   "devDependencies": {
     "@melledijkstra/config": "workspace:*",
+    "@storybook/addon-svelte-csf": "catalog:",
+    "@storybook/svelte": "catalog:",
+    "@storybook/svelte-vite": "catalog:",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@tsconfig/svelte": "catalog:",
+    "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "eslint": "catalog:"
+    "eslint": "catalog:",
+    "storybook": "catalog:",
+    "svelte": "catalog:",
+    "svelte-check": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }

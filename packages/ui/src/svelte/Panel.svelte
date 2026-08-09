@@ -22,14 +22,11 @@
     'flex flex-col',
     'rounded-xl shadow-md backdrop-blur-xs overflow-y-auto',
     'z-40',
-    // size
     size === 'small' && 'w-75 max-h-75',
     size === 'medium' && 'w-125 h-100',
     size === 'large' && 'w-162 h-125',
     !nopadding && 'p-4',
-    // light theme
     'bg-white/40 text-black',
-    // dark theme
     'dark:bg-black/60 dark:text-white',
     props.class,
   ]}

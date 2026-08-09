@@ -1,6 +1,6 @@
 # Odysea Extension Design System
 
-This document outlines the core design language, tokens, and atomic components used in the Odysea Chrome Extension. It serves as a guide for reproducing the extension's look and feel, particularly for the New Tab Page interface.
+This document outlines the core design language, tokens, and atomic components used in the Odysea Design Library. It serves as a guide for reproducing a personal UI/UX look and feel.
 
 ## 1. Design Tokens
 

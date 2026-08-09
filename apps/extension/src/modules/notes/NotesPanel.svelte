@@ -1,7 +1,7 @@
 <script lang="ts">
   import { notes } from '@/stores/notes.svelte'
   import NotesPanelContent from './NotesPanelContent.svelte'
-  import PopPanel from '@/components/atoms/PopPanel.svelte'
+  import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import type { Note } from '@/db/notes'
   import { NotesController } from './NotesController'
   import type { Insertable } from '@melledijkstra/storage'

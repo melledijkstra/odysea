@@ -2,7 +2,7 @@
   import type { ClassValue, HTMLButtonAttributes } from 'svelte/elements'
   import Icon from './Icon.svelte'
 
-  type IconButtonProps = {
+  export type IconButtonProps = {
     icon: string
     size?: number
   } & HTMLButtonAttributes
@@ -15,7 +15,9 @@
     }
     if (Array.isArray(classProp)) {
       return classProp.some(
-        (cls) => cls.includes('text-') || cls.includes('bg-')
+        (cls) =>
+          typeof cls === 'string' &&
+          (cls.includes('text-') || cls.includes('bg-'))
       )
     }
     return false

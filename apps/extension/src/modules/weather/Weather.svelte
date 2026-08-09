@@ -1,7 +1,7 @@
 <script lang="ts">
   import { usePositionQuery, useWeatherQuery } from '@/api/weather'
   import { mdiCloudOff } from '@mdi/js'
-  import IconButton from '@/components/atoms/IconButton.svelte'
+  import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
   import WeatherInfo from './WeatherInfo.svelte'
 
   const positionQuery = usePositionQuery()

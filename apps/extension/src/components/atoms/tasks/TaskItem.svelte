@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { Task } from '@/interfaces/tasks'
-  import ContextMenu from '@/components/atoms/ContextMenu.svelte'
-  import Icon from '@/components/atoms/Icon.svelte'
+  import ContextMenu from '@melledijkstra/ui/svelte/ContextMenu.svelte'
+  import Icon from '@melledijkstra/ui/svelte/Icon.svelte'
   import { mdiDotsVertical, mdiOpenInNew } from '@mdi/js'
-  import DropdownMenu from '../DropdownMenu.svelte'
+  import DropdownMenu from '@melledijkstra/ui/svelte/DropdownMenu.svelte'
 
   export type TaskItemProps = {
     open?: boolean

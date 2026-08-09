@@ -1,7 +1,7 @@
 <script lang="ts">
   import { mdiSpotify } from '@mdi/js'
   import { Popover } from 'bits-ui'
-  import Icon from '@/components/atoms/Icon.svelte'
+  import Icon from '@melledijkstra/ui/svelte/Icon.svelte'
   import SpotifyPanel from './SpotifyPanel.svelte'
   import { SpotifyController } from '@/controllers/SpotifyController'
   import { MPState } from '@/components/musicplayer/state.svelte'

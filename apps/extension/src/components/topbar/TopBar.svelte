@@ -6,7 +6,7 @@
   import MetricsPanel from '@/modules/trackers/MetricsPanel.svelte'
   import Account from './Account.svelte'
   import Metrics from './MetricsBar.svelte'
-  import MenuButton from '../atoms/MenuButton.svelte'
+  import MenuButton from '@melledijkstra/ui/svelte/MenuButton.svelte'
 </script>
 
 {#snippet module(moduleId: ModuleID)}

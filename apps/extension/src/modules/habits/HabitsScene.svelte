@@ -1,7 +1,7 @@
 <script lang="ts">
   import { habits } from '@/stores/habits.svelte'
-  import Input from '@/components/atoms/Input.svelte'
-  import Button from '@/components/atoms/Button.svelte'
+  import Input from '@melledijkstra/ui/svelte/Input.svelte'
+  import Button from '@melledijkstra/ui/svelte/Button.svelte'
   import type { Habit } from '@/db/habits'
   import type { Insertable } from '@melledijkstra/storage'
 

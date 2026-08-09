@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Device } from '@melledijkstra/api'
-  import Icon from '@/components/atoms/Icon.svelte'
+  import Icon from '@melledijkstra/ui/svelte/Icon.svelte'
   import { mdiCellphone, mdiMonitor, mdiSpeaker } from '@mdi/js'
   import { DropdownMenu } from 'bits-ui'
   import type { HTMLAttributes } from 'svelte/elements'

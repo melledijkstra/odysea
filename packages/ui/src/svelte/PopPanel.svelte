@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { Snippet } from 'svelte'
   import { Popover } from 'bits-ui'
-  import Panel, { type PanelProps } from './Panel.svelte'
+  import type { PanelProps } from './Panel.svelte'
+  import Panel from './Panel.svelte'
 
   export type PopPanelProps = {
     children: Snippet
@@ -15,12 +16,7 @@
   {#snippet child({ wrapperProps, props: contentProps, open })}
     {#if open}
       <div {...wrapperProps}>
-        <Popover.Arrow
-          class={[
-            // align with panel background
-            'dark:text-black/40 text-white/40',
-          ]}
-        />
+        <Popover.Arrow class={['dark:text-black/40 text-white/40']} />
         <Panel {...panelProps} {...contentProps}>
           {@render children()}
         </Panel>

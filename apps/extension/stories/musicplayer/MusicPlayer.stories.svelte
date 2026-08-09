@@ -4,7 +4,7 @@
   import { MockMusicPlayerController } from '@/mocks/MockMusicPlayerController'
   import { playbackState } from '@/fixtures/musicplayer/state'
   import { devices } from '@/fixtures/spotify/devices'
-  import Panel from '@/components/atoms/Panel.svelte'
+  import Panel from '@melledijkstra/ui/svelte/Panel.svelte'
   import type { MusicPlayerState } from '@/components/musicplayer/state.svelte'
 
   const state: MusicPlayerState = $state({

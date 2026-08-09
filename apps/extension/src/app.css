@@ -12,8 +12,6 @@
   --text-13xl: 14rem;
   --text-13xl--line-height: normal;
 
-  --shadow-center: 0 0 40px current-color;
-
   /* COLORS */
   --color-primary: #4285f4;
   /* - Brands - */
@@ -43,17 +41,4 @@
 
 body {
   @apply bg-black;
-}
-
-@layer components {
-  /* these styles are shared between the context menu and the dropdown menu */
-  .menu {
-    @apply z-50 rounded-lg py-2 dark:bg-black/90;
-  }
-  .menu-group-heading {
-    @apply px-2 text-xs font-bold dark:text-gray-400;
-  }
-  .menu-item {
-    @apply cursor-pointer px-2 py-1 text-xs select-none focus:bg-gray-800 dark:text-white;
-  }
 }

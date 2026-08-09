@@ -8,8 +8,8 @@
     GithubAuthProvider,
     type OauthProvider,
   } from '@/oauth2/providers'
-  import Input from '@/components/atoms/Input.svelte'
-  import Spinner from '@/components/atoms/Spinner.svelte'
+  import Input from '@melledijkstra/ui/svelte/Input.svelte'
+  import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
   import { onMount, onDestroy } from 'svelte'
   import browser from 'webextension-polyfill'
   import { Logger } from '@/logger'

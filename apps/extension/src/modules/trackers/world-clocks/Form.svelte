@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Icon from '@/components/atoms/Icon.svelte'
-  import Toggle from '@/components/atoms/Toggle.svelte'
+  import Icon from '@melledijkstra/ui/svelte/Icon.svelte'
+  import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
   import { mdiClockPlusOutline } from '@mdi/js'
   import { trackers } from '../state.svelte'
-  import Input from '@/components/atoms/Input.svelte'
-  import Select from '@/components/atoms/Select.svelte'
-  import Button from '@/components/atoms/Button.svelte'
+  import Input from '@melledijkstra/ui/svelte/Input.svelte'
+  import Select from '@melledijkstra/ui/svelte/Select.svelte'
+  import Button from '@melledijkstra/ui/svelte/Button.svelte'
 
   const { onSubmitted }: { onSubmitted?: () => void } = $props()
 

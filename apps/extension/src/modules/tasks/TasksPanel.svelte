@@ -2,7 +2,7 @@
   import AuthButton from '@/components/AuthButton.svelte'
   import { GoogleTasksController } from '@/controllers/GoogleTasksController'
   import { GithubTasksController } from '@/controllers/GithubTasksController'
-  import PopPanel from '@/components/atoms/PopPanel.svelte'
+  import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import TasksPanelContent from './TasksPanelContent.svelte'
 
   type Provider = 'google' | 'github'

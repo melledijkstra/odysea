@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Input from '@/components/atoms/Input.svelte'
+  import Input from '@melledijkstra/ui/svelte/Input.svelte'
   import type { SettingsState } from '@/settings/index.svelte'
   import { settings, settingsStore } from '@/settings/index.svelte'
 

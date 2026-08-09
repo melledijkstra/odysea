@@ -1,7 +1,7 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import DropdownMenu from '@/components/atoms/DropdownMenu.svelte'
-  import Icon from '@/components/atoms/Icon.svelte'
+  import DropdownMenu from '@/svelte/DropdownMenu.svelte'
+  import Icon from '@/svelte/Icon.svelte'
   import { mdiDotsHorizontal } from '@mdi/js'
 
   // set this to true to keep the menu open during development

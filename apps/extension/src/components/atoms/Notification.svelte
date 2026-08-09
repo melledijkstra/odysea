@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
   import type { Notification } from '@/stores/notifications.svelte'
-  import Icon from './Icon.svelte'
+  import Icon from '@melledijkstra/ui/svelte/Icon.svelte'
   import {
     mdiCheckCircleOutline,
     mdiClose,
@@ -45,7 +45,9 @@
           >{title}</strong
         >
       {/if}
-      <p class="mt-0.5 text-sm text-gray-700 dark:text-gray-200 break-words">
+      <p
+        class="mt-0.5 text-sm text-gray-700 dark:text-gray-200 wrap-break-word"
+      >
         {message}
       </p>
     </div>
