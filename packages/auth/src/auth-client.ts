@@ -34,8 +34,8 @@ export interface AuthFlowHandler {
 }
 
 export class AuthClient {
-  protected _arcticClient: ArcticClient
   protected _storage: IStorage
+  protected _redirectUrl: string
   protected _state: string | undefined
   protected _codeVerifier: string | undefined
   protected _logger: Logger
@@ -56,37 +56,43 @@ export class AuthClient {
   ) {
     this._logger = new Logger(`auth:${provider.name}`)
     this.provider = provider
+    this._redirectUrl = redirectUrl
     this._storage = storage
     this._handler = handler
-    switch (provider.name) {
+  }
+
+  /**
+   * Intentionally instantiates a new ArcticClient on every call rather than caching.
+   * This ensures that if the underlying credentials (like settingsStore API keys)
+   * change dynamically at runtime, the latest credentials are always used.
+   * Instantiating these classes is virtually zero cost.
+   */
+  protected get _arcticClient(): ArcticClient {
+    switch (this.provider.name) {
       case 'google':
-        this._arcticClient = new Google(
-          provider.clientId,
-          provider.clientSecret ?? '',
-          redirectUrl
+        return new Google(
+          this.provider.clientId,
+          this.provider.clientSecret ?? '',
+          this._redirectUrl
         )
-        break
       case 'spotify':
-        this._arcticClient = new Spotify(
-          provider.clientId,
-          provider.clientSecret ?? null,
-          redirectUrl
+        return new Spotify(
+          this.provider.clientId,
+          this.provider.clientSecret ?? null,
+          this._redirectUrl
         )
-        break
       case 'github':
-        this._arcticClient = new GitHub(
-          provider.clientId,
-          provider.clientSecret ?? '',
-          redirectUrl
+        return new GitHub(
+          this.provider.clientId,
+          this.provider.clientSecret ?? '',
+          this._redirectUrl
         )
-        break
       default:
-        this._arcticClient = new OAuth2Client(
-          provider.clientId,
-          provider.clientSecret ?? null,
-          redirectUrl
+        return new OAuth2Client(
+          this.provider.clientId,
+          this.provider.clientSecret ?? null,
+          this._redirectUrl
         )
-        break
     }
   }
 

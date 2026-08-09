@@ -1,5 +1,7 @@
 import { Google, GitHub, OAuth2Client, Spotify } from 'arctic'
 
+export { Google, GitHub, OAuth2Client, Spotify }
+
 export type ArcticClient = Google | GitHub | Spotify | OAuth2Client
 
 export type OauthProvider = 'google' | 'spotify' | 'github'
