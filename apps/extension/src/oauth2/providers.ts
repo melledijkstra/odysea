@@ -1,4 +1,3 @@
-import manifest from '../../manifest.json' with { type: 'json' }
 import { settingsStore } from '@/settings/index.svelte'
 import {
   GoogleAuthConfig,
@@ -21,11 +20,22 @@ export class GithubAuthProvider extends GithubAuthConfig {
 }
 
 export class GoogleAuthProvider extends GoogleAuthConfig {
+  redirectPath = 'google'
+
   get clientId() {
-    return settingsStore.apiKeys.google || ''
+    return settingsStore.apiKeys.google_client_id || ''
   }
 
-  scopes = ['profile', 'email', 'openid', 'https://www.googleapis.com/auth/userinfo.profile']
+  get clientSecret() {
+    return settingsStore.apiKeys.google_client_secret || ''
+  }
+
+  scopes = [
+    'profile',
+    'email',
+    'openid',
+    'https://www.googleapis.com/auth/userinfo.profile',
+  ]
 
   extraParams = {
     include_granted_scopes: 'true',
@@ -33,8 +43,6 @@ export class GoogleAuthProvider extends GoogleAuthConfig {
     prompt: 'consent',
   }
 }
-
-
 
 export class SpotifyAuthProvider extends SpotifyAuthConfig {
   get clientId() {

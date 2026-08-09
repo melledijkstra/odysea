@@ -18,7 +18,7 @@ class ExtensionAuthFlowHandler implements AuthFlowHandler {
 
 export class AuthClient extends BaseAuthClient {
   constructor(provider: AuthConfig) {
-    const redirectUrl = browser.identity.getRedirectURL()
+    const redirectUrl = browser.identity.getRedirectURL(provider?.redirectPath)
     super(provider, redirectUrl, {
       storage: new ExtensionStorage(),
       handler: new ExtensionAuthFlowHandler(),

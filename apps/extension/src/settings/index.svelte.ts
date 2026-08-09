@@ -22,7 +22,8 @@ export type SettingsState = {
   }
   apiKeys: {
     weather?: string
-    google?: string
+    google_client_id?: string
+    google_client_secret?: string
     spotify?: string
     github_client_id?: string
     github_client_secret?: string

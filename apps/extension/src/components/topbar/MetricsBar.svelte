@@ -23,7 +23,8 @@
     return trackers.allMetrics.filter((metric) => metric.pinned)
   })
 
-  const sleepScope = 'https://www.googleapis.com/auth/googlehealth.sleep.readonly'
+  const sleepScope =
+    'https://www.googleapis.com/auth/googlehealth.sleep.readonly'
 
   async function getSleepData() {
     const grantedScopes = await authClient.getGrantedScopes()

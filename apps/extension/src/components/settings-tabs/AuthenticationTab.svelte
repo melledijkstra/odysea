@@ -34,18 +34,6 @@
     github: [],
   })
 
-  function formatScope(scope: string): string {
-    if (scope === 'https://www.googleapis.com/auth/tasks') return 'Tasks'
-    if (scope === 'https://www.googleapis.com/auth/googlehealth.sleep.readonly') return 'Health (Sleep)'
-    if (scope === 'https://www.googleapis.com/auth/photoslibrary.readonly') return 'Photos'
-    if (scope === 'https://www.googleapis.com/auth/userinfo.profile') return 'Profile'
-    if (scope.startsWith('https://')) {
-      const parts = scope.split('/')
-      return parts[parts.length - 1]
-    }
-    return scope
-  }
-
   function handleStorageChange(
     changes: Record<string, browser.Storage.StorageChange>
   ) {
@@ -55,7 +43,7 @@
       if (changes[storageKey]) {
         authState[provider] = !!changes[storageKey].newValue
         if (authState[provider]) {
-          clients[provider].getGrantedScopes().then(scopes => {
+          clients[provider].getGrantedScopes().then((scopes) => {
             grantedScopes[provider] = scopes
           })
         } else {
@@ -108,7 +96,12 @@
   />
   <Input
     label="Google Client ID"
-    bind:value={settingsStore.apiKeys.google}
+    bind:value={settingsStore.apiKeys.google_client_id}
+    onchange={() => settings.saveSettingsToStorage()}
+  />
+  <Input
+    label="Google Client Secret"
+    bind:value={settingsStore.apiKeys.google_client_secret}
     onchange={() => settings.saveSettingsToStorage()}
   />
   <Input
@@ -136,22 +129,36 @@
   </div>
 {:then}
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    {#each Object.keys(clients) as key}
+    {#each Object.keys(clients) as key (key)}
       {@const provider = key as OauthProvider}
-      <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg flex flex-col justify-between">
+      <div
+        class="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg flex flex-col justify-between"
+      >
         <div>
           <div class="flex justify-between items-center mb-4">
             <strong class="capitalize">{provider}</strong>
-            <span class="text-xs px-2 py-1 rounded-full font-medium {authState[provider] ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}">
+            <span
+              class="text-xs px-2 py-1 rounded-full font-medium {authState[
+                provider
+              ]
+                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}"
+            >
               {authState[provider] ? 'Connected' : 'Disconnected'}
             </span>
           </div>
           {#if authState[provider] && grantedScopes[provider].length > 0}
             <div class="mb-4">
-              <p class="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold">Granted Permissions</p>
-              <ul class="text-sm list-disc list-inside text-gray-700 dark:text-gray-300">
-                {#each grantedScopes[provider] as scope}
-                  <li>{formatScope(scope)}</li>
+              <p
+                class="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold"
+              >
+                Granted Permissions
+              </p>
+              <ul
+                class="text-sm list-disc list-inside text-gray-700 dark:text-gray-300"
+              >
+                {#each grantedScopes[provider] as scope (scope)}
+                  <li>{scope}</li>
                 {/each}
               </ul>
             </div>
@@ -160,9 +167,11 @@
         <AuthButton
           class="w-full mt-4"
           authenticated={authState[provider]}
-          provider={provider}
+          {provider}
           onclick={() =>
-            authState[provider] ? deauthenticate(provider) : authenticate(provider)}
+            authState[provider]
+              ? deauthenticate(provider)
+              : authenticate(provider)}
         />
       </div>
     {/each}

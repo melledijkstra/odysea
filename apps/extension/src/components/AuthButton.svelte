@@ -25,16 +25,19 @@
   const {
     provider,
     authenticated = false,
+    isLoading = false,
     children,
     ...props
   }: {
     provider: OauthProvider
     authenticated?: boolean
+    isLoading?: boolean
   } & HTMLButtonAttributes = $props()
 </script>
 
 <Button
   {...props}
+  disabled={isLoading || props.disabled}
   class={[
     'flex flex-row items-center justify-center gap-2',
     'disabled:bg-gray-400 disabled:focus:ring-gray-300 disabled:cursor-auto',
@@ -52,6 +55,10 @@
   {#if children}
     {@render children()}
   {:else}
-    {authenticated ? `Revoke Connection` : `Sign in with ${capitalize(provider)}`}
+    {isLoading
+      ? `Connecting...`
+      : authenticated
+        ? `Revoke Connection`
+        : `Sign in with ${capitalize(provider)}`}
   {/if}
 </Button>

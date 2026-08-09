@@ -108,7 +108,7 @@ export class AuthClient {
   }
 
   async authenticate(requestedScopes?: string[]): Promise<boolean> {
-    const token = await this.getAuthToken(false, requestedScopes)
+    const token = await this.getAuthToken(true, requestedScopes)
     return !!token
   }
 
@@ -215,7 +215,7 @@ export class AuthClient {
 
       const newAccessToken = newTokens.accessToken()
       this._logger.log('refreshed new access token, storing it and continue')
-      
+
       const storeToken = await this.getAuthTokenFromStorage()
 
       await this.cacheAuthToken(
@@ -288,12 +288,16 @@ export class AuthClient {
     return `${OAUTH2_STORAGE_KEY}.state.${this.provider.name}`
   }
 
-  async createAuthUrl(requestedScopes: string[] = []): Promise<URL | undefined> {
+  async createAuthUrl(
+    requestedScopes: string[] = []
+  ): Promise<URL | undefined> {
     this._state = generateState()
     this._codeVerifier = generateCodeVerifier()
-    
+
     const previousScopes = await this.getGrantedScopes()
-    const allScopes = Array.from(new Set([...this.provider.scopes, ...previousScopes, ...requestedScopes]))
+    const allScopes = Array.from(
+      new Set([...this.provider.scopes, ...previousScopes, ...requestedScopes])
+    )
 
     await this._storage.set(this.authStateKey, {
       state: this._state,
@@ -377,19 +381,26 @@ export class AuthClient {
     }
   }
 
-  async getAuthToken(interactive = false, requestedScopes?: string[]): Promise<string | undefined> {
+  async getAuthToken(
+    interactive = false,
+    requestedScopes?: string[]
+  ): Promise<string | undefined> {
     const storedToken = await this.getTokenFromStoreOrRefreshToken()
     const grantedScopes = await this.getGrantedScopes()
-    
+
     // Check if we need to request new scopes
-    const hasAllRequestedScopes = requestedScopes ? requestedScopes.every(scope => grantedScopes.includes(scope)) : true;
+    const hasAllRequestedScopes = requestedScopes
+      ? requestedScopes.every((scope) => grantedScopes.includes(scope))
+      : true
 
     if (storedToken && hasAllRequestedScopes) {
       this._logger.log('using stored token with all necessary scopes')
       return storedToken
     } else if (!interactive && !hasAllRequestedScopes) {
-       this._logger.log('missing requested scopes but not interactive, returning nothing')
-       return undefined
+      this._logger.log(
+        'missing requested scopes but not interactive, returning nothing'
+      )
+      return undefined
     } else if (!interactive && !storedToken) {
       this._logger.log(
         'no token retrieved, but not interactive, so returning nothing'
@@ -451,7 +462,12 @@ export class AuthClient {
         scopesToSave = await this.getGrantedScopes()
       }
 
-      await this.cacheAuthToken(tokens.accessToken(), refreshToken, expiresIn, scopesToSave)
+      await this.cacheAuthToken(
+        tokens.accessToken(),
+        refreshToken,
+        expiresIn,
+        scopesToSave
+      )
       return tokens.accessToken()
     } catch (error) {
       this._logger.error('Auth flow failed', { error })

@@ -10,6 +10,7 @@ export abstract class AuthConfig {
   authEndpoint?: string
   tokenEndpoint?: string
   extraParams?: Record<string, string>
+  redirectPath?: string
 
   constructor(name: OauthProvider, scopes: string[]) {
     this.name = name
