@@ -80,3 +80,10 @@ export async function deleteInDB<DBName extends StoreNames<OdyseaExtensionDB>>(
   const db = await dbPromise
   await db.delete(dbName, id)
 }
+
+export async function clearDB<DBName extends StoreNames<OdyseaExtensionDB>>(
+  dbName: DBName
+) {
+  const db = await dbPromise
+  await db.clear(dbName)
+}

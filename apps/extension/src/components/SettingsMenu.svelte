@@ -2,7 +2,7 @@
   import { settingsStore } from '@/settings/index.svelte'
   import NetworkTab from '@/components/settings-tabs/NetworkTab.svelte'
   import AboutTab from '@/components/settings-tabs/AboutTab.svelte'
-  import ExportTab from '@/components/settings-tabs/ExportTab.svelte'
+  import DataTab from '@/components/settings-tabs/DataTab.svelte'
   import AppearanceTab from '@/components/settings-tabs/AppearanceTab.svelte'
   import AuthenticationTab from '@/components/settings-tabs/AuthenticationTab.svelte'
   import ModulesTab from '@/components/settings-tabs/ModulesTab.svelte'
@@ -83,7 +83,7 @@
       {:else if sectionName === 'network'}
         <NetworkTab />
       {:else if sectionName === 'export'}
-        <ExportTab />
+        <DataTab />
       {:else if sectionName === 'about'}
         <AboutTab />
       {/if}
