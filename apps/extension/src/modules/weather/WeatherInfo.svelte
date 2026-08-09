@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '@/components/atoms/Icon.svelte'
+  import Icon from '@melledijkstra/ui/svelte/Icon.svelte'
   import { weatherToMdiIcon } from './utils'
   import { kelvinToCelsius, kelvinToFahrenheit } from '@melledijkstra/toolbox'
 

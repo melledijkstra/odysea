@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Icon from '@/components/atoms/Icon.svelte'
-  import PopPanel from '@/components/atoms/PopPanel.svelte'
+  import Icon from '@melledijkstra/ui/svelte/Icon.svelte'
+  import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import SettingsMenu from '@/components/SettingsMenu.svelte'
   import { Popover } from 'bits-ui'
   import { mdiTuneVertical } from '@mdi/js'

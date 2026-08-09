@@ -9,7 +9,7 @@
   import GeneralTab from '@/components/settings-tabs/GeneralTab.svelte'
   import type { HTMLAttributes } from 'svelte/elements'
   import { Separator, Tabs } from 'bits-ui'
-  import Spinner from '@/components/atoms/Spinner.svelte'
+  import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
 
   const sections = [
     'general',

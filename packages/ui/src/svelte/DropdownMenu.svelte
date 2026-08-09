@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte'
   import { DropdownMenu, type WithoutChild } from 'bits-ui'
 
-  type DropdownMenuProps = DropdownMenu.RootProps & {
+  export type DropdownMenuProps = DropdownMenu.RootProps & {
     open?: boolean
     items: {
       label: string

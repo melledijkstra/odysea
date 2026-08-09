@@ -1,8 +1,8 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import Card from '@/components/atoms/Card.svelte'
-  import Icon from '@/components/atoms/Icon.svelte'
-  import Status from '@/components/atoms/Status.svelte'
+  import Card from '@/svelte/Card.svelte'
+  import Icon from '@/svelte/Icon.svelte'
+  import Status from '@/svelte/Status.svelte'
   import {
     mdiPlay,
     mdiRepeat,
@@ -12,7 +12,7 @@
     mdiSpotify,
     mdiWifi,
   } from '@mdi/js'
-  import Toggle from '@/components/atoms/Toggle.svelte'
+  import Toggle from '@/svelte/Toggle.svelte'
 
   const { Story } = defineMeta({
     title: 'Atoms/Card',
@@ -21,9 +21,7 @@
       variant: 'square',
     },
   })
-</script>
 
-<script>
   let status = $state(true)
 </script>
 

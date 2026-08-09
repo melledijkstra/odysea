@@ -1,6 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import Status from '@/components/atoms/Status.svelte'
+  import Status from '@/svelte/Status.svelte'
 
   const { Story } = defineMeta({
     title: 'Atoms/Status',

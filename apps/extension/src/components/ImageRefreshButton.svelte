@@ -1,7 +1,7 @@
 <script lang="ts">
   import { unsplashClient } from '@/api/unsplash'
   import { setBackgroundImage } from '@/stores/background.svelte'
-  import IconButton from './atoms/IconButton.svelte'
+  import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
   import { mdiCameraRetakeOutline } from '@mdi/js'
   import { settingsStore } from '@/settings/index.svelte'
   import { Logger } from '@/logger'

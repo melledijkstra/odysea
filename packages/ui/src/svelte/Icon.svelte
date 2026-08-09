@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements'
 
-  type IconProps = {
+  export type IconProps = {
     path: string
     class?: string
     size?: number | string
@@ -23,7 +23,7 @@
   const viewboxValue = $derived(viewbox ?? '0 0 24 24')
   const sx = $derived(['both', 'horizontal'].includes(flip) ? '-1' : '1')
   const sy = $derived(['both', 'vertical'].includes(flip) ? '-1' : '1')
-  const r = $derived(isNaN(rotate) ? rotate : rotate + 'deg')
+  const r = $derived(isNaN(rotate as number) ? rotate : rotate + 'deg')
 </script>
 
 <svg

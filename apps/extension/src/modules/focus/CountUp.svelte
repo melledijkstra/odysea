@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '@/components/atoms/Button.svelte'
+  import Button from '@melledijkstra/ui/svelte/Button.svelte'
   import { Timer } from '@melledijkstra/toolbox'
   import { formatSeconds } from '@melledijkstra/toolbox'
   import { onMount } from 'svelte'

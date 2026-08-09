@@ -1,6 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import ContextMenu from '@/components/atoms/ContextMenu.svelte'
+  import ContextMenu from '@/svelte/ContextMenu.svelte'
 
   // set this to true to keep the menu open during development
   const keepOpen = true

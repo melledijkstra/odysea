@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Button from '@/components/atoms/Button.svelte'
-  import Input from '@/components/atoms/Input.svelte'
+  import Button from '@melledijkstra/ui/svelte/Button.svelte'
+  import Input from '@melledijkstra/ui/svelte/Input.svelte'
   import type { Note } from '@/db/notes'
   import type { Insertable } from '@melledijkstra/storage'
 

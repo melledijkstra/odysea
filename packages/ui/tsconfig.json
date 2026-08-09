@@ -1,8 +1,14 @@
 {
   "extends": "@melledijkstra/config/tsconfig/base.json",
   "compilerOptions": {
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["vite/client", "vitest/globals"],
+    "paths": {
+      "@/svelte/*": ["./src/svelte/*"],
+      "@/react/*": ["./src/react/*"],
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["."],
-  "exclude": ["dist", "node_modules", ".turbo"]
+  "include": [".", ".storybook/**/*"],
+  "exclude": ["dist", "node_modules", ".turbo", "storybook-static"]
 }

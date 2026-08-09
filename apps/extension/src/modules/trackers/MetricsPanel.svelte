@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '@/components/atoms/Icon.svelte'
+  import Icon from '@melledijkstra/ui/svelte/Icon.svelte'
   import {
     mdiArrowLeft,
     mdiDelete,
@@ -14,13 +14,13 @@
   } from '@mdi/js'
   import CountdownForm from './countdown/Form.svelte'
   import WorldClockForm from './world-clocks/Form.svelte'
-  import Button from '@/components/atoms/Button.svelte'
+  import Button from '@melledijkstra/ui/svelte/Button.svelte'
   import Countdown from '@/components/atoms/metrics/Countdown.svelte'
   import { trackers, type AnyMetric } from './state.svelte'
   import Clock from '@/components/atoms/metrics/WorldClock.svelte'
   import { Popover } from 'bits-ui'
-  import PopPanel from '@/components/atoms/PopPanel.svelte'
-  import IconButton from '@/components/atoms/IconButton.svelte'
+  import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
+  import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
   import { dndzone, type DndEvent } from 'svelte-dnd-action'
   import { flip } from 'svelte/animate'
   import { untrack } from 'svelte'

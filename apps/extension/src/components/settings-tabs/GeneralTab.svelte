@@ -1,5 +1,5 @@
 <script>
-  import Toggle from '@/components/atoms/Toggle.svelte'
+  import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
   import { settings, settingsStore } from '@/settings/index.svelte'
 
   const googleTasksEnabled = $derived(settingsStore.modules.google_tasks)

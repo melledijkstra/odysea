@@ -1,6 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import ScrollArea from '@/components/atoms/ScrollArea.svelte'
+  import ScrollArea from '@/svelte/ScrollArea.svelte'
 
   const { Story } = defineMeta({
     title: 'Atoms/ScrollArea',

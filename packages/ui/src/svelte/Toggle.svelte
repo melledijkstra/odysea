@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements'
 
-  type ToggleProps = {
+  export type ToggleProps = {
     label: string
     checked: boolean
     parentClass?: string

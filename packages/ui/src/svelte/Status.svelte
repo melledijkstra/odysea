@@ -1,14 +1,12 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements'
 
-  const {
-    status = null,
-    pinging,
-    ...props
-  }: {
+  export type StatusProps = {
     status: boolean | null
     pinging?: boolean
-  } & HTMLAttributes<HTMLDivElement> = $props()
+  } & HTMLAttributes<HTMLDivElement>
+
+  const { status = null, pinging, ...props }: StatusProps = $props()
 </script>
 
 <div {...props} class={['relative flex size-5', props.class]}>

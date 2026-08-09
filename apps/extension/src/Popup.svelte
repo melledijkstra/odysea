@@ -4,7 +4,7 @@
   import { getPomodoroState } from './modules/focus/messages'
   import type { PomodoroState } from './modules/focus/types'
   import { Timer } from '@melledijkstra/toolbox'
-  import Spinner from '@/components/atoms/Spinner.svelte'
+  import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
 
   let pomodoroState = $state<PomodoroState>()
 

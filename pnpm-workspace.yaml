@@ -2,24 +2,6 @@ packages:
   - apps/*
   - packages/*
 
-catalog:
-  typescript: ^6.0.3
-  eslint: ^10.8.0
-  '@types/node': ^25.9.5
-  'react': ^19.2.8
-  'react-dom': ^19.2.8
-  '@types/react': ^19.2.18
-  '@types/react-dom': ^19.2.4
-  eslint-plugin-turbo: ^2.10.8
-  prettier: ^3.9.6
-  prettier-plugin-svelte: ^4.1.1
-  prettier-plugin-tailwindcss: ^0.8.1
-  eslint-config-prettier: ^10.1.8
-  tsx: ^4.23.7
-  vitest: ^4.1.10
-  '@vitest/coverage-v8': ^4.1.10
-  playwright: ^1.49.1
-
 allowBuilds:
   better-sqlite3: true
   deno: false
@@ -35,3 +17,56 @@ onlyBuiltDependencies:
   - '@tailwindcss/oxide'
   - esbuild
   - sqlite3
+
+catalog:
+  # Building & Bundling
+  turbo: ^2.10.8
+  vite: ^8.2.0
+  tsx: ^4.23.7
+  tsdown: ^0.22.14
+  deno: ^2.9.4
+
+  # UI related
+  '@mdi/js': ^7.4.47
+  react: ^19.2.8
+  react-dom: ^19.2.8
+  '@types/react': ^19.2.18
+  '@types/react-dom': ^19.2.4
+  svelte: ^5.56.8
+  svelte-check: ^4.7.4
+  tailwindcss: ^4.3.3
+  bits-ui: ^2.18.1
+
+  # Linting & Formatting
+  eslint: ^10.8.0
+  prettier: ^3.9.6
+  prettier-plugin-svelte: ^4.1.1
+  prettier-plugin-tailwindcss: ^0.8.1
+  eslint-config-prettier: ^10.1.8
+  eslint-plugin-turbo: ^2.10.8
+
+  # Testing
+  vitest: ^4.1.10
+  '@vitest/coverage-v8': ^4.1.10
+  playwright: ^1.49.1
+
+  # Extension
+  webextension-polyfill: ^0.12.0
+  '@types/chrome': ^0.1.43
+  '@types/webextension-polyfill': ^0.12.5
+
+  # Storybook
+  storybook: ^10.5.6
+  '@storybook/addon-svelte-csf': ^5.1.2
+  '@storybook/svelte': ^10.5.6
+  '@storybook/svelte-vite': ^10.5.6
+
+  # Vite Plugins
+  '@sveltejs/vite-plugin-svelte': ^7.2.0
+  '@tailwindcss/vite': ^4.3.3
+
+  # Other (uncategorized)
+  '@tsconfig/svelte': ^5.0.8
+  'dotenv': ^17.4.2
+  typescript: ^6.0.3
+  '@types/node': ^25.9.5

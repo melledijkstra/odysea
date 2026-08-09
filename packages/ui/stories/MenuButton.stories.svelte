@@ -1,6 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import MenuButton from '@/components/atoms/MenuButton.svelte'
+  import MenuButton from '@/svelte/MenuButton.svelte'
   import { mdiAirplane, mdiSpa } from '@mdi/js'
 
   // More on how to set up stories at: https://storybook.js.org/docs/writing-stories

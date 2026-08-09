@@ -2,7 +2,7 @@
   import type { Task } from '@/interfaces/tasks'
   import TaskItem from './TaskItem.svelte'
   import type { HTMLAttributes } from 'svelte/elements'
-  import Spinner from '@/components/atoms/Spinner.svelte'
+  import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
 
   export type TaskListProps = {
     tasks: Task[]

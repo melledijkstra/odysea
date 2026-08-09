@@ -1,7 +1,7 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import Panel from '@/components/atoms/Panel.svelte'
-  import Toggle from '@/components/atoms/Toggle.svelte'
+  import Panel from '@/svelte/Panel.svelte'
+  import Toggle from '@/svelte/Toggle.svelte'
 
   const { Story } = defineMeta({
     title: 'Atoms/Panel',

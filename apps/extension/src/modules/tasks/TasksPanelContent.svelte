@@ -1,6 +1,6 @@
 <script lang="ts">
   import TaskList from '@/components/atoms/tasks/TaskList.svelte'
-  import ScrollArea from '@/components/atoms/ScrollArea.svelte'
+  import ScrollArea from '@melledijkstra/ui/svelte/ScrollArea.svelte'
   import type { TaskControllerInterface } from '@/controllers/GoogleTasksController'
   import {
     createQuery,

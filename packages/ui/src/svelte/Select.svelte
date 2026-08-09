@@ -9,7 +9,7 @@
     label: string
   }
 
-  type SelectProps = {
+  export type SelectProps = {
     options?: Array<SelectOption>
     placeholder?: string
     value?: string

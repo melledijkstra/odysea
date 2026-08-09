@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Input from '@/components/atoms/Input.svelte'
-  import TagInput from '@/components/atoms/TagInput.svelte'
+  import Input from '@melledijkstra/ui/svelte/Input.svelte'
+  import TagInput from '@melledijkstra/ui/svelte/TagInput.svelte'
   import { settings, settingsStore } from '@/settings/index.svelte'
-  import Toggle from '../atoms/Toggle.svelte'
+  import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
 </script>
 
 <h1 class="mb-2 text-xl">Appearance Settings</h1>

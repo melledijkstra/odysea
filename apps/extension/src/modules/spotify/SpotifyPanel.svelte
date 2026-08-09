@@ -3,7 +3,7 @@
   import { SpotifyController } from '@/controllers/SpotifyController'
   import MusicPlayer from '@/components/musicplayer/MusicPlayer.svelte'
   import { spotifyState } from './spotify.state.svelte'
-  import PopPanel from '@/components/atoms/PopPanel.svelte'
+  import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import type { PlaybackState } from 'MusicPlayer'
   import AuthButton from '@/components/AuthButton.svelte'
 

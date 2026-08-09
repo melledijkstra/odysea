@@ -1,11 +1,11 @@
 <script lang="ts">
-  import IconButton from '@/components/atoms/IconButton.svelte'
+  import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
   import { habits } from '@/stores/habits.svelte'
   import { mdiProgressCheck } from '@mdi/js'
-  import PopPanel from '@/components/atoms/PopPanel.svelte'
+  import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import { Popover } from 'bits-ui'
-  import Input from '@/components/atoms/Input.svelte'
-  import Button from '@/components/atoms/Button.svelte'
+  import Input from '@melledijkstra/ui/svelte/Input.svelte'
+  import Button from '@melledijkstra/ui/svelte/Button.svelte'
 
   let newHabit = $state('')
 

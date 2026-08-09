@@ -18,7 +18,7 @@
     "cloud"
   ],
   "dependencies": {
-    "deno": "^2.9.4",
+    "deno": "catalog:",
     "hono": "jsr:@hono/hono@^4.13.0"
   },
   "devDependencies": {

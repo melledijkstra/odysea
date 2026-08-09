@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '@/components/atoms/Button.svelte'
+  import Button from '@melledijkstra/ui/svelte/Button.svelte'
   import type { FocusSession } from '@/db/focus'
   import { getAllFocusSessions } from '@/db/focus'
   import { habitsRepository, type Habit } from '@/db/habits'

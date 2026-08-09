@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ContextMenu from '@/components/atoms/ContextMenu.svelte'
-  import DropdownMenu from '@/components/atoms/DropdownMenu.svelte'
+  import ContextMenu from '@melledijkstra/ui/svelte/ContextMenu.svelte'
+  import DropdownMenu from '@melledijkstra/ui/svelte/DropdownMenu.svelte'
   import { loadModule } from '@/modules'
   import { onMount } from 'svelte'
 

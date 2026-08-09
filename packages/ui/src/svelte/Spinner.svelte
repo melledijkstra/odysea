@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements'
 
-  type SpinnerProps = {
+  export type SpinnerProps = {
     class?: string
     size?: number | string
   } & HTMLAttributes<SVGElement>

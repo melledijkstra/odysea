@@ -13,7 +13,7 @@
     mdiVolumeMedium,
     mdiVolumeOff,
   } from '@mdi/js'
-  import Icon from '../atoms/Icon.svelte'
+  import Icon from '@melledijkstra/ui/svelte/Icon.svelte'
   import { millisecondsToTime } from '@melledijkstra/toolbox'
   import type { PlaybackState } from 'MusicPlayer'
   import type { HTMLAttributes } from 'svelte/elements'

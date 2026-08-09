@@ -4,16 +4,18 @@
     HTMLInputAttributes,
   } from 'svelte/elements'
 
+  export type InputProps = {
+    value?: string | number
+    label?: string | null
+    labelProps?: HTMLLabelAttributes
+  } & HTMLInputAttributes
+
   let {
     value = $bindable<string | number>(),
     label = null,
     labelProps = {},
     ...props
-  }: {
-    value?: string | number
-    label?: string | null
-    labelProps?: HTMLLabelAttributes
-  } & HTMLInputAttributes = $props()
+  }: InputProps = $props()
 </script>
 
 {#if label}

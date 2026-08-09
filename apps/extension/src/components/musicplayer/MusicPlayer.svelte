@@ -9,7 +9,7 @@
   } from 'MusicPlayer'
   import type { Device } from '@melledijkstra/api'
   import ListSkeleton from './ListSkeleton.svelte'
-  import ScrollArea from '../atoms/ScrollArea.svelte'
+  import ScrollArea from '@melledijkstra/ui/svelte/ScrollArea.svelte'
   import TrackList from './TrackList.svelte'
   import { createQuery } from '@tanstack/svelte-query'
 

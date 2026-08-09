@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ScrollArea, type WithoutChild } from 'bits-ui'
 
-  type Props = WithoutChild<ScrollArea.RootProps> & {
+  export type ScrollAreaProps = WithoutChild<ScrollArea.RootProps> & {
     orientation: 'vertical' | 'horizontal' | 'both'
     viewportClasses?: string
     scrollbarClasses?: string
@@ -16,7 +16,7 @@
     thumbClasses,
     children,
     ...restProps
-  }: Props = $props()
+  }: ScrollAreaProps = $props()
 </script>
 
 {#snippet Scrollbar({

@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte'
   import type { HTMLAttributes } from 'svelte/elements'
 
-  type CardProps = {
+  export type CardProps = {
     children: Snippet
     nopadding?: boolean
     variant?: 'square' | 'rectangular' | 'auto'
@@ -20,13 +20,10 @@
 <div
   class={[
     'block bg-white dark:bg-neutral-900 rounded-xl shadow-md overflow-hidden',
-    // text
     'text-black dark:text-white',
-    // sizing
     variant === 'square' && 'aspect-square',
     variant === 'rectangular' && 'aspect-2/1',
     variant === 'auto' && 'aspect-auto',
-    // spacing
     !nopadding && 'p-6',
     className,
   ]}
