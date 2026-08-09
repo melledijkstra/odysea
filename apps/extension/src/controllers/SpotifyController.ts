@@ -1,7 +1,7 @@
 import { Logger } from '@/logger'
 import { spotifyState } from '@/modules/spotify/spotify.state.svelte'
 import { AuthClient } from '@melledijkstra/extension'
-import { SpotifyAuthProvider } from '@/oauth2/providers'
+import { spotifyAuthClient } from '@/oauth2/clients'
 import type { Album, PlaybackState, Playlist, Track } from 'MusicPlayer'
 import type { ILogger } from '@/interfaces/logger.interface'
 import { convertPlayerState } from '@/transforms/spotify'
@@ -13,7 +13,7 @@ import { SpotifyApiService } from '@/services/SpotifyApiService'
 export class SpotifyController extends BaseMusicController implements ILogger {
   logger: Logger = new Logger('SpotifyController')
 
-  protected authClient: AuthClient = new AuthClient(new SpotifyAuthProvider())
+  protected authClient: AuthClient = spotifyAuthClient
   protected playerService: SpotifyPlayerService
   protected apiService: SpotifyApiService
 

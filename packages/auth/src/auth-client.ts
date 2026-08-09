@@ -187,16 +187,14 @@ export class AuthClient {
     if (error instanceof OAuth2RequestError && error.code === 'invalid_grant') {
       return true
     }
-    if (
-      error instanceof UnexpectedErrorResponseBodyError &&
-      error.data &&
-      typeof error.data === 'object' &&
-      'errors' in error.data &&
-      Array.isArray(error.data?.errors)
-    ) {
-      const errors: Array<{ errorType: string; message: string }> =
-        error.data.errors
-      if (errors.some((e) => e.errorType === 'invalid_grant')) {
+    if (error instanceof UnexpectedErrorResponseBodyError) {
+      const errors = (error.data as Record<string, unknown>)?.errors
+      if (
+        Array.isArray(errors) &&
+        errors.some(
+          (e: Record<string, unknown>) => e?.errorType === 'invalid_grant'
+        )
+      ) {
         return true
       }
     }

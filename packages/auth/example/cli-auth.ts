@@ -8,9 +8,9 @@ import {
   OauthProvider,
 } from '../src'
 import {
-  SpotifyAuthConfig,
-  GithubAuthConfig,
-  GoogleAuthConfig,
+  createSpotifyAuthConfig,
+  createGithubAuthConfig,
+  createGoogleAuthConfig,
 } from '../src/providers'
 
 const rl = readline.createInterface({ input, output })
@@ -34,13 +34,13 @@ try {
 
   switch (providerName) {
     case 'google':
-      config = new GoogleAuthConfig()
+      config = createGoogleAuthConfig()
       break
     case 'github':
-      config = new GithubAuthConfig()
+      config = createGithubAuthConfig()
       break
     case 'spotify':
-      config = new SpotifyAuthConfig()
+      config = createSpotifyAuthConfig()
       break
     default:
       console.error(`Error: Unsupported provider '${providerName}'`)

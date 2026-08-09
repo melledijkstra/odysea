@@ -3,10 +3,9 @@
   import { storeUsername, clearUsername, retrieveUsername } from '@/browser'
   import Clock from '@/components/Clock.svelte'
   import Welcome from '@/components/Welcome.svelte'
-  import { GoogleAuthProvider } from '@/oauth2/providers'
+  import { googleAuthClient } from '@/oauth2/clients'
   import { settingsStore } from '@/settings/index.svelte'
   import { GoogleTasksApiClient } from '@melledijkstra/api'
-  import { AuthClient } from '@melledijkstra/extension'
   import { createQuery } from '@tanstack/svelte-query'
   import { onMount } from 'svelte'
 
@@ -15,10 +14,9 @@
   const tasksQuery = createQuery(() => ({
     queryKey: ['tasks', 'google', 'tasks', taskListId],
     queryFn: async () => {
-      const auth = new AuthClient(new GoogleAuthProvider())
-      const isAuthenticated = await auth.isAuthenticated()
+      const isAuthenticated = await googleAuthClient.isAuthenticated()
       if (!isAuthenticated) return []
-      const client = new GoogleTasksApiClient(auth)
+      const client = new GoogleTasksApiClient(googleAuthClient)
       return (await client.fetchTasks(taskListId)) ?? []
     },
     staleTime: 5 * 60 * 1000,

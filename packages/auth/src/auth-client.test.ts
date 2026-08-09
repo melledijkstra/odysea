@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { AuthClient, AuthFlowHandler } from './auth-client'
-import { GoogleAuthConfig } from './providers'
+import { createGoogleAuthConfig, type AuthConfig } from './providers'
 import { MemoryCache } from '@melledijkstra/storage'
 import {
   OAuth2Tokens,
@@ -43,7 +43,7 @@ describe('AuthClient', () => {
   let storage: MemoryCache
   let handler: AuthFlowHandler
   let client: AuthClient
-  let googleAuth: GoogleAuthConfig
+  let googleAuth: AuthConfig
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -51,7 +51,7 @@ describe('AuthClient', () => {
     handler = {
       open: vi.fn(),
     }
-    googleAuth = new GoogleAuthConfig()
+    googleAuth = createGoogleAuthConfig()
     client = new AuthClient(googleAuth, 'http://localhost:3000/callback', {
       storage,
       handler,

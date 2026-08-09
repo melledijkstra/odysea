@@ -5,15 +5,12 @@
   import Countdown from '../atoms/metrics/Countdown.svelte'
   import { onMount } from 'svelte'
   import Sleep from '../atoms/metrics/Sleep.svelte'
-  import { AuthClient } from '@melledijkstra/extension'
-  import { GoogleAuthProvider } from '@/oauth2/providers'
+  import { googleAuthClient } from '@/oauth2/clients'
   import { GoogleHealthApiClient } from '@melledijkstra/api'
 
   const cache = new WebLocalStorage()
 
   const STORAGE_KEY = 'googlehealth::sleep_minutes'
-
-  const authClient = new AuthClient(new GoogleAuthProvider())
 
   let client = $state<GoogleHealthApiClient>()
 
@@ -27,21 +24,21 @@
     'https://www.googleapis.com/auth/googlehealth.sleep.readonly'
 
   async function getSleepData() {
-    const grantedScopes = await authClient.getGrantedScopes()
+    const grantedScopes = await googleAuthClient.getGrantedScopes()
     if (!grantedScopes.includes(sleepScope)) {
       console.log('No sleep scope granted')
       return
     }
 
     if (!client) {
-      client = new GoogleHealthApiClient(authClient)
+      client = new GoogleHealthApiClient(googleAuthClient)
     }
     sleepMinutes = await client.getSleep()
     await cache.set(STORAGE_KEY, sleepMinutes, 60 * 60 * 1000) // Cache for 1 hour
   }
 
   async function authenticate() {
-    const tokenData = await authClient.getAuthToken(true, [sleepScope])
+    const tokenData = await googleAuthClient.getAuthToken(true, [sleepScope])
     if (tokenData) {
       getSleepData()
     }

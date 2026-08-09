@@ -1,5 +1,5 @@
 import { createServer } from 'node:http'
-import { AuthClient, GoogleAuthConfig } from '../src'
+import { AuthClient, createGoogleAuthConfig } from '../src'
 
 // const clientId = process.env.GITHUB_CLIENT_ID
 // const clientSecret = process.env.GITHUB_CLIENT_SECRET
@@ -8,7 +8,7 @@ import { AuthClient, GoogleAuthConfig } from '../src'
 const PORT = 8000
 const redirectUrl = `http://localhost:${PORT}/oauth/callback`
 
-const authClient = new AuthClient(new GoogleAuthConfig(), redirectUrl)
+const authClient = new AuthClient(createGoogleAuthConfig(), redirectUrl)
 
 console.log('Trying to authenticate...')
 
