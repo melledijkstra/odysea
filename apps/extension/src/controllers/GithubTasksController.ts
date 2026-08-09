@@ -1,6 +1,6 @@
 import { Octokit } from '@octokit/rest'
 import { AuthClient } from '@melledijkstra/extension'
-import { GithubAuthProvider } from '@/oauth2/providers'
+import { githubAuthClient } from '@/oauth2/clients'
 import type { Task, TaskList } from '@/interfaces/tasks'
 import type { TaskControllerInterface } from './GoogleTasksController'
 import type { ILogger } from '@/interfaces/logger.interface'
@@ -41,7 +41,7 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
 
   constructor() {
     this.logger = new Logger('GithubTasksController')
-    this.auth = new AuthClient(new GithubAuthProvider())
+    this.auth = githubAuthClient
   }
 
   async authenticate(): Promise<boolean> {

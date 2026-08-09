@@ -1,59 +1,50 @@
+import type { AuthConfig, OauthProvider } from '@melledijkstra/auth'
 import { settingsStore } from '@/settings/index.svelte'
-import {
-  GoogleAuthConfig,
-  SpotifyAuthConfig,
-  GithubAuthConfig,
-} from '@melledijkstra/auth'
+export type { OauthProvider }
 
-export type OauthProvider = 'google' | 'spotify' | 'github'
-
-export class GithubAuthProvider extends GithubAuthConfig {
+export const getGithubAuthConfig = (): AuthConfig => ({
+  name: 'github',
   get clientId() {
     return settingsStore.apiKeys.github_client_id || ''
-  }
-
+  },
   get clientSecret() {
     return settingsStore.apiKeys.github_client_secret || ''
-  }
+  },
+  scopes: ['repo'],
+})
 
-  scopes = ['repo']
-}
-
-export class GoogleAuthProvider extends GoogleAuthConfig {
-  redirectPath = 'google'
-
+export const getGoogleAuthConfig = (): AuthConfig => ({
+  name: 'google',
+  redirectPath: 'google',
   get clientId() {
     return settingsStore.apiKeys.google_client_id || ''
-  }
-
+  },
   get clientSecret() {
     return settingsStore.apiKeys.google_client_secret || ''
-  }
-
-  scopes = [
+  },
+  scopes: [
     'profile',
     'email',
     'openid',
     'https://www.googleapis.com/auth/userinfo.profile',
-  ]
-
-  extraParams = {
+  ],
+  extraParams: {
     include_granted_scopes: 'true',
     access_type: 'offline',
     prompt: 'consent',
-  }
-}
+  },
+})
 
-export class SpotifyAuthProvider extends SpotifyAuthConfig {
+export const getSpotifyAuthConfig = (): AuthConfig => ({
+  name: 'spotify',
   get clientId() {
     return settingsStore.apiKeys.spotify || ''
-  }
-
-  scopes = [
+  },
+  scopes: [
     'streaming',
     'app-remote-control',
     'user-read-playback-state',
     'user-modify-playback-state',
     'playlist-read-private',
-  ]
-}
+  ],
+})

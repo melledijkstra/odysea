@@ -2,7 +2,7 @@ import { GoogleTasksApiClient } from '@melledijkstra/api'
 import type { ILogger } from '@/interfaces/logger.interface'
 import { Logger } from '@/logger'
 import { AuthClient } from '@melledijkstra/extension'
-import { GoogleAuthProvider } from '@/oauth2/providers'
+import { googleAuthClient } from '@/oauth2/clients'
 import { addNotification } from '@/stores/notifications.svelte'
 import type { Task, TaskList } from '@/interfaces/tasks'
 
@@ -32,7 +32,7 @@ export class GoogleTasksController implements TaskControllerInterface, ILogger {
 
   constructor() {
     this.logger = new Logger('GoogleTasksController')
-    this.auth = new AuthClient(new GoogleAuthProvider())
+    this.auth = googleAuthClient
     this.api = new GoogleTasksApiClient(this.auth)
   }
 

@@ -1,13 +1,12 @@
 <script lang="ts">
   import { settingsStore, settings } from '@/settings/index.svelte'
   import AuthButton from '@/components/AuthButton.svelte'
-  import { AuthClient } from '@melledijkstra/extension'
+  import { type OauthProvider } from '@/oauth2/providers'
   import {
-    GoogleAuthProvider,
-    SpotifyAuthProvider,
-    GithubAuthProvider,
-    type OauthProvider,
-  } from '@/oauth2/providers'
+    googleAuthClient,
+    spotifyAuthClient,
+    githubAuthClient,
+  } from '@/oauth2/clients'
   import Input from '@melledijkstra/ui/svelte/Input.svelte'
   import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
   import { onMount, onDestroy } from 'svelte'
@@ -17,9 +16,9 @@
   const logger = new Logger('AuthenticationTab')
 
   const clients = {
-    google: new AuthClient(new GoogleAuthProvider()),
-    spotify: new AuthClient(new SpotifyAuthProvider()),
-    github: new AuthClient(new GithubAuthProvider()),
+    google: googleAuthClient,
+    spotify: spotifyAuthClient,
+    github: githubAuthClient,
   } as const
 
   const authState = $state({

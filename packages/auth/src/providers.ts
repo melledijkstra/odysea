@@ -1,68 +1,54 @@
 import { Google, GitHub, OAuth2Client, Spotify } from 'arctic'
 
+export { Google, GitHub, OAuth2Client, Spotify }
+
 export type ArcticClient = Google | GitHub | Spotify | OAuth2Client
 
 export type OauthProvider = 'google' | 'spotify' | 'github'
-export abstract class AuthConfig {
+export interface AuthConfig {
   name: OauthProvider
-
   scopes: string[]
+  clientId: string
+  clientSecret?: string
   authEndpoint?: string
   tokenEndpoint?: string
   extraParams?: Record<string, string>
   redirectPath?: string
-
-  constructor(name: OauthProvider, scopes: string[]) {
-    this.name = name
-    this.scopes = scopes
-  }
-
-  abstract get clientId(): string
-  abstract get clientSecret(): string | undefined
 }
 
-export class GoogleAuthConfig extends AuthConfig {
-  constructor() {
-    super('google', ['openid', 'profile'])
-    this.extraParams = {
-      access_type: 'offline',
-      prompt: 'consent',
-    }
-  }
-
-  get clientId(): string {
+export const createGoogleAuthConfig = (): AuthConfig => ({
+  name: 'google',
+  scopes: ['openid', 'profile'],
+  get clientId() {
     return process.env.GOOGLE_CLIENT_ID!
-  }
+  },
+  get clientSecret() {
+    return process.env.GOOGLE_CLIENT_SECRET
+  },
+  extraParams: {
+    access_type: 'offline',
+    prompt: 'consent',
+  },
+})
 
-  get clientSecret(): string | undefined {
-    return process.env.GOOGLE_CLIENT_SECRET!
-  }
-}
-
-export class GithubAuthConfig extends AuthConfig {
-  constructor() {
-    super('github', ['user'])
-  }
-
-  get clientId(): string {
+export const createGithubAuthConfig = (): AuthConfig => ({
+  name: 'github',
+  scopes: ['user'],
+  get clientId() {
     return process.env.GITHUB_CLIENT_ID!
-  }
+  },
+  get clientSecret() {
+    return process.env.GITHUB_CLIENT_SECRET
+  },
+})
 
-  get clientSecret(): string | undefined {
-    return process.env.GITHUB_CLIENT_SECRET!
-  }
-}
-
-export class SpotifyAuthConfig extends AuthConfig {
-  constructor() {
-    super('spotify', ['user'])
-  }
-
-  get clientId(): string {
+export const createSpotifyAuthConfig = (): AuthConfig => ({
+  name: 'spotify',
+  scopes: ['user'],
+  get clientId() {
     return process.env.SPOTIFY_CLIENT_ID!
-  }
-
-  get clientSecret(): string | undefined {
-    return process.env.SPOTIFY_CLIENT_SECRET!
-  }
-}
+  },
+  get clientSecret() {
+    return process.env.SPOTIFY_CLIENT_SECRET
+  },
+})

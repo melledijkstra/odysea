@@ -24,7 +24,7 @@ export class TokenBaseClient extends BaseClient {
     const baseHeaders = await super._getHeaders()
 
     if (!token) {
-      return baseHeaders
+      throw new Error('Authentication token is missing or undefined.')
     }
 
     return {

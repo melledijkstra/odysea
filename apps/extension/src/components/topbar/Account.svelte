@@ -2,11 +2,9 @@
   import { onMount } from 'svelte'
   import { ACCOUNT_CACHE_KEY } from '../../constants'
   import { GoogleAccountApiClient, type Account } from '@melledijkstra/api'
-  import { AuthClient } from '@melledijkstra/extension'
-  import { GoogleAuthProvider } from '@/oauth2/providers'
+  import { googleAuthClient } from '@/oauth2/clients'
 
-  const auth = new AuthClient(new GoogleAuthProvider())
-  const client = new GoogleAccountApiClient(auth)
+  const client = new GoogleAccountApiClient(googleAuthClient)
 
   let accountInfo = $state<Account>()
 
