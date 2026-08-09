@@ -44,6 +44,14 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
     this.auth = new AuthClient(new GithubAuthProvider())
   }
 
+  async authenticate(): Promise<boolean> {
+    return await this.auth.authenticate()
+  }
+
+  async isAuthenticated(): Promise<boolean> {
+    return await this.auth.isAuthenticated()
+  }
+
   async initialize() {
     const token = await this.auth.getAuthToken(false)
     if (token) {

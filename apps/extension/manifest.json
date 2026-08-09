@@ -48,16 +48,5 @@
     "notifications",
     "geolocation"
   ],
-  "host_permissions": ["<all_urls>"],
-  "oauth2": {
-    "client_id": "%CLIENT_ID%",
-    "scopes": [
-      "profile",
-      "email",
-      "https://www.googleapis.com/auth/photoslibrary.readonly",
-      "https://www.googleapis.com/auth/tasks",
-      "https://www.googleapis.com/auth/userinfo.profile",
-      "https://www.googleapis.com/auth/googlehealth.sleep.readonly"
-    ]
-  }
+  "host_permissions": ["<all_urls>"]
 }

@@ -4,6 +4,7 @@
   import { GithubTasksController } from '@/controllers/GithubTasksController'
   import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import TasksPanelContent from './TasksPanelContent.svelte'
+  import { addNotification } from '@/stores/notifications.svelte'
 
   type Provider = 'google' | 'github'
   const STORAGE_KEY = 'tasks::activeProvider'
@@ -24,15 +25,25 @@
 
   let isAuthenticated = $state(false)
   let isInitializing = $state(true)
+  let isAuthenticating = $state(false)
 
   async function triggerAuthFlow() {
-    isAuthenticated = await activeController.auth.authenticate()
+    isAuthenticating = true
+    try {
+      isAuthenticated = await activeController.authenticate()
+    } catch (e: unknown) {
+      console.error('Authentication error:', e)
+      const errorMessage = e instanceof Error ? e.message : 'Unknown error'
+      addNotification(`Authentication failed: ${errorMessage}`, 'error')
+    } finally {
+      isAuthenticating = false
+    }
   }
 
   $effect(() => {
     isInitializing = true
     activeController.initialize().then(() => {
-      activeController.auth.isAuthenticated().then((auth) => {
+      activeController.isAuthenticated().then((auth) => {
         isAuthenticated = auth
         isInitializing = false
       })
@@ -76,6 +87,10 @@
         ? 'Google'
         : 'GitHub'}
     </p>
-    <AuthButton provider={activeProvider} onclick={triggerAuthFlow} />
+    <AuthButton
+      provider={activeProvider}
+      isLoading={isAuthenticating}
+      onclick={triggerAuthFlow}
+    />
   {/if}
 </PopPanel>

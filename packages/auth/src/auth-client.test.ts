@@ -100,6 +100,8 @@ describe('AuthClient', () => {
         hasRefreshToken: () => true,
         refreshToken: () => 'new-refresh-token',
         accessTokenExpiresInSeconds: () => 3600,
+        hasScopes: () => true,
+        scopes: () => ['profile', 'email'],
       } as unknown as OAuth2Tokens
 
       vi.spyOn(client, 'refreshAccessToken').mockResolvedValueOnce(mockTokens)
@@ -111,7 +113,8 @@ describe('AuthClient', () => {
       expect(client.cacheAuthToken).toHaveBeenCalledWith(
         'new-access-token',
         'new-refresh-token',
-        3600
+        3600,
+        ['profile', 'email']
       )
       expect(token).toBe('new-access-token')
     })
@@ -121,28 +124,29 @@ describe('AuthClient', () => {
         access_token: 'expired-token',
         expires_at: Date.now() - 10000,
         refresh_token: 'old-refresh-token',
+        scopes: ['profile', 'email'],
       }
-      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce(
-        mockStore
-      )
+      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValue(mockStore)
 
-      // Simulate a provider that returns no refresh_token in the response
-      const mockTokens = new OAuth2Tokens({
-        access_token: 'new-access-token',
-        expires_in: 3600,
-        // no refresh_token field
-      })
+      // Simulate a provider that returns no refresh_token and no scopes in the response
+      const mockTokens = {
+        accessToken: () => 'new-access-token',
+        hasRefreshToken: () => false,
+        accessTokenExpiresInSeconds: () => 3600,
+        hasScopes: () => false,
+      } as unknown as OAuth2Tokens
 
       vi.spyOn(client, 'refreshAccessToken').mockResolvedValueOnce(mockTokens)
       vi.spyOn(client, 'cacheAuthToken').mockResolvedValueOnce(undefined)
 
       const token = await client.getTokenFromStoreOrRefreshToken()
 
-      // Should reuse the old refresh token instead of throwing
+      // Should reuse the old refresh token and old scopes instead of throwing
       expect(client.cacheAuthToken).toHaveBeenCalledWith(
         'new-access-token',
         'old-refresh-token',
-        3600
+        3600,
+        ['profile', 'email']
       )
       expect(token).toBe('new-access-token')
     })
@@ -219,6 +223,7 @@ describe('AuthClient', () => {
         hasRefreshToken: () => true,
         refreshToken: () => 'new-refresh-token',
         accessTokenExpiresInSeconds: () => 3600,
+        hasScopes: () => false,
       } as unknown as OAuth2Tokens
 
       const refreshSpy = vi
@@ -247,9 +252,51 @@ describe('AuthClient', () => {
       vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue(
         'stored-token'
       )
+      vi.spyOn(client, 'getGrantedScopes').mockResolvedValue(['profile'])
 
       const token = await client.getAuthToken()
       expect(token).toBe('stored-token')
+    })
+
+    it('should return stored token if requested scopes are already granted', async () => {
+      vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue(
+        'stored-token'
+      )
+      vi.spyOn(client, 'getGrantedScopes').mockResolvedValue([
+        'profile',
+        'email',
+      ])
+
+      const token = await client.getAuthToken(false, ['profile'])
+      expect(token).toBe('stored-token')
+    })
+
+    it('should initiate auth flow if requested scopes are not granted', async () => {
+      vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue(
+        'stored-token'
+      )
+      vi.spyOn(client, 'getGrantedScopes').mockResolvedValue(['profile'])
+      vi.spyOn(client, 'createAuthUrl').mockResolvedValue(
+        new URL('http://mock')
+      )
+
+      const mockTokens = {
+        accessToken: () => 'new-access-token',
+        hasRefreshToken: () => true,
+        refreshToken: () => 'new-refresh-token',
+        accessTokenExpiresInSeconds: () => 3600,
+        hasScopes: () => true,
+        scopes: () => ['profile', 'tasks'],
+      } as unknown as OAuth2Tokens
+
+      vi.spyOn(client, 'validate').mockResolvedValue(mockTokens)
+      vi.mocked(handler.open).mockResolvedValue(
+        new URL('http://callback?code=123&state=abc')
+      )
+
+      const token = await client.getAuthToken(true, ['tasks'])
+      expect(client.createAuthUrl).toHaveBeenCalledWith(['tasks'])
+      expect(token).toBe('new-access-token')
     })
 
     it('should return undefined if no token and not interactive', async () => {
@@ -271,6 +318,7 @@ describe('AuthClient', () => {
         hasRefreshToken: () => true,
         refreshToken: () => 'new-refresh-token',
         accessTokenExpiresInSeconds: () => 3600,
+        hasScopes: () => false,
       } as unknown as OAuth2Tokens
 
       vi.spyOn(client, 'validate').mockResolvedValue(mockTokens)
@@ -337,6 +385,17 @@ describe('AuthClient', () => {
         state: context.state,
         codeVerifier: context.codeVerifier,
       })
+    })
+
+    it('should include previously granted scopes and newly requested scopes in auth url', async () => {
+      vi.spyOn(client, 'getGrantedScopes').mockResolvedValue(['profile'])
+      const authUrl = await client.createAuthUrl(['tasks', 'email'])
+
+      expect(authUrl).toBeDefined()
+      // Google provider passes space-separated scopes in the URL
+      expect(authUrl?.searchParams.get('scope')).toContain('profile')
+      expect(authUrl?.searchParams.get('scope')).toContain('tasks')
+      expect(authUrl?.searchParams.get('scope')).toContain('email')
     })
 
     it('should throw error in validate if state does not match', async () => {

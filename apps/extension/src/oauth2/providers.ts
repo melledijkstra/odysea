@@ -1,4 +1,3 @@
-import manifest from '../../manifest.json' with { type: 'json' }
 import { settingsStore } from '@/settings/index.svelte'
 import {
   GoogleAuthConfig,
@@ -21,26 +20,28 @@ export class GithubAuthProvider extends GithubAuthConfig {
 }
 
 export class GoogleAuthProvider extends GoogleAuthConfig {
+  redirectPath = 'google'
+
   get clientId() {
-    return settingsStore.apiKeys.google || ''
+    return settingsStore.apiKeys.google_client_id || ''
   }
 
-  scopes = manifest.oauth2.scopes.filter(
-    (scope) => !scope.includes('googlehealth')
-  )
-}
-
-export class GoogleHealthAuthProvider extends GoogleAuthConfig {
-  get clientId() {
-    return settingsStore.apiKeys.google || ''
+  get clientSecret() {
+    return settingsStore.apiKeys.google_client_secret || ''
   }
 
   scopes = [
     'profile',
     'email',
+    'openid',
     'https://www.googleapis.com/auth/userinfo.profile',
-    'https://www.googleapis.com/auth/googlehealth.sleep.readonly',
   ]
+
+  extraParams = {
+    include_granted_scopes: 'true',
+    access_type: 'offline',
+    prompt: 'consent',
+  }
 }
 
 export class SpotifyAuthProvider extends SpotifyAuthConfig {
