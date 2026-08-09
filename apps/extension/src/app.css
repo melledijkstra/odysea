@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '@melledijkstra/ui/styles.css';
 
 @theme {
   --text-5xl: 3rem;
@@ -11,22 +12,6 @@
   --text-12xl--line-height: normal;
   --text-13xl: 14rem;
   --text-13xl--line-height: normal;
-
-  /* COLORS */
-  --color-primary: #4285f4;
-  /* - Brands - */
-  --color-spotify: #1db954;
-  --color-google: #4285f4;
-
-  --animate-fade-in: fadeIn 0.5s ease-in;
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
 
   --animate-progress: progress var(--progress-duration, 3000ms) linear forwards;
   @keyframes progress {

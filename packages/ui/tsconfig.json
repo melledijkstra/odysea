@@ -9,6 +9,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [".", ".storybook/**/*", "stories/**/*"],
-  "exclude": ["dist", "node_modules", ".turbo"]
+  "include": [".", ".storybook/**/*"],
+  "exclude": ["dist", "node_modules", ".turbo", "storybook-static"]
 }
