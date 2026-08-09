@@ -47,6 +47,8 @@
     if (!target.files || target.files.length === 0) return
 
     const file = target.files[0]
+    // Reset the input value to allow re-importing the same file
+    target.value = ''
     const reader = new FileReader()
 
     reader.onload = async (e) => {
@@ -64,23 +66,25 @@
         if (data.databases) {
           if (data.databases.focusSessions) {
             await clearDB('focus')
-            for (const session of data.databases.focusSessions) {
-              await updateInDB('focus', session)
-            }
+            await Promise.all(
+              data.databases.focusSessions.map((session) =>
+                updateInDB('focus', session)
+              )
+            )
           }
 
           if (data.databases.notes) {
             await clearDB('notes')
-            for (const note of data.databases.notes) {
-              await updateInDB('notes', note)
-            }
+            await Promise.all(
+              data.databases.notes.map((note) => updateInDB('notes', note))
+            )
           }
 
           if (data.databases.habits) {
             await clearDB('habits')
-            for (const habit of data.databases.habits) {
-              await updateInDB('habits', habit)
-            }
+            await Promise.all(
+              data.databases.habits.map((habit) => updateInDB('habits', habit))
+            )
           }
         }
 
