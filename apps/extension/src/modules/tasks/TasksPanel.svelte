@@ -26,13 +26,13 @@
   let isInitializing = $state(true)
 
   async function triggerAuthFlow() {
-    isAuthenticated = await activeController.auth.authenticate()
+    isAuthenticated = await activeController.authenticate()
   }
 
   $effect(() => {
     isInitializing = true
     activeController.initialize().then(() => {
-      activeController.auth.isAuthenticated().then((auth) => {
+      activeController.isAuthenticated().then((auth) => {
         isAuthenticated = auth
         isInitializing = false
       })

@@ -52,6 +52,6 @@
   {#if children}
     {@render children()}
   {:else}
-    {authenticated ? `Sign out` : `Sign in with ${capitalize(provider)}`}
+    {authenticated ? `Revoke Connection` : `Sign in with ${capitalize(provider)}`}
   {/if}
 </Button>

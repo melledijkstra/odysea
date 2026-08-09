@@ -25,23 +25,16 @@ export class GoogleAuthProvider extends GoogleAuthConfig {
     return settingsStore.apiKeys.google || ''
   }
 
-  scopes = manifest.oauth2.scopes.filter(
-    (scope) => !scope.includes('googlehealth')
-  )
-}
+  scopes = ['profile', 'email', 'openid', 'https://www.googleapis.com/auth/userinfo.profile']
 
-export class GoogleHealthAuthProvider extends GoogleAuthConfig {
-  get clientId() {
-    return settingsStore.apiKeys.google || ''
+  extraParams = {
+    include_granted_scopes: 'true',
+    access_type: 'offline',
+    prompt: 'consent',
   }
-
-  scopes = [
-    'profile',
-    'email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-    'https://www.googleapis.com/auth/googlehealth.sleep.readonly',
-  ]
 }
+
+
 
 export class SpotifyAuthProvider extends SpotifyAuthConfig {
   get clientId() {

@@ -19,6 +19,8 @@ export type TaskControllerInterface = {
   ) => Promise<boolean>
   deleteTask: (taskId: string, taskListId?: string) => Promise<boolean>
   updateTask: (task: Task, taskListId?: string) => Promise<boolean>
+  authenticate: () => Promise<boolean>
+  isAuthenticated: () => Promise<boolean>
 }
 
 export class GoogleTasksController implements TaskControllerInterface, ILogger {
@@ -38,9 +40,19 @@ export class GoogleTasksController implements TaskControllerInterface, ILogger {
     const success = await this.api.deleteTask(taskId, taskListId)
     return success
   }
+  private readonly tasksScope = 'https://www.googleapis.com/auth/tasks'
+
+  async authenticate(): Promise<boolean> {
+    return await this.auth.authenticate([this.tasksScope])
+  }
+
+  async isAuthenticated(): Promise<boolean> {
+    const token = await this.auth.getAuthToken(false, [this.tasksScope])
+    return !!token
+  }
 
   async initialize() {
-    await this.auth.getAuthToken(false)
+    await this.isAuthenticated()
   }
 
   async getTaskLists(): Promise<TaskList[]> {

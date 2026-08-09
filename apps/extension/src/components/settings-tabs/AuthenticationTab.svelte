@@ -28,6 +28,24 @@
     github: false,
   })
 
+  const grantedScopes = $state<Record<OauthProvider, string[]>>({
+    google: [],
+    spotify: [],
+    github: [],
+  })
+
+  function formatScope(scope: string): string {
+    if (scope === 'https://www.googleapis.com/auth/tasks') return 'Tasks'
+    if (scope === 'https://www.googleapis.com/auth/googlehealth.sleep.readonly') return 'Health (Sleep)'
+    if (scope === 'https://www.googleapis.com/auth/photoslibrary.readonly') return 'Photos'
+    if (scope === 'https://www.googleapis.com/auth/userinfo.profile') return 'Profile'
+    if (scope.startsWith('https://')) {
+      const parts = scope.split('/')
+      return parts[parts.length - 1]
+    }
+    return scope
+  }
+
   function handleStorageChange(
     changes: Record<string, browser.Storage.StorageChange>
   ) {
@@ -36,6 +54,13 @@
       const storageKey = clients[provider].storageKey
       if (changes[storageKey]) {
         authState[provider] = !!changes[storageKey].newValue
+        if (authState[provider]) {
+          clients[provider].getGrantedScopes().then(scopes => {
+            grantedScopes[provider] = scopes
+          })
+        } else {
+          grantedScopes[provider] = []
+        }
       }
     }
   }
@@ -50,9 +75,15 @@
 
   async function retrieveAuthState() {
     logger.log('Retrieving authentication state from all providers...')
-    authState.google = await clients.google.isAuthenticated()
-    authState.spotify = await clients.spotify.isAuthenticated()
-    authState.github = await clients.github.isAuthenticated()
+    for (const key of Object.keys(clients)) {
+      const provider = key as OauthProvider
+      authState[provider] = await clients[provider].isAuthenticated()
+      if (authState[provider]) {
+        grantedScopes[provider] = await clients[provider].getGrantedScopes()
+      } else {
+        grantedScopes[provider] = []
+      }
+    }
   }
 
   async function authenticate(provider: OauthProvider) {
@@ -104,41 +135,36 @@
     <Spinner class="text-gray-400" />
   </div>
 {:then}
-  <div class="flex flex-col gap-3">
-    <p class="text-sm">
-      <strong>Google:</strong>
-      <span class="text-gray-400">{authState.google}</span>
-      <AuthButton
-        class="mt-2"
-        authenticated={authState.google}
-        provider="google"
-        onclick={() =>
-          authState.google ? deauthenticate('google') : authenticate('google')}
-      />
-    </p>
-    <p class="text-sm">
-      <strong>Spotify:</strong>
-      <span class="text-gray-400">{authState.spotify}</span>
-      <AuthButton
-        class="mt-2"
-        authenticated={authState.spotify}
-        provider="spotify"
-        onclick={() =>
-          authState.spotify
-            ? deauthenticate('spotify')
-            : authenticate('spotify')}
-      />
-    </p>
-    <p class="text-sm">
-      <strong>GitHub:</strong>
-      <span class="text-gray-400">{authState.github}</span>
-      <AuthButton
-        class="mt-2"
-        authenticated={authState.github}
-        provider="github"
-        onclick={() =>
-          authState.github ? deauthenticate('github') : authenticate('github')}
-      />
-    </p>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {#each Object.keys(clients) as key}
+      {@const provider = key as OauthProvider}
+      <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <strong class="capitalize">{provider}</strong>
+            <span class="text-xs px-2 py-1 rounded-full font-medium {authState[provider] ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}">
+              {authState[provider] ? 'Connected' : 'Disconnected'}
+            </span>
+          </div>
+          {#if authState[provider] && grantedScopes[provider].length > 0}
+            <div class="mb-4">
+              <p class="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold">Granted Permissions</p>
+              <ul class="text-sm list-disc list-inside text-gray-700 dark:text-gray-300">
+                {#each grantedScopes[provider] as scope}
+                  <li>{formatScope(scope)}</li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+        </div>
+        <AuthButton
+          class="w-full mt-4"
+          authenticated={authState[provider]}
+          provider={provider}
+          onclick={() =>
+            authState[provider] ? deauthenticate(provider) : authenticate(provider)}
+        />
+      </div>
+    {/each}
   </div>
 {/await}
