@@ -22,7 +22,6 @@
   import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
   import { dndzone, type DndEvent } from 'svelte-dnd-action'
-  import { flip } from 'svelte/animate'
   import { untrack } from 'svelte'
 
   type FormType = 'countdown' | 'worldclock' | 'sleep' | 'counter'
@@ -163,7 +162,6 @@
           >
             {#each items as item (item.id)}
               <div
-                animate:flip={{ duration: 300 }}
                 class="flex flex-row items-center justify-between gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group/item"
               >
                 <div

@@ -13,6 +13,6 @@
   }
 </script>
 
-<PopPanel class="overflow-auto">
+<PopPanel>
   <NotesPanelContent notes={notes.items} {onSubmitNote} />
 </PopPanel>

@@ -24,8 +24,8 @@
     </Tooltip.Trigger>
     <Tooltip.Portal>
       <Tooltip.Content
-        class="z-10 bg-black/50 text-white text-center py-1 px-2 rounded-md"
-        sideOffset={4}
+        class="bg-black/50 text-white text-center py-1 px-2 rounded-md"
+        sideOffset={8}
       >
         <Tooltip.Arrow class="text-black/50" />
         {#if children}

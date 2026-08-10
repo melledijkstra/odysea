@@ -28,5 +28,7 @@
   >
     <Icon path={mdiSpotify} size={36} />
   </Popover.Trigger>
-  <SpotifyPanel playbackState={MPState.playback} {controller} />
+  <Popover.Portal>
+    <SpotifyPanel playbackState={MPState.playback} {controller} />
+  </Popover.Portal>
 </Popover.Root>

@@ -15,7 +15,9 @@
   >
     <Icon path={mdiTuneVertical} size={25} />
   </Popover.Trigger>
-  <PopPanel panelProps={{ nopadding: true }} class="w-[550px] h-80">
-    <SettingsMenu />
-  </PopPanel>
+  <Popover.Portal>
+    <PopPanel panelProps={{ size: 'large', nopadding: true }}>
+      <SettingsMenu />
+    </PopPanel>
+  </Popover.Portal>
 </Popover.Root>

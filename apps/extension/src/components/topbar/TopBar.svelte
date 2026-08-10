@@ -7,6 +7,7 @@
   import Account from './Account.svelte'
   import Metrics from './MetricsBar.svelte'
   import MenuButton from '@melledijkstra/ui/svelte/MenuButton.svelte'
+  import { spotifyState } from '@/modules/spotify/spotify.state.svelte'
 </script>
 
 {#snippet module(moduleId: ModuleID)}
@@ -32,6 +33,7 @@
     <MenuButton
       onclick={() => switchAppMode('default')}
       tooltip="Home"
+      tooltipDisabled={spotifyState.isPanelOpen}
       mdiIcon={mdiHomeOutline}
     />
     {@render module('focus')}

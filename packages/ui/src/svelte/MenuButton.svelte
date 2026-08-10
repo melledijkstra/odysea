@@ -6,13 +6,19 @@
   export type MenuButtonProps = {
     mdiIcon: string
     tooltip?: string
+    tooltipDisabled?: boolean
   } & TooltipType.TriggerProps
 
-  const { mdiIcon, tooltip, ...triggerProps }: MenuButtonProps = $props()
+  const {
+    mdiIcon,
+    tooltip,
+    tooltipDisabled,
+    ...triggerProps
+  }: MenuButtonProps = $props()
 </script>
 
 <Tooltip
-  disabled={!tooltip}
+  disabled={!tooltip || tooltipDisabled}
   triggerProps={{
     class: [
       'text-white/70 hover:text-white',

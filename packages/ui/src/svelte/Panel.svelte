@@ -20,7 +20,7 @@
   {...props}
   class={[
     'flex flex-col',
-    'rounded-xl shadow-md backdrop-blur-xs overflow-y-auto',
+    'transition-all rounded-xl shadow-md backdrop-blur-xs overflow-y-auto scrollbar',
     'z-40',
     size === 'small' && 'w-75 max-h-75',
     size === 'medium' && 'w-125 h-100',

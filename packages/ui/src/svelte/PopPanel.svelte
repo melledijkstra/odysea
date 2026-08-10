@@ -9,18 +9,29 @@
     panelProps?: Omit<PanelProps, 'children'>
   } & Popover.ContentProps
 
-  const { children, panelProps, ...props }: PopPanelProps = $props()
+  const {
+    children,
+    panelProps,
+    class: contentClass,
+    ...props
+  }: PopPanelProps = $props()
 </script>
 
-<Popover.Content sideOffset={8} collisionPadding={8} {...props}>
-  {#snippet child({ wrapperProps, props: contentProps, open })}
-    {#if open}
-      <div {...wrapperProps}>
-        <Popover.Arrow class={['dark:text-black/40 text-white/40']} />
-        <Panel {...panelProps} {...contentProps}>
-          {@render children()}
-        </Panel>
-      </div>
-    {/if}
-  {/snippet}
+<Popover.Content
+  forceMount
+  sideOffset={8}
+  collisionPadding={8}
+  class={[
+    contentClass,
+    'transition-all duration-200 ease-linear',
+    'data-[state=closed]:pointer-events-none',
+    'data-[state=closed]:opacity-0 data-[state=closed]:scale-98',
+    'data-[state=open]:opacity-100 data-[state=open]:scale-100',
+  ]}
+  {...props}
+>
+  <Popover.Arrow class={['dark:text-black/40 text-white/40']} />
+  <Panel {...panelProps}>
+    {@render children()}
+  </Panel>
 </Popover.Content>

@@ -10,7 +10,7 @@
 
   --shadow-center: 0 0 40px current-color;
 
-  --animate-fade-in: fadeIn 0.5s ease-in;
+  --animate-fade-in: fadeIn 0.2s ease-in;
   @keyframes fadeIn {
     0% {
       opacity: 0;
@@ -18,6 +18,26 @@
     100% {
       opacity: 1;
     }
+  }
+}
+
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    border-radius: var(--radius-xl);
+    background: #555;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: #b2b2b2;
+    border-radius: var(--radius-xl);
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #e9e9e9;
   }
 }
 

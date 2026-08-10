@@ -47,7 +47,7 @@
     size: 'large',
     nopadding: true,
   }}
-  class="flex flex-col"
+  class="flex flex-col z-10"
 >
   {#if !hasTabLock}
     <div class="flex flex-col gap-4 items-center justify-center h-full">
