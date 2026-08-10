@@ -18,15 +18,13 @@
 </script>
 
 <Popover.Content
-  forceMount
   sideOffset={8}
   collisionPadding={8}
   class={[
     contentClass,
-    'transition-all duration-200 ease-linear',
-    'data-[state=closed]:pointer-events-none',
-    'data-[state=closed]:opacity-0 data-[state=closed]:scale-98',
-    'data-[state=open]:opacity-100 data-[state=open]:scale-100',
+    'backdrop-blur-2xl z-20 rounded-xl',
+    'data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out',
+    'data-[state=open]:animate-duration-100 data-[state=closed]:animate-duration-100',
   ]}
   {...props}
 >

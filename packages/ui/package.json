@@ -27,7 +27,8 @@
   },
   "dependencies": {
     "@mdi/js": "catalog:",
-    "bits-ui": "catalog:"
+    "bits-ui": "catalog:",
+    "tailwind-animations": "catalog:"
   },
   "devDependencies": {
     "@melledijkstra/config": "workspace:*",
@@ -35,8 +36,8 @@
     "@storybook/svelte": "catalog:",
     "@storybook/svelte-vite": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
-    "@tsconfig/svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
+    "@tsconfig/svelte": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "eslint": "catalog:",

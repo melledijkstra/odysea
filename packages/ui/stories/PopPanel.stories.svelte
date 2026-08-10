@@ -6,6 +6,7 @@
   import Toggle from '@/svelte/Toggle.svelte'
   import { mdiInformation, mdiCog } from '@mdi/js'
   import Button from '@/svelte/Button.svelte'
+  import BitsUiPop from './BitsUiPop.svelte'
 
   const { Story } = defineMeta({
     title: 'Atoms/PopPanel',
@@ -82,5 +83,11 @@
         </div>
       </PopPanel>
     </Popover.Root>
+  {/snippet}
+</Story>
+
+<Story name="Bits UI">
+  {#snippet template()}
+    <BitsUiPop />
   {/snippet}
 </Story>

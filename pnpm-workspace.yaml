@@ -35,6 +35,7 @@ catalog:
   svelte: ^5.56.8
   svelte-check: ^4.7.4
   tailwindcss: ^4.3.3
+  tailwind-animations: ^1.0.2
   bits-ui: ^2.18.1
 
   # Linting & Formatting

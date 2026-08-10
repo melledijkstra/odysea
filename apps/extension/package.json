@@ -54,6 +54,7 @@
     "@tanstack/svelte-query-devtools": "^6.1.38",
     "bits-ui": "catalog:",
     "idb": "^8.0.3",
-    "svelte-dnd-action": "^0.9.77"
+    "svelte-dnd-action": "^0.9.77",
+    "tailwind-animations": "catalog:"
   }
 }
