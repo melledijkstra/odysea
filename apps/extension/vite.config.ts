@@ -43,9 +43,10 @@ const determinePlugins = (mode: string): PluginOption[] => {
   return plugins
 }
 
-const defaultConfig = defineConfig(({ mode }) => ({
+const viteConfig = defineConfig(({ mode }) => ({
   plugins: determinePlugins(mode),
   build: {
+    modulePreload: false,
     minify: mode === 'production',
     rollupOptions: {
       input: {
@@ -80,4 +81,4 @@ const defaultConfig = defineConfig(({ mode }) => ({
   }),
 }))
 
-export default defaultConfig
+export default viteConfig
