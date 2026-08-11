@@ -17,19 +17,21 @@
   }: PopPanelProps = $props()
 </script>
 
-<Popover.Content
-  sideOffset={8}
-  collisionPadding={8}
-  class={[
-    contentClass,
-    'backdrop-blur-2xl z-20 rounded-xl',
-    'data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out',
-    'data-[state=open]:animate-duration-100 data-[state=closed]:animate-duration-100',
-  ]}
-  {...props}
->
-  <Popover.Arrow class={['dark:text-black/40 text-white/40']} />
-  <Panel {...panelProps}>
-    {@render children()}
-  </Panel>
-</Popover.Content>
+<Popover.Portal>
+  <Popover.Content
+    sideOffset={8}
+    collisionPadding={8}
+    class={[
+      contentClass,
+      'backdrop-blur-xl z-20',
+      'data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out',
+      'data-[state=open]:animate-duration-100 data-[state=closed]:animate-duration-100',
+    ]}
+    {...props}
+  >
+    <Popover.Arrow class={['dark:text-black/40 text-white/40']} />
+    <Panel blur={false} {...panelProps}>
+      {@render children()}
+    </Panel>
+  </Popover.Content>
+</Popover.Portal>

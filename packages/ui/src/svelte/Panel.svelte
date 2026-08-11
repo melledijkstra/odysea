@@ -6,12 +6,14 @@
     children: Snippet
     nopadding?: boolean
     size?: 'small' | 'medium' | 'large'
+    blur?: boolean
   } & HTMLAttributes<HTMLDivElement>
 
   const {
     children,
     nopadding,
     size = 'medium',
+    blur = true,
     ...props
   }: PanelProps = $props()
 </script>
@@ -20,7 +22,8 @@
   {...props}
   class={[
     'flex flex-col',
-    'rounded-xl shadow-md backdrop-blur-xs overflow-y-auto scrollbar',
+    'rounded-xl shadow-md overflow-y-auto scrollbar',
+    blur && 'backdrop-blur-xl',
     'z-40',
     size === 'small' && 'w-75 max-h-75',
     size === 'medium' && 'w-125 h-100',

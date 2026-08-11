@@ -16,7 +16,7 @@
     displayUnit="C"
     location={weatherQuery.data.location}
   />
-{:else if weatherQuery.isPending}
+{:else if positionQuery.isPending || weatherQuery.isPending}
   <WeatherInfoSkeleton displayUnit="C" />
 {:else if weatherQuery?.isError}
   <IconButton icon={mdiCloudOff} onclick={() => weatherQuery.refetch()} />

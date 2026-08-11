@@ -10,7 +10,7 @@
 <footer
   class={[
     'flex flex-row justify-between content-end items-end p-6',
-    'bg-gradient-to-t from-gray-700/50 from-10% to-transparent',
+    'bg-linear-to-t from-gray-700/50 from-10% to-transparent',
   ]}
 >
   <!-- BOTTOM LEFT -->
