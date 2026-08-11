@@ -6,31 +6,36 @@
     googleAuthClient,
     spotifyAuthClient,
     githubAuthClient,
+    googleHealthAuthClient,
   } from '@/oauth2/clients'
   import Input from '@melledijkstra/ui/svelte/Input.svelte'
   import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
   import { onMount, onDestroy } from 'svelte'
   import browser from 'webextension-polyfill'
   import { Logger } from '@/logger'
+  import type { AuthClient } from '@melledijkstra/extension'
 
   const logger = new Logger('AuthenticationTab')
 
-  const clients = {
+  const clients: Record<OauthProvider, AuthClient> = {
     google: googleAuthClient,
     spotify: spotifyAuthClient,
     github: githubAuthClient,
+    'google-health': googleHealthAuthClient,
   } as const
 
   const authState = $state({
     google: false,
     spotify: false,
     github: false,
+    'google-health': false,
   })
 
   const grantedScopes = $state<Record<OauthProvider, string[]>>({
     google: [],
     spotify: [],
     github: [],
+    'google-health': [],
   })
 
   function handleStorageChange(
@@ -86,7 +91,7 @@
   }
 </script>
 
-<h1 class="text-xl mb-3">API Keys</h1>
+<h1 class="text-xl mb-3">Authentication Configurations</h1>
 <div class="flex flex-col gap-3 mb-6">
   <Input
     label="OpenWeather API Key"
@@ -121,58 +126,23 @@
   />
 </div>
 
-<h1 class="text-xl mb-3">Authentication</h1>
+<h1 class="text-xl mb-3">Authentication Status</h1>
 {#await retrieveAuthState()}
   <div class="flex p-4">
     <Spinner class="text-gray-400" />
   </div>
 {:then}
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    {#each Object.keys(clients) as key (key)}
-      {@const provider = key as OauthProvider}
-      <div
-        class="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg flex flex-col justify-between"
-      >
-        <div>
-          <div class="flex justify-between items-center mb-4">
-            <strong class="capitalize">{provider}</strong>
-            <span
-              class="text-xs px-2 py-1 rounded-full font-medium {authState[
-                provider
-              ]
-                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}"
-            >
-              {authState[provider] ? 'Connected' : 'Disconnected'}
-            </span>
-          </div>
-          {#if authState[provider] && grantedScopes[provider].length > 0}
-            <div class="mb-4">
-              <p
-                class="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold"
-              >
-                Granted Permissions
-              </p>
-              <ul
-                class="text-sm list-disc list-inside text-gray-700 dark:text-gray-300"
-              >
-                {#each grantedScopes[provider] as scope (scope)}
-                  <li>{scope}</li>
-                {/each}
-              </ul>
-            </div>
-          {/if}
-        </div>
-        <AuthButton
-          class="w-full mt-4"
-          authenticated={authState[provider]}
-          {provider}
-          onclick={() =>
-            authState[provider]
-              ? deauthenticate(provider)
-              : authenticate(provider)}
-        />
-      </div>
-    {/each}
-  </div>
+  {#each Object.keys(clients) as key (key)}
+    {@const provider = key as OauthProvider}
+    <AuthButton
+      title={grantedScopes[provider].length > 0
+        ? `Granted scopes: ${grantedScopes[provider].join(', ')}`
+        : 'No scopes granted'}
+      class="w-full mt-4"
+      authenticated={authState[provider]}
+      {provider}
+      onclick={() =>
+        authState[provider] ? deauthenticate(provider) : authenticate(provider)}
+    />
+  {/each}
 {/await}

@@ -4,7 +4,7 @@ export { Google, GitHub, OAuth2Client, Spotify }
 
 export type ArcticClient = Google | GitHub | Spotify | OAuth2Client
 
-export type OauthProvider = 'google' | 'spotify' | 'github'
+export type OauthProvider = 'google' | 'spotify' | 'github' | 'google-health'
 export interface AuthConfig {
   name: OauthProvider
   scopes: string[]
@@ -14,6 +14,7 @@ export interface AuthConfig {
   tokenEndpoint?: string
   extraParams?: Record<string, string>
   redirectPath?: string
+  skipServerRevoke?: boolean
 }
 
 export const createGoogleAuthConfig = (): AuthConfig => ({

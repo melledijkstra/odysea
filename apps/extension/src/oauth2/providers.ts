@@ -33,6 +33,26 @@ export const getGoogleAuthConfig = (): AuthConfig => ({
     access_type: 'offline',
     prompt: 'consent',
   },
+  skipServerRevoke: true,
+})
+
+export const getGoogleHealthAuthConfig = (): AuthConfig => ({
+  // google health uses the same client id and secret as google, but with different scopes
+  ...getGoogleAuthConfig(),
+  get clientId() {
+    return settingsStore.apiKeys.google_client_id || ''
+  },
+  get clientSecret() {
+    return settingsStore.apiKeys.google_client_secret || ''
+  },
+  name: 'google-health',
+  scopes: ['https://www.googleapis.com/auth/googlehealth.sleep.readonly'],
+  extraParams: {
+    include_granted_scopes: 'false',
+    access_type: 'offline',
+    prompt: 'consent',
+  },
+  skipServerRevoke: true,
 })
 
 export const getSpotifyAuthConfig = (): AuthConfig => ({

@@ -70,6 +70,7 @@ export class AuthClient {
   protected get _arcticClient(): ArcticClient {
     switch (this.provider.name) {
       case 'google':
+      case 'google-health':
         return new Google(
           this.provider.clientId,
           this.provider.clientSecret ?? '',
@@ -103,6 +104,7 @@ export class AuthClient {
   async isAuthenticated(): Promise<boolean> {
     try {
       const token = await this.getAuthToken()
+      this._logger.debug('isAuthenticated?', !!token)
       return !!token
     } catch {
       return false
@@ -121,7 +123,7 @@ export class AuthClient {
   async deauthenticate(): Promise<boolean> {
     this._logger.log('deauthenticating')
     const token = await this.getAuthTokenFromStorage()
-    if (token) {
+    if (token && !this.provider.skipServerRevoke) {
       await this.revokeAuthToken(token.access_token)
     }
     await this.removeAuthTokenFromStorage()
@@ -423,7 +425,12 @@ export class AuthClient {
       return
     }
 
-    this._logger.log('Generated Auth URL:', url.href)
+    this._logger.debug('Generated Auth URL:', url.href, {
+      provider: this.provider.name,
+      scopes: requestedScopes,
+      clientId: this.provider.clientId,
+      clientSecret: this.provider.clientSecret ? '***' : undefined,
+    })
 
     if (this._handler) {
       return this.handleRedirectFlow(url)

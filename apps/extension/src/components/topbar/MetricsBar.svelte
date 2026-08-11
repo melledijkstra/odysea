@@ -5,16 +5,20 @@
   import Countdown from '../atoms/metrics/Countdown.svelte'
   import { onMount } from 'svelte'
   import Sleep from '../atoms/metrics/Sleep.svelte'
-  import { googleAuthClient } from '@/oauth2/clients'
+  import { googleHealthAuthClient } from '@/oauth2/clients'
   import { GoogleHealthApiClient } from '@melledijkstra/api'
+  import { Toggle } from '@melledijkstra/ui/svelte'
+  import { addNotification } from '@/stores/notifications.svelte'
 
   const cache = new WebLocalStorage()
 
   const STORAGE_KEY = 'googlehealth::sleep_minutes'
 
-  let client = $state<GoogleHealthApiClient>()
+  const client = new GoogleHealthApiClient(googleHealthAuthClient)
 
-  let sleepMinutes = $state<number>() // Default to 8 hours in minutes
+  let authenticated = $state<boolean>(false)
+
+  let sleepMinutes = $state<number>()
 
   const metrics = $derived.by(() => {
     return trackers.allMetrics.filter((metric) => metric.pinned)
@@ -24,29 +28,48 @@
     'https://www.googleapis.com/auth/googlehealth.sleep.readonly'
 
   async function getSleepData() {
-    const grantedScopes = await googleAuthClient.getGrantedScopes()
-    if (!grantedScopes.includes(sleepScope)) {
-      console.log('No sleep scope granted')
+    if (!authenticated) {
       return
     }
 
-    if (!client) {
-      client = new GoogleHealthApiClient(googleAuthClient)
+    const grantedScopes = await googleHealthAuthClient.getGrantedScopes()
+    if (!grantedScopes.includes(sleepScope)) {
+      addNotification({
+        type: 'error',
+        message:
+          'You need to grant access to your Google Health sleep data to use this feature.',
+      })
+      return
     }
-    sleepMinutes = await client.getSleep()
-    await cache.set(STORAGE_KEY, sleepMinutes, 60 * 60 * 1000) // Cache for 1 hour
+
+    try {
+      sleepMinutes = await client.getSleep()
+      await cache.set(STORAGE_KEY, sleepMinutes, 60 * 60 * 1000) // Cache for 1 hour
+    } catch (error) {
+      console.error('Error fetching sleep data:', error)
+      addNotification({
+        type: 'error',
+        message: 'Failed to fetch sleep data from Google Health.',
+      })
+    }
   }
 
   async function authenticate() {
-    const tokenData = await googleAuthClient.getAuthToken(true, [sleepScope])
+    const tokenData = await googleHealthAuthClient.authenticate([sleepScope])
+
     if (tokenData) {
+      authenticated = true
       getSleepData()
+    } else {
+      authenticated = false
     }
   }
 
-  onMount(async () => {
-    if (!trackers.sleepEnabled) {
-      return
+  async function initSleepLogic() {
+    authenticated = await googleHealthAuthClient.isAuthenticated()
+
+    if (!authenticated) {
+      await cache.delete(STORAGE_KEY)
     }
 
     const cacheSleepMinutes = await cache.get<number>(STORAGE_KEY)
@@ -58,6 +81,12 @@
     }
 
     getSleepData()
+  }
+
+  onMount(() => {
+    if (trackers.sleepEnabled) {
+      initSleepLogic()
+    }
   })
 </script>
 
@@ -69,13 +98,22 @@
       {:else if metric.type === 'countdown'}
         <Countdown {metric} />
       {:else if metric.type === 'sleep'}
-        <Sleep
-          oncontextmenu={(e) => {
-            e.preventDefault()
-            authenticate()
-          }}
-          minutes={sleepMinutes}
-        />
+        {#if authenticated}
+          <Sleep minutes={sleepMinutes} />
+        {:else}
+          <div class="flex flex-col gap-1 items-center">
+            <img
+              src="/icons/google-health.svg"
+              class="w-[2em]"
+              alt="Google Health"
+            />
+            <Toggle
+              toggleSize="small"
+              bind:checked={authenticated}
+              onclick={authenticate}
+            />
+          </div>
+        {/if}
       {:else if metric.type === 'counter'}
         <div class="dark:text-white text-black rounded-lg text-right">
           <p class="text-base leading-none">{metric.value}</p>

@@ -85,6 +85,25 @@ describe('AuthClient', () => {
       expect(client.removeAuthTokenFromStorage).toHaveBeenCalled()
     })
 
+    it('should deauthenticate correctly when skipServerRevoke is true', async () => {
+      client.provider.skipServerRevoke = true
+      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce({
+        access_token: 'old-token',
+        expires_at: Date.now() + 10000,
+        refresh_token: 'old-refresh',
+      })
+      vi.spyOn(client, 'revokeAuthToken').mockResolvedValueOnce(undefined)
+      vi.spyOn(client, 'removeAuthTokenFromStorage').mockResolvedValueOnce(
+        undefined
+      )
+
+      const result = await client.deauthenticate()
+
+      expect(result).toBe(true)
+      expect(client.revokeAuthToken).not.toHaveBeenCalled()
+      expect(client.removeAuthTokenFromStorage).toHaveBeenCalled()
+    })
+
     it('getTokenFromStoreOrRefreshToken should refresh if token is expired', async () => {
       const mockStore = {
         access_token: 'expired-token',

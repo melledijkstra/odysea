@@ -1,5 +1,9 @@
+<script lang="ts">
+  let props = $props()
+</script>
+
 <svg
-  class="w-[1em] h-[1em] inline"
+  class={['w-[1em] h-[1em] inline', props.class]}
   fill="currentColor"
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 18 19"

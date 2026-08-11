@@ -8,6 +8,7 @@
   /* - Brands - */
   --color-spotify: #1db954;
   --color-google: #4285f4;
+  --color-google-health: #003f9e;
 
   --shadow-center: 0 0 40px current-color;
 }
@@ -20,6 +21,7 @@
   .scrollbar::-webkit-scrollbar-track {
     border-radius: var(--radius-xl);
     background: #555;
+    color: #2657a0;
   }
 
   .scrollbar::-webkit-scrollbar-thumb {

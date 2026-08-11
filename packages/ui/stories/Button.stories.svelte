@@ -9,3 +9,5 @@
 </script>
 
 <Story name="Default">Simple Button</Story>
+
+<Story name="Outline" args={{ outline: true }}>Outline Button</Story>

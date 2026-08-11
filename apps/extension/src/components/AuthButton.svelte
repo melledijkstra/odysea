@@ -20,6 +20,9 @@
     github: [
       'bg-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-hidden focus:ring-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700',
     ],
+    'google-health': [
+      'dark:bg-google-health dark:hover:bg-google-health/80 dark:focus:ring-zinc-600 dark:border-zinc-400',
+    ],
   }
 
   const {
@@ -51,6 +54,12 @@
     <IconSpotify />
   {:else if provider === 'github'}
     <IconGithub />
+  {:else if provider === 'google-health'}
+    <img
+      src="/icons/google-health.svg"
+      class="w-[1em] h-[1em] inline"
+      alt="Google Health"
+    />
   {/if}
   {#if children}
     {@render children()}
