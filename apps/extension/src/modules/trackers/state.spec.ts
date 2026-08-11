@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { Trackers, type AnyMetric } from './state.svelte'
+import { Trackers } from './state.svelte'
+import type { AnyMetric } from './types'
 
 describe('Trackers', () => {
   beforeEach(() => {

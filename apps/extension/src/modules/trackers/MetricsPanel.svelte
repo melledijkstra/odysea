@@ -14,21 +14,23 @@
   } from '@mdi/js'
   import CountdownForm from './countdown/Form.svelte'
   import WorldClockForm from './world-clocks/Form.svelte'
-  import Button from '@melledijkstra/ui/svelte/Button.svelte'
   import Countdown from '@/components/atoms/metrics/Countdown.svelte'
-  import { trackers, type AnyMetric } from './state.svelte'
   import Clock from '@/components/atoms/metrics/WorldClock.svelte'
+  import { trackers } from './state.svelte'
+  import type { AnyMetric } from './types'
   import { Popover } from 'bits-ui'
   import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
   import { dndzone, type DndEvent } from 'svelte-dnd-action'
   import { untrack } from 'svelte'
 
-  type FormType = 'countdown' | 'worldclock' | 'sleep' | 'counter'
-
-  let isOpen = $state(false)
+  type FormType = 'countdown' | 'worldclock' | 'counter'
 
   let currentForm = $state<FormType>()
+
+  let items = $state<AnyMetric[]>([])
+  let isDragging = $state(false)
+  let isOpen = $state(false)
 
   function showForm(formType: FormType) {
     currentForm = formType
@@ -38,13 +40,13 @@
     currentForm = undefined
   }
 
-  function addSleepTracker() {
-    trackers.setSleepEnabled(true)
-    backToMain()
+  function toggleSleepTracker() {
+    if (trackers.sleepEnabled) {
+      trackers.setSleepEnabled(false)
+    } else {
+      trackers.setSleepEnabled(true)
+    }
   }
-
-  let items = $state<AnyMetric[]>([])
-  let isDragging = $state(false)
 
   $effect(() => {
     const currentMetrics = trackers.allMetrics
@@ -55,14 +57,14 @@
     })
   })
 
-  function handleDndConsider(e: CustomEvent<DndEvent<AnyMetric>>) {
+  function handleDndConsider(dragEvent: CustomEvent<DndEvent<AnyMetric>>) {
     isDragging = true
-    items = e.detail.items as AnyMetric[]
+    items = dragEvent.detail.items as AnyMetric[]
   }
 
-  function handleDndFinalize(e: CustomEvent<DndEvent<AnyMetric>>) {
+  function handleDndFinalize(dragEvent: CustomEvent<DndEvent<AnyMetric>>) {
     isDragging = false
-    items = e.detail.items as AnyMetric[]
+    items = dragEvent.detail.items as AnyMetric[]
     trackers.setMetrics(items)
   }
 </script>
@@ -84,7 +86,7 @@
       <IconButton
         icon={mdiArrowLeft}
         size={20}
-        onclick={() => (currentForm = undefined)}
+        onclick={() => backToMain()}
         class="mb-2"
       />
     {/if}
@@ -103,7 +105,7 @@
             class="mb-2 text-primary group-hover:scale-110 transition-transform"
           />
           <span class="text-xs font-medium dark:text-white text-black"
-            >Countdown</span
+            >Date Countdown</span
           >
         </button>
         <button
@@ -133,8 +135,11 @@
           >
         </button>
         <button
-          onclick={() => showForm('sleep')}
-          class="flex flex-col items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 group"
+          onclick={toggleSleepTracker}
+          class={[
+            'flex flex-col items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border group',
+            trackers.sleepEnabled ? 'border-primary' : 'border-white/10',
+          ]}
         >
           <Icon
             path={mdiBedOutline}
@@ -226,11 +231,6 @@
       <h2 class="text-lg mb-3">Counters 🔢</h2>
       <!-- Placeholder for future counter form -->
       <p>Counter form not yet implemented.</p>
-    {:else if currentForm === 'sleep'}
-      <h2 class="text-lg mb-3">Sleep Tracker 🛏️</h2>
-      <Button onclick={addSleepTracker} class="w-full"
-        >Enable sleep tracker</Button
-      >
     {/if}
   </PopPanel>
 </Popover.Root>

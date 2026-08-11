@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { WorldClockMetric } from '@/modules/trackers/state.svelte'
+  import type { WorldClockMetric } from '@/modules/trackers/types'
   import { renderTimezone, repeatEvery } from '@melledijkstra/toolbox'
   import { onDestroy, onMount } from 'svelte'
   import { fade } from 'svelte/transition'

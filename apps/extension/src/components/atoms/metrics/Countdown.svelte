@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CountdownMetric } from '@/modules/trackers/state.svelte'
+  import type { CountdownMetric } from '@/modules/trackers/types'
   import { calculateRemainingDays } from '@melledijkstra/toolbox'
   import { fade } from 'svelte/transition'
 

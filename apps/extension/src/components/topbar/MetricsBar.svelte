@@ -20,7 +20,7 @@
 
   let sleepMinutes = $state<number>()
 
-  const metrics = $derived.by(() => {
+  const pinnedMetrics = $derived.by(() => {
     return trackers.allMetrics.filter((metric) => metric.pinned)
   })
 
@@ -88,11 +88,18 @@
       initSleepLogic()
     }
   })
+
+  $effect(() => {
+    // if sleep tracking is enabled, initialize the sleep logic
+    if (trackers.sleepEnabled) {
+      initSleepLogic()
+    }
+  })
 </script>
 
-{#if metrics.length > 0}
+{#if pinnedMetrics.length > 0}
   <div class="flex flex-row gap-5 items-center">
-    {#each metrics as metric (metric.id)}
+    {#each pinnedMetrics as metric (metric.id)}
       {#if metric.type === 'worldClock'}
         <Clock {metric} />
       {:else if metric.type === 'countdown'}
