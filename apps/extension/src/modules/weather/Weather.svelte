@@ -3,6 +3,7 @@
   import { mdiCloudOff } from '@mdi/js'
   import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
   import WeatherInfo from './WeatherInfo.svelte'
+  import WeatherInfoSkeleton from './WeatherInfoSkeleton.svelte'
 
   const positionQuery = usePositionQuery()
   const weatherQuery = useWeatherQuery(positionQuery)
@@ -15,6 +16,8 @@
     displayUnit="C"
     location={weatherQuery.data.location}
   />
+{:else if weatherQuery.isPending}
+  <WeatherInfoSkeleton displayUnit="C" />
 {:else if weatherQuery?.isError}
   <IconButton icon={mdiCloudOff} onclick={() => weatherQuery.refetch()} />
 {/if}
