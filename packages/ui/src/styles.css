@@ -40,9 +40,9 @@
     @apply z-50 rounded-lg border border-gray-200 bg-white py-2 shadow-md dark:border-gray-800 dark:bg-black/90;
   }
   .menu-group-heading {
-    @apply px-2 text-xs font-bold text-gray-500 dark:text-gray-400;
+    @apply px-2 text-sm font-bold text-gray-500 dark:text-gray-400;
   }
   .menu-item {
-    @apply cursor-pointer px-2 py-1 text-xs text-gray-900 select-none focus:bg-gray-100 dark:text-white dark:focus:bg-gray-800;
+    @apply cursor-pointer px-2 py-1 text-sm text-gray-900 select-none focus:bg-gray-100 dark:text-white dark:focus:bg-gray-800;
   }
 }

@@ -34,14 +34,14 @@
       <ContextMenu.Group class="flex flex-col gap-1">
         {#if heading}
           <ContextMenu.GroupHeading
-            class="dark:text-gray-400 text-xs font-bold px-2"
+            class="dark:text-gray-400 text-sm font-bold px-2"
             >{heading}</ContextMenu.GroupHeading
           >
         {/if}
         {#each items as item (item.label)}
           <ContextMenu.Item
             onSelect={() => item.onSelect(item.label)}
-            class="dark:text-white cursor-pointer focus:bg-gray-600 px-2 py-1 text-xs"
+            class="dark:text-white cursor-pointer focus:bg-gray-600 px-2 py-1 text-sm"
           >
             {item.label}
           </ContextMenu.Item>
