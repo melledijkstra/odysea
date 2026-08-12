@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { usePositionQuery, useWeatherQuery } from '@/api/weather'
+  import { useWeatherQuery } from '@/queries/weather'
+  import { usePositionQuery } from '@/queries/position'
   import { mdiCloudOff } from '@mdi/js'
   import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
   import WeatherInfo from './WeatherInfo.svelte'

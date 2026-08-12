@@ -9,6 +9,7 @@ declare global {
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      refetchOnWindowFocus: true,
       // General default config for extension data, can be overridden per query
       staleTime: 60 * 1000,
     },

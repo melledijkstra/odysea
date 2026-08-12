@@ -6,7 +6,7 @@ import { trimCache } from './background/image-cache'
 
 declare const self: ServiceWorkerGlobalScope
 
-export const logger = new Logger('background')
+export const bgLogger = new Logger('background')
 
 declare global {
   function r(): void
@@ -15,7 +15,7 @@ declare global {
 const services = []
 
 browser.runtime.onInstalled.addListener(({ reason }) => {
-  logger.log('Extension installed:', reason)
+  bgLogger.log('Extension installed:', reason)
   if (reason === 'install') {
     browser.notifications.create({
       type: 'basic',
@@ -28,7 +28,7 @@ browser.runtime.onInstalled.addListener(({ reason }) => {
 })
 
 browser.notifications.onClicked.addListener((notificationId) => {
-  logger.log('Notification clicked:', notificationId)
+  bgLogger.log('Notification clicked:', notificationId)
   browser.tabs.create({ url: '/index.html' })
 })
 
@@ -41,10 +41,10 @@ self.addEventListener('activate', (e) => {
   e.waitUntil(trimCache())
 })
 
-logger.log('Service worker activated')
-logger.log('Initializing services...')
+bgLogger.log('Service worker activated')
+bgLogger.log('Initializing services...')
 services.push(new FocusService())
-logger.log(
+bgLogger.log(
   `Services initialized: ${services.map((s) => s.constructor.name).join(', ')}`
 )
 

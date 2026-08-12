@@ -49,9 +49,7 @@
 </script>
 
 <Clock />
-{#if appState?.user}
-  <Welcome user={appState.user} {onUsernameChange} {onClearUsername} />
-{/if}
+<Welcome user={appState.user} {onUsernameChange} {onClearUsername} />
 
 <div class="mt-4 text-lg empty:h-7">
   {#if settingsStore.ui.showCurrentTask && currentTask}

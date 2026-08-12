@@ -6,3 +6,5 @@ export class Logger extends BaseLogger {
     super(name, disabled ?? !isDevelopment)
   }
 }
+
+export const logger = new Logger('$')

@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill'
 import type { BackgroundService } from '@/services/types'
-import { logger } from '@/background.entry'
+import { bgLogger } from '@/background.entry'
 import {
   getPomodoroState,
   pomodoroComplete,
@@ -38,7 +38,7 @@ export class FocusService implements BackgroundService {
   }
 
   initialize() {
-    logger.log('Pomodoro service initialized')
+    bgLogger.log('Pomodoro service initialized')
     this.wireEvents()
   }
 
@@ -69,7 +69,7 @@ export class FocusService implements BackgroundService {
   }
 
   onComplete() {
-    logger.log('Pomodoro completed in background service')
+    bgLogger.log('Pomodoro completed in background service')
     browserAction.setBadgeText({ text: null })
     browser.notifications.create('pomodoroDone', {
       type: 'basic',
@@ -87,8 +87,8 @@ export class FocusService implements BackgroundService {
   }
 
   startPomodoro() {
-    logger.log('Pomodoro started in background service')
-    logger.log(browser.action, browser.browserAction)
+    bgLogger.log('Pomodoro started in background service')
+    bgLogger.log(browser.action, browser.browserAction)
     browserAction.setBadgeText({
       text: this.timer.formatRemainingMinutes(),
     })
@@ -98,7 +98,7 @@ export class FocusService implements BackgroundService {
   }
 
   stopPomodoro() {
-    logger.log('Pomodoro stopped in background service')
+    bgLogger.log('Pomodoro stopped in background service')
     this.timer.stop()
     this.state.isRunning = false
     this.state.timeRemaining = this.state.duration
@@ -107,7 +107,7 @@ export class FocusService implements BackgroundService {
   }
 
   switchMode(mode: Mode) {
-    logger.log(`Pomodoro mode switched in background service: ${mode}`)
+    bgLogger.log(`Pomodoro mode switched in background service: ${mode}`)
     this.state.mode = mode
     const duration = mode === 'break' ? BREAK_DURATION : WORK_DURATION
     this.timer.setDuration(duration)

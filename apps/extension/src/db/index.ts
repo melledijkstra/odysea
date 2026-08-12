@@ -5,7 +5,7 @@ import type { Note } from './notes'
 import type { FocusSession } from './focus'
 import { Logger } from '@/logger'
 
-export const logger = new Logger('db')
+export const dbLogger = new Logger('db')
 
 export interface OdyseaExtensionDB extends DBSchema {
   habits: {

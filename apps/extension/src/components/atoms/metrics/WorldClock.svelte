@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { WorldClockMetric } from '@/modules/trackers/types'
+  import { onPageVisible } from '@/utils/visibility'
   import { renderTimezone, repeatEvery } from '@melledijkstra/toolbox'
   import { onDestroy, onMount } from 'svelte'
   import { fade } from 'svelte/transition'
@@ -18,6 +19,12 @@
 
   onDestroy(() => {
     cancelUpdater?.()
+  })
+
+  $effect(() => {
+    return onPageVisible(() => {
+      updateKey = Date.now()
+    })
   })
 </script>
 
