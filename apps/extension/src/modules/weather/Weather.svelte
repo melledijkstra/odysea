@@ -7,6 +7,9 @@
 
   const positionQuery = usePositionQuery()
   const weatherQuery = useWeatherQuery(positionQuery)
+
+  const isPending = $derived(positionQuery.isPending && weatherQuery.isPending)
+  const failed = $derived(positionQuery.isError || weatherQuery.isError)
 </script>
 
 {#if weatherQuery?.data}
@@ -16,8 +19,8 @@
     displayUnit="C"
     location={weatherQuery.data.location}
   />
-{:else if positionQuery.isPending || weatherQuery.isPending}
+{:else if isPending}
   <WeatherInfoSkeleton displayUnit="C" />
-{:else if weatherQuery?.isError}
+{:else if failed}
   <IconButton icon={mdiCloudOff} onclick={() => weatherQuery.refetch()} />
 {/if}

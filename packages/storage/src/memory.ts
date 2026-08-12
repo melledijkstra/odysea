@@ -38,6 +38,7 @@ export function withCache<T, A extends unknown[]>(
     // Attempt to get from cache
     const cachedData = await get<T>(cacheKey)
     if (cachedData !== undefined) {
+      globalMemoryCache.logger.debug(`cache hit for: ${cacheKey}`)
       return cachedData
     }
 
