@@ -1,0 +1,71 @@
+### Variables
+@client_id = {{$dotenv .env GOOGLE_CLIENT_ID_BROWSER}}
+@client_secret = {{$dotenv .env GOOGLE_CLIENT_SECRET_BROWSER}}
+@redirect_uri = https://kaeibbjbbioodhkpgclmhdhnoggcikhi.chromiumapp.org/google
+@auth_code = YOUR_AUTHORIZATION_CODE
+@refresh_token = YOUR_REFRESH_TOKEN
+@scopes = https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
+
+
+# ============================================================================
+# STEP 1: Authorize (Browser step)
+# Direct the user to this URL in a browser to generate the authorization code:
+#
+# https://accounts.google.com/o/oauth2/v2/auth?
+#   client_id={{client_id}}
+#   &redirect_uri={{redirect_uri}}
+#   &response_type=code
+#   &scope=https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email
+#   &access_type=offline
+#   &prompt=consent
+# ============================================================================
+GET https://accounts.google.com/o/oauth2/v2/auth
+    ?client_id={{client_id}}
+    &redirect_uri=https://kaeibbjbbioodhkpgclmhdhnoggcikhi.chromiumapp.org/google
+    &response_type=code
+    &scope=https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email
+    &access_type=offline
+    &prompt=consent
+
+# Result:
+# https://kaeibbjbbioodhkpgclmhdhnoggcikhi.chromiumapp.org/google?iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AXEQxIDLAk80s75LpIlfGIAJRUEd2pL7cCa9KAYdxpwfeVC8L5PVSHwKHnFD2feHDTRcvg&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent
+
+
+
+### STEP 2: Exchange Authorization Code for Access & Refresh Tokens
+# @name exchangeToken
+POST https://oauth2.googleapis.com/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{client_id}}
+&client_secret={{client_secret}}
+&code={{auth_code}}
+&grant_type=authorization_code
+&redirect_uri={{redirect_uri}}
+
+
+### STEP 3: Refresh an Access Token
+# @name refreshToken
+POST https://oauth2.googleapis.com/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{client_id}}
+&client_secret={{client_secret}}
+&refresh_token={{refresh_token}}
+&grant_type=refresh_token
+
+
+### Variable capture from exchangeToken request (or change to refreshToken)
+@access_token = {{exchangeToken.response.body.access_token}}
+
+
+### STEP 4: Call Protected API (Get User Info)
+GET https://www.googleapis.com/oauth2/v3/userinfo
+Authorization: Bearer {{access_token}}
+
+
+### STEP 5: Revoke Access/Refresh Token
+POST https://oauth2.googleapis.com/revoke
+Content-Type: application/x-www-form-urlencoded
+
+token={{access_token}}

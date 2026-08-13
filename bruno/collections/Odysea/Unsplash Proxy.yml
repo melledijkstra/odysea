@@ -1,0 +1,18 @@
+info:
+  name: Unsplash Proxy
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: '{{host}}/api/daily-image'
+  headers:
+    - name: X-Extension-Id
+      value: kaeibbjbbioodhkpgclmhdhnoggcikhi
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

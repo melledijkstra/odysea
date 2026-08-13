@@ -1,0 +1,12 @@
+opencollection: 1.0.0
+info:
+  name: 'odysea'
+  type: workspace
+
+collections:
+  - name: 'Odysea'
+    path: 'collections/Odysea'
+
+specs:
+
+docs: ''

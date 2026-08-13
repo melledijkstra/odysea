@@ -1,0 +1,10 @@
+
+@host = odysea.melledijkstra.deno.net
+
+### Odysea Serverless API
+GET https://{{host}}/
+
+
+### Unsplash Proxy Request
+GET https://{{host}}/api/daily-image
+X-Extension-Id: kaeibbjbbioodhkpgclmhdhnoggcikhi
