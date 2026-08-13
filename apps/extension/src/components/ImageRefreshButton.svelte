@@ -1,6 +1,6 @@
 <script lang="ts">
   import { unsplashClient } from '@/api/unsplash'
-  import { setBackgroundImage } from '@/stores/background.svelte'
+  import { background, setBackgroundImage } from '@/stores/background.svelte'
   import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
   import { mdiCameraRetakeOutline } from '@mdi/js'
   import { settingsStore } from '@/settings/index.svelte'
@@ -13,9 +13,17 @@
   const dailyImageCollections = $derived(settingsStore.ui.dailyImageCollections)
 
   async function refreshBackround() {
-    const url = await unsplashClient.refreshDailyImage()
-    if (url) {
-      setBackgroundImage(url)
+    try {
+      const url = await unsplashClient.refreshDailyImage()
+      if (url) {
+        await setBackgroundImage(url)
+      } else {
+        background.error = true
+        background.url = undefined
+      }
+    } catch {
+      background.error = true
+      background.url = undefined
     }
   }
 

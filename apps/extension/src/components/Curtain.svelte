@@ -1,15 +1,24 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { unsplashClient } from '@/api/unsplash'
-  import { setBackgroundImage } from '@/stores/background.svelte'
+  import { background, setBackgroundImage } from '@/stores/background.svelte'
 
   let loaded = $state(false)
 
   onMount(async () => {
-    const url = await unsplashClient.getDailyImage()
+    try {
+      const url = await unsplashClient.getDailyImage()
 
-    if (url) {
-      await setBackgroundImage(url)
+      if (url) {
+        await setBackgroundImage(url)
+      } else {
+        background.error = true
+        background.url = undefined
+      }
+    } catch {
+      background.error = true
+      background.url = undefined
+    } finally {
       loaded = true
     }
   })

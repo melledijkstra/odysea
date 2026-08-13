@@ -14,11 +14,21 @@ function fetchImage(src: string): Promise<string> {
   })
 }
 
-export const background = $state<{ url: string | undefined }>({
+export const background = $state<{
+  url: string | undefined
+  error: boolean
+}>({
   url: undefined,
+  error: false,
 })
 
 export async function setBackgroundImage(url: string) {
-  const src = await fetchImage(url)
-  background.url = src
+  try {
+    const src = await fetchImage(url)
+    background.url = src
+    background.error = false
+  } catch {
+    background.url = undefined
+    background.error = true
+  }
 }

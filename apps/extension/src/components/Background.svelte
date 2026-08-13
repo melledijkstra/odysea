@@ -5,6 +5,12 @@
   const url = $derived(background.url)
 </script>
 
+<!-- Fallback Gradient Background -->
+<div
+  class="fixed inset-0 -z-30 bg-linear-to-br from-amber-900 via-slate-900 to-indigo-800"
+  data-testid="background-gradient"
+></div>
+
 {#if url}
   {#key url}
     <div
