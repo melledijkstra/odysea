@@ -4,6 +4,7 @@
   import { renderTimezone, repeatEvery } from '@melledijkstra/toolbox'
   import { onDestroy, onMount } from 'svelte'
   import { fade } from 'svelte/transition'
+  import { Trackers } from './index'
 
   const { metric }: { metric: WorldClockMetric } = $props()
 
@@ -28,9 +29,11 @@
   })
 </script>
 
-<div transition:fade class="dark:text-white text-black">
-  {#key updateKey}
-    <p class="text-base truncate">{renderTimezone(metric.timeZone)}</p>
-  {/key}
-  <p class="text-xs truncate leading-tight">{metric.name}</p>
+<div transition:fade>
+  <Trackers.Root>
+    {#key updateKey}
+      <Trackers.Metric>{renderTimezone(metric.timeZone)}</Trackers.Metric>
+    {/key}
+    <Trackers.Title>{metric.name}</Trackers.Title>
+  </Trackers.Root>
 </div>
