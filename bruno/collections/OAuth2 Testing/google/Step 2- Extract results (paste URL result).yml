@@ -1,0 +1,70 @@
+info:
+  name: 'Step 2: Extract results (paste URL result)'
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: https://kaeibbjbbioodhkpgclmhdhnoggcikhi.chromiumapp.org/google?iss=https://accounts.google.com&code=4/0AXEQxIBv4neREd8hg7_HjHhpZ_8MbGefIQ6BvY0os9MHqYT01nmBjfvZZ-DXQRehUu0X-Q&scope=email%20profile%20https://www.googleapis.com/auth/drive.metadata.readonly%20https://www.googleapis.com/auth/calendar.readonly%20https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email%20openid%20https://www.googleapis.com/auth/googlehealth.sleep.readonly%20https://www.googleapis.com/auth/tasks&authuser=0&prompt=consent
+  params:
+    - name: iss
+      value: https://accounts.google.com
+      type: query
+    - name: code
+      value: 4/0AXEQxIBv4neREd8hg7_HjHhpZ_8MbGefIQ6BvY0os9MHqYT01nmBjfvZZ-DXQRehUu0X-Q
+      type: query
+    - name: scope
+      value: email%20profile%20https://www.googleapis.com/auth/drive.metadata.readonly%20https://www.googleapis.com/auth/calendar.readonly%20https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email%20openid%20https://www.googleapis.com/auth/googlehealth.sleep.readonly%20https://www.googleapis.com/auth/tasks
+      type: query
+    - name: authuser
+      value: '0'
+      type: query
+    - name: prompt
+      value: consent
+      type: query
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        const queryString = req.getQueryString();
+        const params = {};
+
+        if (queryString) {
+          queryString.split('&').forEach(pair => {
+            const [key, value] = pair.split('=');
+            if (key) {
+              params[decodeURIComponent(key)] = value ? decodeURIComponent(value) : '';
+            }
+          });
+        }
+
+        // Access the resulting object
+        console.log(params);
+
+        const acceptedScopes = params['scope'].split('+');
+        console.log('Accepted scopes', acceptedScopes);
+
+        if (params['code']) {
+          bru.setVar('auth_code', params['code'])
+          console.log('✅ Auth code received and set in variables')
+        } else {
+          console.log('NO AUTH CODE RECEIVED')
+          console.log('Check the pasted URL and the authentication flow')
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  ## Result URL Query Param Fields
+
+  - **client_id:** The client ID obtained from the Cloud Console Clients page.
+  - **client_secret:**	Optional The client secret obtained from the Cloud Console Clients page.
+  - **code:**	The authorization code returned from the initial request.
+  - **grant_type:** As defined in the OAuth 2.0 specification, this field's value must be set to authorization_code.
+  - **redirect_uri:**	One of the redirect URIs listed for your project in the Cloud Console Clients page for the given client_id.

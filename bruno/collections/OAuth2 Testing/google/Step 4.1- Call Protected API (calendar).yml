@@ -1,0 +1,18 @@
+info:
+  name: 'Step 4.1: Call Protected API (calendar)'
+  type: http
+  seq: 9
+
+http:
+  method: GET
+  url: https://www.googleapis.com/oauth2/v3/userinfo
+  headers:
+    - name: Authorization
+      value: Bearer {{access_token}}
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

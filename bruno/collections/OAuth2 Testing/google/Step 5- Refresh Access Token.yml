@@ -1,0 +1,62 @@
+info:
+  name: 'Step 5: Refresh Access Token'
+  type: http
+  seq: 10
+
+http:
+  method: POST
+  url: https://oauth2.googleapis.com/token?client_id={{process.env.GOOGLE_CLIENT_ID_BROWSER}}&client_secret={{process.env.GOOGLE_CLIENT_SECRET_BROWSER}}&grant_type=refresh_token&refresh_token={{process.env.REFRESH_TOKEN}}
+  params:
+    - name: client_id
+      value: '{{process.env.GOOGLE_CLIENT_ID_BROWSER}}'
+      type: query
+    - name: client_secret
+      value: '{{process.env.GOOGLE_CLIENT_SECRET_BROWSER}}'
+      type: query
+    - name: grant_type
+      value: refresh_token
+      type: query
+    - name: refresh_token
+      value: '{{process.env.REFRESH_TOKEN}}'
+      type: query
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        function fancyTimeFormat(duration) {
+          // Hours, minutes and seconds
+          const hrs = ~~(duration / 3600);
+          const mins = ~~((duration % 3600) / 60);
+          const secs = ~~duration % 60;
+
+          // Output like "1:01" or "4:03:59" or "123:03:59"
+          let ret = "";
+
+          if (hrs > 0) {
+            ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+          }
+
+          ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+          ret += "" + secs;
+
+          return ret;
+        }
+
+        const token = res.body.access_token
+
+        if (token) {
+          bru.setVar('access_token', res.body.access_token)
+          const expiresIn = res.body.expires_in;
+          console.log('✅ Access token (refresh) received and saved. Expires in: ', fancyTimeFormat(expiresIn))
+          console.log('Accepted scopes:', res.body.scope.split(' '))
+        } else {
+          console.log('🛑 No access token received in response')
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

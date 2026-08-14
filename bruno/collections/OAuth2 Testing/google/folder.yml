@@ -1,0 +1,13 @@
+info:
+  name: google
+  type: folder
+  seq: 1
+
+request:
+  auth: inherit
+
+docs:
+  content: |-
+    More information about Google's OAuth2 Flow can be found here:
+    https://developers.google.com/identity/protocols/oauth2/javascript-implicit-flow
+  type: text/markdown

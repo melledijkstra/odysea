@@ -30,8 +30,6 @@ GET https://accounts.google.com/o/oauth2/v2/auth
 # Result:
 # https://kaeibbjbbioodhkpgclmhdhnoggcikhi.chromiumapp.org/google?iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AXEQxIDLAk80s75LpIlfGIAJRUEd2pL7cCa9KAYdxpwfeVC8L5PVSHwKHnFD2feHDTRcvg&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent
 
-
-
 ### STEP 2: Exchange Authorization Code for Access & Refresh Tokens
 # @name exchangeToken
 POST https://oauth2.googleapis.com/token

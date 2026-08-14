@@ -6,6 +6,8 @@ info:
 collections:
   - name: 'Odysea'
     path: 'collections/Odysea'
+  - name: 'OAuth2 Testing'
+    path: 'collections/OAuth2 Testing'
 
 specs:
 
