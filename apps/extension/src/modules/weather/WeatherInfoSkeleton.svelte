@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Spinner } from '@melledijkstra/ui/svelte'
+  import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
 
   let { displayUnit }: { displayUnit?: 'C' | 'F' } = $props()
 
