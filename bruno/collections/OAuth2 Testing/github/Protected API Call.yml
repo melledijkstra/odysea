@@ -1,14 +1,14 @@
 info:
-  name: "Step 4.1: Call Protected API (calendar)"
+  name: Protected API Call
   type: http
-  seq: 9
+  seq: 4
 
 http:
   method: GET
-  url: https://www.googleapis.com/calendar/v3/calendars/primary
+  url: https://api.github.com/user
   headers:
     - name: Authorization
-      value: Bearer {{access_token}}
+      value: Bearer  {{access_token}}
   auth: inherit
 
 settings:

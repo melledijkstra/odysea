@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: https://oauth2.googleapis.com/token?client_id={{process.env.GOOGLE_CLIENT_ID_BROWSER}}&client_secret={{process.env.GOOGLE_CLIENT_SECRET_BROWSER}}&grant_type=refresh_token&refresh_token={{process.env.REFRESH_TOKEN}}
+  url: https://oauth2.googleapis.com/token?client_id={{process.env.GOOGLE_CLIENT_ID_BROWSER}}&client_secret={{process.env.GOOGLE_CLIENT_SECRET_BROWSER}}&grant_type=refresh_token&refresh_token={{process.env.GOOGLE_REFRESH_TOKEN}}
   params:
     - name: client_id
       value: '{{process.env.GOOGLE_CLIENT_ID_BROWSER}}'
@@ -17,7 +17,7 @@ http:
       value: refresh_token
       type: query
     - name: refresh_token
-      value: '{{process.env.REFRESH_TOKEN}}'
+      value: '{{process.env.GOOGLE_REFRESH_TOKEN}}'
       type: query
   auth: inherit
 

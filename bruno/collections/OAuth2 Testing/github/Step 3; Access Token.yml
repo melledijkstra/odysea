@@ -1,0 +1,76 @@
+info:
+  name: Step 3; Access Token
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: https://github.com/login/oauth/access_token?client_id={{process.env.GITHUB_CLIENT_ID}}&client_secret={{process.env.GITHUB_CLIENT_SECRET}}&code={{auth_code}}&redirect_uri={{redirectUrl}}
+  params:
+    - name: client_id
+      value: "{{process.env.GITHUB_CLIENT_ID}}"
+      type: query
+    - name: client_secret
+      value: "{{process.env.GITHUB_CLIENT_SECRET}}"
+      type: query
+    - name: code
+      value: "{{auth_code}}"
+      type: query
+    - name: redirect_uri
+      value: "{{redirectUrl}}"
+      type: query
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const params = {};
+
+        if (res.body) {
+          res.body.split('&').forEach(pair => {
+            const [key, value] = pair.split('=');
+            if (key) {
+              params[decodeURIComponent(key)] = value ? decodeURIComponent(value) : '';
+            }
+          });
+        }
+
+        function fancyTimeFormat(duration) {
+          // Hours, minutes and seconds
+          const hrs = ~~(duration / 3600);
+          const mins = ~~((duration % 3600) / 60);
+          const secs = ~~duration % 60;
+
+          // Output like "1:01" or "4:03:59" or "123:03:59"
+          let ret = "";
+
+          if (hrs > 0) {
+            ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+          }
+
+          ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+          ret += "" + secs;
+
+          return ret;
+        }
+
+        console.log(params)
+
+        const token = params.access_token
+
+        if (token) {
+          bru.setVar('access_token', token)
+          bru.setVar('refresh_token', params.refresh_token)
+          const expiresIn = params.expires_in;
+          console.log('✅ Access token received and saved. Expires in: ', fancyTimeFormat(expiresIn))
+          console.log('Accepted scopes:', params.scope.split(' '))
+        } else {
+          console.log('🛑 No access token received in response')
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
