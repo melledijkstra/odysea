@@ -5,7 +5,7 @@
     src,
     alt,
     class: className,
-    children
+    children,
   }: {
     src: string
     alt?: string

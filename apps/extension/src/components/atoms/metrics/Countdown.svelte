@@ -2,14 +2,14 @@
   import type { CountdownMetric } from '@/modules/trackers/types'
   import { calculateRemainingDays } from '@melledijkstra/toolbox'
   import { fade } from 'svelte/transition'
-  import { Trackers } from './index'
+  import { Tracker } from '@melledijkstra/ui/svelte'
 
   const { metric }: { metric: CountdownMetric } = $props()
 </script>
 
 <div transition:fade>
-  <Trackers.Root>
-    <Trackers.Metric>{calculateRemainingDays(metric.date)}d</Trackers.Metric>
-    <Trackers.Title>{metric.name}</Trackers.Title>
-  </Trackers.Root>
+  <Tracker.Root>
+    <Tracker.Metric>{calculateRemainingDays(metric.date)}d</Tracker.Metric>
+    <Tracker.Title>{metric.name}</Tracker.Title>
+  </Tracker.Root>
 </div>

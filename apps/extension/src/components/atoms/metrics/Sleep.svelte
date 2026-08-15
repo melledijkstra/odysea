@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements'
   import { fade } from 'svelte/transition'
-  import { Trackers } from './index'
+  import { Tracker } from '@melledijkstra/ui/svelte/tracker/index.ts'
 
   const {
     minutes,
@@ -29,8 +29,12 @@
 </script>
 
 <div transition:fade {...props}>
-  <Trackers.Root class={['text-right', props.class]}>
-    <Trackers.Metric>{formatted}</Trackers.Metric>
-    <Trackers.IconTitle src="/icons/google-health.svg" alt="Google Health" class="justify-end">Sleep</Trackers.IconTitle>
-  </Trackers.Root>
+  <Tracker.Root class={['text-right', props.class]}>
+    <Tracker.Metric>{formatted}</Tracker.Metric>
+    <Tracker.IconTitle
+      src="/icons/google-health.svg"
+      alt="Google Health"
+      class="justify-end">Sleep</Tracker.IconTitle
+    >
+  </Tracker.Root>
 </div>

@@ -7,7 +7,7 @@
   import Sleep from '../atoms/metrics/Sleep.svelte'
   import { googleHealthAuthClient } from '@/oauth2/clients'
   import { GoogleHealthApiClient } from '@melledijkstra/api'
-  import { Toggle } from '@melledijkstra/ui/svelte'
+  import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
   import { addNotification } from '@/stores/notifications.svelte'
 
   const cache = new WebLocalStorage()
