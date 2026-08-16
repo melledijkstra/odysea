@@ -13,6 +13,7 @@
     mdiDrag,
   } from '@mdi/js'
   import CountdownForm from './countdown/Form.svelte'
+  import CounterForm from './counter/Form.svelte'
   import WorldClockForm from './world-clocks/Form.svelte'
   import Countdown from '@/components/atoms/metrics/Countdown.svelte'
   import Clock from '@/components/atoms/metrics/WorldClock.svelte'
@@ -229,8 +230,7 @@
       <WorldClockForm onSubmitted={backToMain} />
     {:else if currentForm === 'counter'}
       <h2 class="text-lg mb-3">Counters 🔢</h2>
-      <!-- Placeholder for future counter form -->
-      <p>Counter form not yet implemented.</p>
+      <CounterForm onSubmitted={backToMain} />
     {/if}
   </PopPanel>
 </Popover.Root>

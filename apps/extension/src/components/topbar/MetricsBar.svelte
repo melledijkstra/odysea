@@ -3,6 +3,7 @@
   import { trackers } from '@/modules/trackers/state.svelte'
   import Clock from '@/components/atoms/metrics/WorldClock.svelte'
   import Countdown from '../atoms/metrics/Countdown.svelte'
+  import Counter from '../atoms/metrics/Counter.svelte'
   import { onMount } from 'svelte'
   import Sleep from '../atoms/metrics/Sleep.svelte'
   import { googleHealthAuthClient } from '@/oauth2/clients'
@@ -122,10 +123,7 @@
           </div>
         {/if}
       {:else if metric.type === 'counter'}
-        <div class="dark:text-white text-black rounded-lg text-right">
-          <p class="text-base leading-none">{metric.value}</p>
-          <p class="text-xs">{metric.name}</p>
-        </div>
+        <Counter {metric} />
       {/if}
     {/each}
   </div>
