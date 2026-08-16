@@ -1,4 +1,4 @@
-<script lang="ts" module>
+<script lang="ts">
   import type { Snippet } from 'svelte'
   import type { ClassValue } from 'svelte/elements'
 
@@ -6,10 +6,8 @@
     class?: ClassValue
     children?: Snippet
   }
-</script>
 
-<script lang="ts">
-  const { class: className, children }: TrackerProps = $props()
+  let { class: className, children }: TrackerProps = $props()
 </script>
 
 <div class={['dark:text-white text-black', className]}>
