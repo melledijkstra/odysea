@@ -1,23 +1,23 @@
 info:
-  name: 'Step 2: Extract results (paste URL result)'
+  name: "Step 2: Extract results (paste URL result)"
   type: http
-  seq: 6
+  seq: 7
 
 http:
   method: GET
-  url: https://kaeibbjbbioodhkpgclmhdhnoggcikhi.chromiumapp.org/google?iss=https://accounts.google.com&code=4/0AXEQxIBv4neREd8hg7_HjHhpZ_8MbGefIQ6BvY0os9MHqYT01nmBjfvZZ-DXQRehUu0X-Q&scope=email%20profile%20https://www.googleapis.com/auth/drive.metadata.readonly%20https://www.googleapis.com/auth/calendar.readonly%20https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email%20openid%20https://www.googleapis.com/auth/googlehealth.sleep.readonly%20https://www.googleapis.com/auth/tasks&authuser=0&prompt=consent
+  url: https://kaeibbjbbioodhkpgclmhdhnoggcikhi.chromiumapp.org/google?iss=https://accounts.google.com&code=4/0ATsMZqAOVv6r3a9W1uezB4HWMvjz1EVhmbYYeEMIK3FGtliemqxGRypB31YGDe8t7BNJaw&scope=email%20profile%20https://www.googleapis.com/auth/drive.metadata.readonly%20https://www.googleapis.com/auth/calendar.readonly%20https://www.googleapis.com/auth/googlehealth.sleep.readonly%20https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly%20https://www.googleapis.com/auth/tasks%20https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email%20openid&authuser=0&prompt=consent
   params:
     - name: iss
       value: https://accounts.google.com
       type: query
     - name: code
-      value: 4/0AXEQxIBv4neREd8hg7_HjHhpZ_8MbGefIQ6BvY0os9MHqYT01nmBjfvZZ-DXQRehUu0X-Q
+      value: 4/0ATsMZqAOVv6r3a9W1uezB4HWMvjz1EVhmbYYeEMIK3FGtliemqxGRypB31YGDe8t7BNJaw
       type: query
     - name: scope
-      value: email%20profile%20https://www.googleapis.com/auth/drive.metadata.readonly%20https://www.googleapis.com/auth/calendar.readonly%20https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email%20openid%20https://www.googleapis.com/auth/googlehealth.sleep.readonly%20https://www.googleapis.com/auth/tasks
+      value: email%20profile%20https://www.googleapis.com/auth/drive.metadata.readonly%20https://www.googleapis.com/auth/calendar.readonly%20https://www.googleapis.com/auth/googlehealth.sleep.readonly%20https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly%20https://www.googleapis.com/auth/tasks%20https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email%20openid
       type: query
     - name: authuser
-      value: '0'
+      value: "0"
       type: query
     - name: prompt
       value: consent
@@ -43,7 +43,7 @@ runtime:
         // Access the resulting object
         console.log(params);
 
-        const acceptedScopes = params['scope'].split('+');
+        const acceptedScopes = params['scope'].split(' ');
         console.log('Accepted scopes', acceptedScopes);
 
         if (params['code']) {

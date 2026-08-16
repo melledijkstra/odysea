@@ -14,6 +14,10 @@
   import browser from 'webextension-polyfill'
   import { Logger } from '@/logger'
   import type { AuthClient } from '@melledijkstra/extension'
+  import { getAuthContext } from '@/oauth2/auth.state.svelte'
+  import Card from '@melledijkstra/ui/svelte/Card.svelte'
+  import { scopeRegistry } from '@/oauth2/scope-registry'
+  import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
 
   const logger = new Logger('AuthenticationTab')
 
@@ -24,19 +28,7 @@
     'google-health': googleHealthAuthClient,
   } as const
 
-  const authState = $state({
-    google: false,
-    spotify: false,
-    github: false,
-    'google-health': false,
-  })
-
-  const grantedScopes = $state<Record<OauthProvider, string[]>>({
-    google: [],
-    spotify: [],
-    github: [],
-    'google-health': [],
-  })
+  const authState = getAuthContext()
 
   function handleStorageChange(
     changes: Record<string, browser.Storage.StorageChange>
@@ -45,13 +37,11 @@
       const provider = key as OauthProvider
       const storageKey = clients[provider].storageKey
       if (changes[storageKey]) {
-        authState[provider] = !!changes[storageKey].newValue
-        if (authState[provider]) {
+        authState.update(provider, !!changes[storageKey].newValue, [])
+        if (authState.providers[provider].isAuthenticated) {
           clients[provider].getGrantedScopes().then((scopes) => {
-            grantedScopes[provider] = scopes
+            authState.update(provider, true, scopes)
           })
-        } else {
-          grantedScopes[provider] = []
         }
       }
     }
@@ -67,28 +57,34 @@
 
   async function retrieveAuthState() {
     logger.log('Retrieving authentication state from all providers...')
-    for (const key of Object.keys(clients)) {
+    for (const key of Object.keys(authState.providers)) {
       const provider = key as OauthProvider
-      authState[provider] = await clients[provider].isAuthenticated()
-      if (authState[provider]) {
-        grantedScopes[provider] = await clients[provider].getGrantedScopes()
+      const isAuthenticated = await clients[provider].isAuthenticated()
+      if (isAuthenticated) {
+        const scopes = await clients[provider].getGrantedScopes()
+        authState.update(provider, true, scopes)
       } else {
-        grantedScopes[provider] = []
+        authState.deauthenticated(provider)
       }
     }
   }
 
+  const loadAuthState = retrieveAuthState()
+
   async function authenticate(provider: OauthProvider) {
     logger.log('Authenticating with', provider)
-    const token = await clients[provider].getAuthToken(true)
-    authState[provider] = !!token
+    const authToken = await clients[provider].getAuthToken(true)
+    const scopes = await clients[provider].getGrantedScopes()
+    authState.update(provider, !!authToken, scopes)
   }
 
   async function deauthenticate(provider: OauthProvider) {
     logger.log('Deauthenticating from', provider)
     await clients[provider].deauthenticate()
-    authState[provider] = false
+    authState.deauthenticated(provider)
   }
+
+  $inspect(authState.providers['google'].scopes)
 </script>
 
 <h1 class="text-xl mb-3">Authentication Configurations</h1>
@@ -127,22 +123,65 @@
 </div>
 
 <h1 class="text-xl mb-3">Authentication Status</h1>
-{#await retrieveAuthState()}
+{#await loadAuthState}
   <div class="flex p-4">
     <Spinner class="text-gray-400" />
   </div>
 {:then}
   {#each Object.keys(clients) as key (key)}
     {@const provider = key as OauthProvider}
-    <AuthButton
-      title={grantedScopes[provider].length > 0
-        ? `Granted scopes: ${grantedScopes[provider].join(', ')}`
-        : 'No scopes granted'}
-      class="w-full mt-4"
-      authenticated={authState[provider]}
-      {provider}
-      onclick={() =>
-        authState[provider] ? deauthenticate(provider) : authenticate(provider)}
-    />
+    {@const providerState = authState.providers[provider]}
+
+    {#if provider === 'google'}
+      <Card variant="auto">
+        <div class="flex flex-row justify-between">
+          <h2 class="text-lg">Google</h2>
+          <Toggle
+            bind:checked={providerState.isAuthenticated}
+            onclick={() =>
+              providerState.isAuthenticated
+                ? deauthenticate(provider)
+                : authenticate(provider)}
+          />
+        </div>
+        <div class="flex flex-row gap-3 my-2">
+          <!-- TODO: allow IconButton to provide custom icons, not just mdi -->
+          <!-- <IconButton icon={mdiListBox} /> -->
+          {#each Object.keys(scopeRegistry) as scopeKey (scopeKey)}
+            {@const key = scopeKey as keyof typeof scopeRegistry}
+            {@const scope = scopeRegistry[key]}
+            {@const hasScopes =
+              authState.providers.google.isAuthenticated &&
+              authState.hasScopes(provider, scope.scopes)}
+            <button
+              title={scope.scopes.join(', ')}
+              class={[
+                'size-10 p-1 rounded transition-colors hover:bg-gray-200/20 cursor-pointer',
+              ]}
+              onclick={() => googleAuthClient.authenticate(scope.scopes)}
+            >
+              <img
+                src={scope.icon}
+                alt={scopeKey}
+                class={[!hasScopes && 'grayscale']}
+              />
+            </button>
+          {/each}
+        </div>
+      </Card>
+    {:else}
+      <AuthButton
+        title={providerState.scopes.length > 0
+          ? `Granted scopes: ${providerState.scopes.join(', ')}`
+          : 'No scopes granted'}
+        class="w-full mt-4"
+        authenticated={providerState.isAuthenticated}
+        {provider}
+        onclick={() =>
+          providerState.isAuthenticated
+            ? deauthenticate(provider)
+            : authenticate(provider)}
+      />
+    {/if}
   {/each}
 {/await}

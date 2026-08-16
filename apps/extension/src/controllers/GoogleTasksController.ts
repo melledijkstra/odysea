@@ -5,6 +5,7 @@ import { AuthClient } from '@melledijkstra/extension'
 import { googleAuthClient } from '@/oauth2/clients'
 import { addNotification } from '@/stores/notifications.svelte'
 import type { Task, TaskList } from '@/interfaces/tasks'
+import { TASKS_SCOPE } from '@/oauth2/scope-registry'
 
 export type TaskControllerInterface = {
   canCreateTask: boolean
@@ -40,14 +41,13 @@ export class GoogleTasksController implements TaskControllerInterface, ILogger {
     const success = await this.api.deleteTask(taskId, taskListId)
     return success
   }
-  private readonly tasksScope = 'https://www.googleapis.com/auth/tasks'
 
   async authenticate(): Promise<boolean> {
-    return await this.auth.authenticate([this.tasksScope])
+    return await this.auth.authenticate([TASKS_SCOPE])
   }
 
   async isAuthenticated(): Promise<boolean> {
-    const token = await this.auth.getAuthToken(false, [this.tasksScope])
+    const token = await this.auth.getAuthToken(false, [TASKS_SCOPE])
     return !!token
   }
 

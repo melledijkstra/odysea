@@ -12,3 +12,10 @@ export const spotifyAuthClient = new AuthClient(getSpotifyAuthConfig())
 export const googleHealthAuthClient = new AuthClient(
   getGoogleHealthAuthConfig()
 )
+
+export const allAuthClients = [
+  githubAuthClient,
+  googleAuthClient,
+  spotifyAuthClient,
+  googleHealthAuthClient,
+]

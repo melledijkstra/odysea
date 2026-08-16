@@ -11,6 +11,13 @@
   import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools'
   import { QueryClientProvider } from '@tanstack/svelte-query'
   import { queryClient } from '@/queryClient'
+  import { AuthState, setAuthContext } from './oauth2/auth.state.svelte'
+
+  const authState = new AuthState()
+
+  authState.initialize()
+
+  setAuthContext(authState)
 </script>
 
 <svelte:head>

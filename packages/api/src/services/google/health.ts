@@ -1,7 +1,6 @@
 import type { AuthClient } from '@melledijkstra/auth'
 import { TokenBaseClient } from '../../tokenbaseclient'
 import { Logger } from '@melledijkstra/toolbox'
-
 import type { ReconcileDataPointsResponse } from '../../definitions/google'
 
 const BASE_URL = 'https://health.googleapis.com/v4'

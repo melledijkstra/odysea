@@ -2,11 +2,8 @@
   import TaskList from '@/components/atoms/tasks/TaskList.svelte'
   import ScrollArea from '@melledijkstra/ui/svelte/ScrollArea.svelte'
   import type { TaskControllerInterface } from '@/controllers/GoogleTasksController'
-  import {
-    createQuery,
-    createMutation,
-    useQueryClient,
-  } from '@tanstack/svelte-query'
+  import { createMutation, useQueryClient } from '@tanstack/svelte-query'
+  import { useTasksQuery, useTasksListQuery } from '@/queries/tasks'
   import type { Task } from '@/interfaces/tasks'
 
   export type TasksPanelContentProps = {
@@ -17,34 +14,20 @@
   const { controller, providerId }: TasksPanelContentProps = $props()
   const queryClient = useQueryClient()
 
-  let selectedTaskList = $state<string>('')
+  let defaultListId = $derived(controller.defaultListId)
+  let selectedTaskList = $state<string>(defaultListId)
   let newTaskTitle = $state('')
 
-  $effect(() => {
-    // Make sure we update when provider changes
-    if (providerId) {
-      selectedTaskList = controller.defaultListId
-    }
-  })
+  // $effect(() => {
+  //   // Make sure we update when provider changes
+  //   if (providerId) {
+  //     selectedTaskList = controller.defaultListId
+  //   }
+  // })
 
-  const taskListsQuery = createQuery(() => ({
-    queryKey: ['tasks', providerId, 'lists'],
-    queryFn: async () => {
-      const lists = await controller.getTaskLists()
-      if (lists.length > 0 && !selectedTaskList) {
-        selectedTaskList = controller.defaultListId
-      }
-      return lists
-    },
-    staleTime: 5 * 60 * 1000,
-  }))
+  const taskListsQuery = useTasksListQuery(providerId, controller)
 
-  const tasksQuery = createQuery(() => ({
-    queryKey: ['tasks', providerId, 'tasks', selectedTaskList],
-    queryFn: () => controller.getTasks(selectedTaskList),
-    enabled: !!selectedTaskList,
-    staleTime: 5 * 60 * 1000,
-  }))
+  const tasksQuery = useTasksQuery(providerId, controller, selectedTaskList)
 
   const createTaskMutation = createMutation(() => ({
     mutationFn: (title: string) =>

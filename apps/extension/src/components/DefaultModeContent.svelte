@@ -3,24 +3,22 @@
   import { storeUsername, clearUsername, retrieveUsername } from '@/browser'
   import Clock from '@/components/Clock.svelte'
   import Welcome from '@/components/Welcome.svelte'
-  import { googleAuthClient } from '@/oauth2/clients'
   import { settingsStore } from '@/settings/index.svelte'
-  import { GoogleTasksApiClient } from '@melledijkstra/api'
-  import { createQuery } from '@tanstack/svelte-query'
+  import { getAuthContext } from '@/oauth2/auth.state.svelte'
   import { onMount } from 'svelte'
+  import { useTasksQuery } from '@/queries/tasks'
+  import { GoogleTasksController } from '@/controllers/GoogleTasksController'
 
   const taskListId = '@default'
 
-  const tasksQuery = createQuery(() => ({
-    queryKey: ['tasks', 'google', 'tasks', taskListId],
-    queryFn: async () => {
-      const isAuthenticated = await googleAuthClient.isAuthenticated()
-      if (!isAuthenticated) return []
-      const client = new GoogleTasksApiClient(googleAuthClient)
-      return (await client.fetchTasks(taskListId)) ?? []
-    },
-    staleTime: 5 * 60 * 1000,
-  }))
+  const authState = getAuthContext()
+
+  const tasksQuery = useTasksQuery(
+    'google',
+    new GoogleTasksController(),
+    taskListId,
+    authState.providers.google.isAuthenticated
+  )
 
   const currentTask = $derived(
     tasksQuery.data?.find((task) => task.status === 'needsAction')

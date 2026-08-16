@@ -1,28 +1,45 @@
 info:
-  name: 'Step 5: Refresh Access Token'
+  name: "Step 5: Refresh Access Token"
   type: http
-  seq: 10
+  seq: 13
 
 http:
   method: POST
-  url: https://oauth2.googleapis.com/token?client_id={{process.env.GOOGLE_CLIENT_ID_BROWSER}}&client_secret={{process.env.GOOGLE_CLIENT_SECRET_BROWSER}}&grant_type=refresh_token&refresh_token={{process.env.GOOGLE_REFRESH_TOKEN}}
+  url: https://oauth2.googleapis.com/token?client_id={{process.env.GOOGLE_CLIENT_ID_BROWSER}}&client_secret={{process.env.GOOGLE_CLIENT_SECRET_BROWSER}}&grant_type=refresh_token&refresh_token={{refresh_token}}
   params:
     - name: client_id
-      value: '{{process.env.GOOGLE_CLIENT_ID_BROWSER}}'
+      value: "{{process.env.GOOGLE_CLIENT_ID_BROWSER}}"
       type: query
     - name: client_secret
-      value: '{{process.env.GOOGLE_CLIENT_SECRET_BROWSER}}'
+      value: "{{process.env.GOOGLE_CLIENT_SECRET_BROWSER}}"
       type: query
     - name: grant_type
       value: refresh_token
       type: query
     - name: refresh_token
-      value: '{{process.env.GOOGLE_REFRESH_TOKEN}}'
+      value: "{{refresh_token}}"
       type: query
   auth: inherit
 
 runtime:
   scripts:
+    - type: before-request
+      code: |-
+        const key = 'refresh_token'
+        const value = bru.getVar(key) ?? bru.getEnvVar(key);
+
+        if (value) {
+          console.log('⚠️ overriding with runtime refresh token')
+          const url = new URL(req.getUrl());
+          url.searchParams.set(key, value);
+          
+          // Fully decode every key and value to raw characters
+          const rawQuery = Array.from(url.searchParams.entries())
+            .map(([k, v]) => `${decodeURIComponent(k)}=${decodeURIComponent(v)}`)
+            .join('&');
+          
+          req.setUrl(`${url.origin}${url.pathname}${rawQuery ? '?' + rawQuery : ''}`);
+        }
     - type: after-response
       code: |-
         function fancyTimeFormat(duration) {

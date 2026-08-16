@@ -5,12 +5,18 @@
   import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import TasksPanelContent from './TasksPanelContent.svelte'
   import { addNotification } from '@/stores/notifications.svelte'
+  import { getAuthContext } from '@/oauth2/auth.state.svelte'
 
   type Provider = 'google' | 'github'
+
   const STORAGE_KEY = 'tasks::activeProvider'
   let activeProvider = $state<Provider>(
     (localStorage.getItem(STORAGE_KEY) as Provider) ?? 'google'
   )
+
+  const authState = getAuthContext()
+
+  const activeProviderState = $derived(authState.providers[activeProvider])
 
   $effect(() => {
     localStorage.setItem(STORAGE_KEY, activeProvider)
@@ -23,14 +29,14 @@
     activeProvider === 'google' ? googleController : githubController
   )
 
-  let isAuthenticated = $state(false)
   let isInitializing = $state(true)
   let isAuthenticating = $state(false)
 
   async function triggerAuthFlow() {
-    isAuthenticating = true
     try {
-      isAuthenticated = await activeController.authenticate()
+      const isAuthenticated = await activeController.authenticate()
+      const grantedScopes = await activeController.auth.getGrantedScopes()
+      authState.update(activeProvider, isAuthenticated, grantedScopes)
     } catch (e: unknown) {
       console.error('Authentication error:', e)
       const errorMessage = e instanceof Error ? e.message : 'Unknown error'
@@ -42,11 +48,18 @@
 
   $effect(() => {
     isInitializing = true
+    let isAuthenticated = false
     activeController.initialize().then(() => {
-      activeController.isAuthenticated().then((auth) => {
-        isAuthenticated = auth
-        isInitializing = false
-      })
+      activeController
+        .isAuthenticated()
+        .then((auth) => {
+          isAuthenticated = auth
+          return activeController.auth.getGrantedScopes()
+        })
+        .then((grantedScopes) => {
+          authState.update(activeProvider, isAuthenticated, grantedScopes)
+          isInitializing = false
+        })
     })
   })
 </script>
@@ -75,7 +88,7 @@
 
   {#if isInitializing}
     <p class="text-sm text-gray-400">Loading...</p>
-  {:else if isAuthenticated}
+  {:else if activeProviderState.isAuthenticated}
     <TasksPanelContent
       controller={activeController}
       providerId={activeProvider}

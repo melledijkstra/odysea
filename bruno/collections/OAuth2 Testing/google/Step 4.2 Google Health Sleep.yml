@@ -1,0 +1,24 @@
+info:
+  name: Step 4.2 Google Health Sleep
+  type: http
+  seq: 11
+
+http:
+  method: GET
+  url: https://health.googleapis.com/v4/users/me/dataTypes/sleep/dataPoints:reconcile?filter=sleep.interval.end_time+%3E%3D+%222026-08-15T18%3A26%3A05.665Z%22
+  headers:
+    - name: Authorization
+      value: Bearer {{access_token}}
+    - name: Accept
+      value: application/json
+  params:
+    - name: filter
+      value: sleep.interval.end_time+%3E%3D+%222026-08-15T18%3A26%3A05.665Z%22
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

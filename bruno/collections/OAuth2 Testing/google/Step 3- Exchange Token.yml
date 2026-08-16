@@ -1,26 +1,26 @@
 info:
-  name: 'Step 3: Exchange Token'
+  name: "Step 3: Exchange Token"
   type: http
-  seq: 7
+  seq: 8
 
 http:
   method: POST
   url: https://oauth2.googleapis.com/token?client_id={{process.env.GOOGLE_CLIENT_ID_BROWSER}}&client_secret={{process.env.GOOGLE_CLIENT_SECRET_BROWSER}}&code={{auth_code}}&grant_type=authorization_code&redirect_uri={{redirectUrl}}
   params:
     - name: client_id
-      value: '{{process.env.GOOGLE_CLIENT_ID_BROWSER}}'
+      value: "{{process.env.GOOGLE_CLIENT_ID_BROWSER}}"
       type: query
     - name: client_secret
-      value: '{{process.env.GOOGLE_CLIENT_SECRET_BROWSER}}'
+      value: "{{process.env.GOOGLE_CLIENT_SECRET_BROWSER}}"
       type: query
     - name: code
-      value: '{{auth_code}}'
+      value: "{{auth_code}}"
       type: query
     - name: grant_type
       value: authorization_code
       type: query
     - name: redirect_uri
-      value: '{{redirectUrl}}'
+      value: "{{redirectUrl}}"
       type: query
   auth: inherit
 

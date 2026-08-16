@@ -10,6 +10,8 @@
   import { GoogleHealthApiClient } from '@melledijkstra/api'
   import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
   import { addNotification } from '@/stores/notifications.svelte'
+  import { SLEEP_SCOPE } from '@/oauth2/scope-registry'
+  import { getAuthContext } from '@/oauth2/auth.state.svelte'
 
   const cache = new WebLocalStorage()
 
@@ -17,7 +19,11 @@
 
   const client = new GoogleHealthApiClient(googleHealthAuthClient)
 
-  let authenticated = $state<boolean>(false)
+  const authState = getAuthContext()
+
+  let authenticated = $derived(
+    authState.providers['google-health'].isAuthenticated
+  )
 
   let sleepMinutes = $state<number>()
 
@@ -25,16 +31,13 @@
     return trackers.allMetrics.filter((metric) => metric.pinned)
   })
 
-  const sleepScope =
-    'https://www.googleapis.com/auth/googlehealth.sleep.readonly'
-
   async function getSleepData() {
     if (!authenticated) {
       return
     }
 
     const grantedScopes = await googleHealthAuthClient.getGrantedScopes()
-    if (!grantedScopes.includes(sleepScope)) {
+    if (!grantedScopes.includes(SLEEP_SCOPE)) {
       addNotification({
         type: 'error',
         message:
@@ -56,19 +59,16 @@
   }
 
   async function authenticate() {
-    const tokenData = await googleHealthAuthClient.authenticate([sleepScope])
+    const tokenData = await googleHealthAuthClient.authenticate([SLEEP_SCOPE])
+    const grantedScopes = await googleHealthAuthClient.getGrantedScopes()
+    authState.update('google-health', !!tokenData, grantedScopes)
 
-    if (tokenData) {
-      authenticated = true
+    if (tokenData && grantedScopes.includes(SLEEP_SCOPE)) {
       getSleepData()
-    } else {
-      authenticated = false
     }
   }
 
   async function initSleepLogic() {
-    authenticated = await googleHealthAuthClient.isAuthenticated()
-
     if (!authenticated) {
       await cache.delete(STORAGE_KEY)
     }

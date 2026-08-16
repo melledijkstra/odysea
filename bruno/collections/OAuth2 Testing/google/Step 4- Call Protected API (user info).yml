@@ -1,7 +1,7 @@
 info:
-  name: 'Step 4: Call Protected API (user info)'
+  name: "Step 4: Call Protected API (user info)"
   type: http
-  seq: 8
+  seq: 9
 
 http:
   method: GET
