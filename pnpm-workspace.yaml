@@ -69,5 +69,5 @@ catalog:
   # Other (uncategorized)
   '@tsconfig/svelte': ^5.0.8
   'dotenv': ^17.4.2
-  typescript: ^6.0.3
+  typescript: ^7.0.2
   '@types/node': ^25.9.5
