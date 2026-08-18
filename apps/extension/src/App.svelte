@@ -15,16 +15,19 @@
 
   const authState = new AuthState()
 
-  authState.initialize()
-
   setAuthContext(authState)
+
+  const initPromise = Promise.allSettled([
+    settings.initialize(),
+    authState.initialize(),
+  ])
 </script>
 
 <svelte:head>
   <title>{appState.title}</title>
 </svelte:head>
 
-{#await settings.initialize() then}
+{#await initPromise then}
   <QueryClientProvider client={queryClient}>
     <SvelteQueryDevtools buttonPosition="top-right" />
     <ModulesInitializer />

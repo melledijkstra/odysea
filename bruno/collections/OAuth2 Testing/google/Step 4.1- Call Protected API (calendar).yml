@@ -1,5 +1,5 @@
 info:
-  name: "Step 4.1: Call Protected API (calendar)"
+  name: 'Step 4.1: Call Protected API (calendar)'
   type: http
   seq: 10
 

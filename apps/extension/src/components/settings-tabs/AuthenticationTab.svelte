@@ -83,8 +83,6 @@
     await clients[provider].deauthenticate()
     authState.deauthenticated(provider)
   }
-
-  $inspect(authState.providers['google'].scopes)
 </script>
 
 <h1 class="text-xl mb-3">Authentication Configurations</h1>
@@ -158,7 +156,8 @@
               class={[
                 'size-10 p-1 rounded transition-colors hover:bg-gray-200/20 cursor-pointer',
               ]}
-              onclick={() => googleAuthClient.authenticate(scope.scopes)}
+              onclick={() =>
+                !hasScopes && googleAuthClient.authenticate(scope.scopes)}
             >
               <img
                 src={scope.icon}

@@ -8,6 +8,8 @@ collections:
     path: 'collections/Odysea'
   - name: 'OAuth2 Testing'
     path: 'collections/OAuth2 Testing'
+  - name: 'Google'
+    path: 'collections/Google'
 
 specs:
 

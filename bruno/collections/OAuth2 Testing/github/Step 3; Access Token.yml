@@ -8,16 +8,16 @@ http:
   url: https://github.com/login/oauth/access_token?client_id={{process.env.GITHUB_CLIENT_ID}}&client_secret={{process.env.GITHUB_CLIENT_SECRET}}&code={{auth_code}}&redirect_uri={{redirectUrl}}
   params:
     - name: client_id
-      value: "{{process.env.GITHUB_CLIENT_ID}}"
+      value: '{{process.env.GITHUB_CLIENT_ID}}'
       type: query
     - name: client_secret
-      value: "{{process.env.GITHUB_CLIENT_SECRET}}"
+      value: '{{process.env.GITHUB_CLIENT_SECRET}}'
       type: query
     - name: code
-      value: "{{auth_code}}"
+      value: '{{auth_code}}'
       type: query
     - name: redirect_uri
-      value: "{{redirectUrl}}"
+      value: '{{redirectUrl}}'
       type: query
   auth: inherit
 

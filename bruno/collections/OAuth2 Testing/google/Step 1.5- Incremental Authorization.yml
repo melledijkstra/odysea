@@ -1,5 +1,5 @@
 info:
-  name: "Step 1.5: Incremental Authorization"
+  name: 'Step 1.5: Incremental Authorization'
   type: http
   seq: 5
 
@@ -8,11 +8,11 @@ http:
   url: https://accounts.google.com/o/oauth2/v2/auth?client_id={{process.env.GOOGLE_CLIENT_ID_BROWSER}}&redirect_uri={{redirectUrl}}&response_type=code&scope=https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/calendar.readonly&access_type=offline&prompt=consent&include_granted_scopes=true&login_hint={{process.env.USER_EMAIL}}
   params:
     - name: client_id
-      value: "{{process.env.GOOGLE_CLIENT_ID_BROWSER}}"
+      value: '{{process.env.GOOGLE_CLIENT_ID_BROWSER}}'
       type: query
       description: ID identifying your application
     - name: redirect_uri
-      value: "{{redirectUrl}}"
+      value: '{{redirectUrl}}'
       type: query
       description: |-
         Determines where the API server redirects the user after the user completes the authorization flow. The value must exactly match one of the authorized redirect URIs for the OAuth 2.0 client, which you configured in your client's Cloud Console Clients page. If this value doesn't match an authorized redirect URI for the provided client_id you will get a redirect_uri_mismatch error.
@@ -31,10 +31,10 @@ http:
       value: consent
       type: query
     - name: include_granted_scopes
-      value: "true"
+      value: 'true'
       type: query
     - name: login_hint
-      value: "{{process.env.USER_EMAIL}}"
+      value: '{{process.env.USER_EMAIL}}'
       type: query
   auth: inherit
 

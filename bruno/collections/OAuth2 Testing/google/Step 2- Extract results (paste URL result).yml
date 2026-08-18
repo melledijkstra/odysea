@@ -1,5 +1,5 @@
 info:
-  name: "Step 2: Extract results (paste URL result)"
+  name: 'Step 2: Extract results (paste URL result)'
   type: http
   seq: 7
 
@@ -17,7 +17,7 @@ http:
       value: email%20profile%20https://www.googleapis.com/auth/drive.metadata.readonly%20https://www.googleapis.com/auth/calendar.readonly%20https://www.googleapis.com/auth/googlehealth.sleep.readonly%20https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly%20https://www.googleapis.com/auth/tasks%20https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email%20openid
       type: query
     - name: authuser
-      value: "0"
+      value: '0'
       type: query
     - name: prompt
       value: consent

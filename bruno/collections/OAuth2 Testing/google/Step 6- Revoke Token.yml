@@ -1,5 +1,5 @@
 info:
-  name: "Step 6: Revoke Token"
+  name: 'Step 6: Revoke Token'
   type: http
   seq: 14
 
@@ -15,9 +15,9 @@ http:
     type: form-urlencoded
     data:
       - name: client_id
-        value: "{{process.env.GOOGLE_CLIENT_ID_BROWSER}}"
+        value: '{{process.env.GOOGLE_CLIENT_ID_BROWSER}}'
       - name: token
-        value: "{{access_token}}"
+        value: '{{access_token}}'
   auth: inherit
 
 runtime:

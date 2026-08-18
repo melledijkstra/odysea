@@ -36,7 +36,9 @@
   )
 </script>
 
-<label class={['inline-flex items-center cursor-pointer', parentClass]}>
+<label
+  class={['relative inline-flex items-center cursor-pointer', parentClass]}
+>
   <input type="checkbox" class="sr-only peer" name="" {...props} bind:checked />
   <div
     class={[

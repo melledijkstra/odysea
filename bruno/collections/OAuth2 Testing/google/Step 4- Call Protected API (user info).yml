@@ -1,5 +1,5 @@
 info:
-  name: "Step 4: Call Protected API (user info)"
+  name: 'Step 4: Call Protected API (user info)'
   type: http
   seq: 9
 
