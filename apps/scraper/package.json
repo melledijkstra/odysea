@@ -3,10 +3,11 @@
   "version": "0.0.1",
   "description": "Reusable web scraper skeleton using Crawlee",
   "type": "module",
-  "main": "src/main.ts",
+  "main": "src/scrapers/main.ts",
   "scripts": {
-    "start": "tsx src/main.ts",
-    "dev": "tsx watch src/main.ts",
+    "start": "tsx src/scrapers/main.ts",
+    "scrape:ss-fitness": "tsx src/scrapers/ss-fitness.ts",
+    "dev": "tsx watch src/scrapers/main.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },

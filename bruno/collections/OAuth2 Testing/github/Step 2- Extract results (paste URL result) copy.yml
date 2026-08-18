@@ -1,5 +1,5 @@
 info:
-  name: "Step 2: Extract results (paste URL result) copy"
+  name: 'Step 2: Extract results (paste URL result) copy'
   type: http
   seq: 2
 

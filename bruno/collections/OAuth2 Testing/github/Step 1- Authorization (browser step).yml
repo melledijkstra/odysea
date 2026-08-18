@@ -1,5 +1,5 @@
 info:
-  name: "Step 1: Authorization (browser step)"
+  name: 'Step 1: Authorization (browser step)'
   type: http
   seq: 1
 
@@ -8,23 +8,23 @@ http:
   url: https://github.com/login/oauth/authorize?client_id={{process.env.GITHUB_CLIENT_ID}}&redirect_uri={{redirectUrl}}&scope=repo&allow_signup=false
   params:
     - name: client_id
-      value: "{{process.env.GITHUB_CLIENT_ID}}"
+      value: '{{process.env.GITHUB_CLIENT_ID}}'
       type: query
     - name: redirect_uri
-      value: "{{redirectUrl}}"
+      value: '{{redirectUrl}}'
       type: query
     - name: login
-      value: ""
+      value: ''
       type: query
       disabled: true
     - name: scope
       value: repo
       type: query
     - name: allow_signup
-      value: "false"
+      value: 'false'
       type: query
     - name: prompt
-      value: ""
+      value: ''
       type: query
       disabled: true
   auth: inherit
