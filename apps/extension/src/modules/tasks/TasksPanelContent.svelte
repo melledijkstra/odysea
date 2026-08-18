@@ -14,20 +14,22 @@
   const { controller, providerId }: TasksPanelContentProps = $props()
   const queryClient = useQueryClient()
 
-  let defaultListId = $derived(controller.defaultListId)
-  let selectedTaskList = $state<string>(defaultListId)
+  let manualSelectedListId = $state<string | null>(null)
+  let selectedTaskList = $derived(
+    manualSelectedListId ?? controller.defaultListId ?? ''
+  )
   let newTaskTitle = $state('')
 
-  // $effect(() => {
-  //   // Make sure we update when provider changes
-  //   if (providerId) {
-  //     selectedTaskList = controller.defaultListId
-  //   }
-  // })
+  const taskListsQuery = useTasksListQuery(() => ({
+    providerId,
+    controller,
+  }))
 
-  const taskListsQuery = useTasksListQuery(providerId, controller)
-
-  const tasksQuery = useTasksQuery(providerId, controller, selectedTaskList)
+  const tasksQuery = useTasksQuery(() => ({
+    providerId,
+    controller,
+    taskListId: selectedTaskList,
+  }))
 
   const createTaskMutation = createMutation(() => ({
     mutationFn: (title: string) =>
@@ -69,7 +71,10 @@
   <select
     name="task-list-selector"
     class="w-full text-black dark:text-white text-lg bg-transparent border-none focus:outline-hidden"
-    bind:value={selectedTaskList}
+    value={selectedTaskList}
+    onchange={(e) => {
+      manualSelectedListId = e.currentTarget.value
+    }}
   >
     {#if taskListsQuery.data}
       {#each taskListsQuery.data as list, i (list.id)}

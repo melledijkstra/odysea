@@ -13,12 +13,12 @@
 
   const authState = getAuthContext()
 
-  const tasksQuery = useTasksQuery(
-    'google',
-    new GoogleTasksController(),
+  const tasksQuery = useTasksQuery(() => ({
+    providerId: 'google',
+    controller: new GoogleTasksController(),
     taskListId,
-    authState.providers.google.isAuthenticated
-  )
+    enabled: authState.providers.google.isAuthenticated,
+  }))
 
   const currentTask = $derived(
     tasksQuery.data?.find((task) => task.status === 'needsAction')
