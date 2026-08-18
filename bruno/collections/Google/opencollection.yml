@@ -7,12 +7,12 @@ config:
     inherit: true
     config:
       protocol: http
-      hostname: ''
-      port: ''
+      hostname: ""
+      port: ""
       auth:
-        username: ''
-        password: ''
-      bypassProxy: ''
+        username: ""
+        password: ""
+      bypassProxy: ""
 
 request:
   auth:
@@ -21,10 +21,10 @@ request:
     authorizationUrl: https://accounts.google.com/o/oauth2/v2/auth
     accessTokenUrl: https://oauth2.googleapis.com/token
     credentials:
-      clientId: '{{process.env.GOOGLE_CLIENT_ID}}'
-      clientSecret: '{{process.env.GOOGLE_CLIENT_SECRET}}'
+      clientId: "{{process.env.GOOGLE_CLIENT_ID}}"
+      clientSecret: "{{process.env.GOOGLE_CLIENT_SECRET}}"
       placement: basic_auth_header
-    scope: '{{process.env.GOOGLE_SCOPES}}'
+    scope: "{{process.env.GOOGLE_SCOPES}}"
     pkce: {}
     tokenConfig:
       id: credentials
