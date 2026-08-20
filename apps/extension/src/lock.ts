@@ -1,4 +1,4 @@
-import { getCurrentTab } from '@/browser'
+import { getActiveTab } from '@melledijkstra/extension'
 import { Logger } from '@/logger'
 
 const LOCK_KEY = 'music-player-tab-lock'
@@ -8,7 +8,7 @@ const storage = localStorage
 const logger = new Logger('TabLock')
 
 export async function acquireTabLock(): Promise<boolean> {
-  const tab = await getCurrentTab()
+  const tab = await getActiveTab()
   const tabId = tab.id?.toString() ?? ''
   const existing = storage.getItem(LOCK_KEY)
 
@@ -24,7 +24,7 @@ export async function acquireTabLock(): Promise<boolean> {
 }
 
 export async function hasTabLockAcquired(): Promise<boolean> {
-  const tab = await getCurrentTab()
+  const tab = await getActiveTab()
   const tabId = tab.id?.toString() ?? ''
   const existing = storage.getItem(LOCK_KEY)
   logger.log('hasLockAcquired', tabId, existing, existing === tabId)
@@ -36,7 +36,7 @@ export function lockExists(): boolean {
 }
 
 export async function releaseTabLock(): Promise<boolean> {
-  const tab = await getCurrentTab()
+  const tab = await getActiveTab()
   const tabId = tab.id?.toString() ?? ''
   const existing = storage.getItem(LOCK_KEY)
 
