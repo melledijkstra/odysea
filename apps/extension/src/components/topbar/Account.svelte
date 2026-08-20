@@ -3,39 +3,62 @@
   import { ACCOUNT_CACHE_KEY } from '../../constants'
   import { GoogleAccountApiClient, type Account } from '@melledijkstra/api'
   import { googleAuthClient } from '@/oauth2/clients'
+  import { WebLocalStorage } from '@melledijkstra/storage'
+  import { getAuthContext } from '@/oauth2/auth.state.svelte'
+  import { appState } from '@/app-state.svelte'
 
+  const authState = getAuthContext()
+
+  let prevGoogleAuth = $state.raw(authState.providers.google.isAuthenticated)
+
+  const storage = new WebLocalStorage()
   const client = new GoogleAccountApiClient(googleAuthClient)
 
-  let accountInfo = $state<Account>()
-
   async function getAccountInfo() {
-    const cachedAccountInfo = localStorage.getItem(ACCOUNT_CACHE_KEY)
+    if (!authState.providers.google.isAuthenticated) {
+      return
+    }
+
+    const cachedAccountInfo = await storage.get<Account>(ACCOUNT_CACHE_KEY)
 
     if (cachedAccountInfo) {
-      accountInfo = JSON.parse(cachedAccountInfo) as Account
+      appState.account = cachedAccountInfo
       return
     }
 
     const fetchedAccountInfo = await client.fetchAccountInfo()
 
     if (fetchedAccountInfo) {
-      accountInfo = fetchedAccountInfo
-      localStorage.setItem(
-        ACCOUNT_CACHE_KEY,
-        JSON.stringify(fetchedAccountInfo)
-      )
+      appState.account = fetchedAccountInfo
+      storage.set<Account>(ACCOUNT_CACHE_KEY, fetchedAccountInfo)
     }
   }
 
   onMount(() => {
     getAccountInfo()
   })
+
+  $effect(() => {
+    if (prevGoogleAuth === authState.providers.google.isAuthenticated) {
+      return
+    }
+
+    const googleAuth = authState.providers.google.isAuthenticated
+    prevGoogleAuth = googleAuth
+
+    if (authState.providers.google.isAuthenticated) {
+      getAccountInfo()
+    } else {
+      appState.account = undefined
+      storage.delete(ACCOUNT_CACHE_KEY)
+    }
+  })
 </script>
 
 <a href="https://myaccount.google.com/" target="_blank">
   <img
     class="size-9 aspect-square rounded-full border-2 border-white/80"
-    src={accountInfo?.picture ?? '/icons/default-account.jpg'}
-    alt={accountInfo?.name ?? 'Account picture'}
+    src={appState.account?.picture ?? '/icons/default-account.jpg'}
+    alt={appState.account?.name ?? 'Account picture'}
   />
 </a>

@@ -34,6 +34,9 @@ request:
     settings:
       autoFetchToken: true
       autoRefreshToken: false
+  variables:
+    - name: host
+      value: https://www.googleapis.com
 bundled: false
 extensions:
   bruno:

@@ -1,4 +1,6 @@
-import type { LocationInfo, WeatherInfo } from '@melledijkstra/api'
+import type { LocationInfo, WeatherInfo, Account } from '@melledijkstra/api'
+import { WebLocalStorage } from '@melledijkstra/storage'
+import { ACCOUNT_CACHE_KEY } from './constants'
 
 const STORAGE_KEY = 'appMode'
 
@@ -12,14 +14,17 @@ export type User = {
 
 export type AppState = {
   mode: AppMode
-  user?: User
+  account?: Account
   title: string
   weather?: WeatherInfo
   geolocation?: LocationInfo
 }
 
+const cache = new WebLocalStorage()
+
 export const appState = $state<AppState>({
   mode: (localStorage.getItem(STORAGE_KEY) as AppMode) ?? 'default',
+  account: await cache.get<Account>(ACCOUNT_CACHE_KEY),
   title: 'New Tab',
 })
 

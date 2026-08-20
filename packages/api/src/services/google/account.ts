@@ -5,6 +5,8 @@ export type Account = {
   name: string
   picture: string
   email: string
+  given_name: string
+  family_name: string
 }
 
 export class GoogleAccountApiClient extends TokenBaseClient {
@@ -13,6 +15,6 @@ export class GoogleAccountApiClient extends TokenBaseClient {
   }
 
   async fetchAccountInfo(): Promise<Account | undefined> {
-    return this.request<Account>('/oauth2/v2/userinfo')
+    return this.request<Account>('/oauth2/v3/userinfo')
   }
 }

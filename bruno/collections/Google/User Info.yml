@@ -1,0 +1,105 @@
+info:
+  name: User Info
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{host}}/oauth2/v2/userinfo"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: v3 example
+    request:
+      url: "{{host}}/oauth2/v3/userinfo"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: cache-control
+          value: no-cache, no-store, max-age=0, must-revalidate
+        - name: date
+          value: Wed, 19 Aug 2026 15:55:24 GMT
+        - name: pragma
+          value: no-cache
+        - name: expires
+          value: Mon, 01 Jan 1990 00:00:00 GMT
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: vary
+          value: Origin, X-Origin, Referer
+        - name: server
+          value: ESF
+        - name: x-xss-protection
+          value: "0"
+        - name: x-frame-options
+          value: SAMEORIGIN
+        - name: x-content-type-options
+          value: nosniff
+        - name: alt-svc
+          value: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: json
+        data: |-
+          {
+            "sub": "102753346296788210395",
+            "name": "Melle Dijkstra",
+            "given_name": "Melle",
+            "family_name": "Dijkstra",
+            "picture": "https://lh3.googleusercontent.com/a/ACg8ocI1cy4gzVFhWfZGcsXJr0QjApMoItLM5J3GBlL1G2QTaA_t7Jsx=s96-c",
+            "email": "melle.dykstra@gmail.com",
+            "email_verified": true
+          }
+  - name: v2 example
+    request:
+      url: "{{host}}/oauth2/v2/userinfo"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: pragma
+          value: no-cache
+        - name: cache-control
+          value: no-cache, no-store, max-age=0, must-revalidate
+        - name: date
+          value: Wed, 19 Aug 2026 15:56:12 GMT
+        - name: expires
+          value: Mon, 01 Jan 1990 00:00:00 GMT
+        - name: content-type
+          value: application/json; charset=UTF-8
+        - name: vary
+          value: Origin, X-Origin, Referer
+        - name: server
+          value: ESF
+        - name: x-xss-protection
+          value: "0"
+        - name: x-frame-options
+          value: SAMEORIGIN
+        - name: x-content-type-options
+          value: nosniff
+        - name: alt-svc
+          value: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: json
+        data: |-
+          {
+            "id": "102753346296788210395",
+            "email": "melle.dykstra@gmail.com",
+            "verified_email": true,
+            "name": "Melle Dijkstra",
+            "given_name": "Melle",
+            "family_name": "Dijkstra",
+            "picture": "https://lh3.googleusercontent.com/a/ACg8ocI1cy4gzVFhWfZGcsXJr0QjApMoItLM5J3GBlL1G2QTaA_t7Jsx=s96-c"
+          }
