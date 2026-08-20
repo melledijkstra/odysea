@@ -4,15 +4,16 @@ import { createQuery } from '@tanstack/svelte-query'
 export interface TaskListQueryParams {
   providerId: string
   controller: TaskControllerInterface
+  enabled?: boolean
 }
 
 export function useTasksListQuery(getParams: () => TaskListQueryParams) {
   return createQuery(() => {
-    const { providerId, controller } = getParams()
+    const { providerId, controller, enabled = true } = getParams()
     return {
       queryKey: ['tasks', providerId, 'lists'],
       queryFn: async () => await controller.getTaskLists(),
-      enabled: !!providerId,
+      enabled: !!providerId && enabled,
       staleTime: 5 * 60 * 1000,
     }
   })

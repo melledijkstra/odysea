@@ -59,6 +59,11 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
     }
   }
 
+  async isEnabled(): Promise<boolean> {
+    const isAuthenticated = await this.isAuthenticated()
+    return isAuthenticated
+  }
+
   async getTaskLists(): Promise<TaskList[]> {
     return this.TASK_LISTS
   }

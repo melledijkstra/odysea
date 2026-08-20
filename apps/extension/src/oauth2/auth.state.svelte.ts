@@ -1,6 +1,7 @@
 import { getContext, setContext } from 'svelte'
 import type { OauthProvider } from '@/oauth2/providers'
 import { allAuthClients } from './clients'
+import browser, { type Storage } from 'webextension-polyfill'
 
 export interface ProviderState {
   isAuthenticated: boolean
@@ -8,29 +9,56 @@ export interface ProviderState {
 }
 
 export class AuthState {
+  isInitialized = $state(false)
   providers = $state<Record<OauthProvider, ProviderState>>({
     google: { isAuthenticated: false, scopes: [] },
     spotify: { isAuthenticated: false, scopes: [] },
     github: { isAuthenticated: false, scopes: [] },
     'google-health': { isAuthenticated: false, scopes: [] },
   })
+  private storageListenerBound = false
 
-  initialize() {
-    Promise.all(
+  async initialize() {
+    this.setupStorageListener()
+    await Promise.all(
       allAuthClients.map(async (client) => {
         const isAuthenticated = await client.isAuthenticated()
         const grantedScopes = await client.getGrantedScopes()
         this.update(client.provider.name, isAuthenticated, grantedScopes)
       })
     )
+    this.isInitialized = true
+  }
+
+  private setupStorageListener() {
+    if (this.storageListenerBound) return
+    browser.storage.local.onChanged.addListener(this.handleStorageChange)
+    this.storageListenerBound = true
+  }
+
+  private handleStorageChange = async (
+    changes: Storage.StorageAreaOnChangedChangesType
+  ) => {
+    for (const client of allAuthClients) {
+      const provider = client.provider.name as OauthProvider
+      const storageKey = client.storageKey
+      if (changes[storageKey]) {
+        const hasToken = !!changes[storageKey].newValue
+        const isAuthenticated = hasToken && (await client.isAuthenticated())
+        const scopes = isAuthenticated ? await client.getGrantedScopes() : []
+        this.update(provider, isAuthenticated, scopes)
+      }
+    }
   }
 
   update(provider: OauthProvider, isAuthenticated: boolean, scopes: string[]) {
-    this.providers[provider] = { isAuthenticated, scopes }
+    this.providers[provider].isAuthenticated = isAuthenticated
+    this.providers[provider].scopes = scopes
   }
 
   deauthenticated(provider: OauthProvider) {
-    this.providers[provider] = { isAuthenticated: false, scopes: [] }
+    this.providers[provider].isAuthenticated = false
+    this.providers[provider].scopes = []
   }
 
   hasScopes(provider: OauthProvider, scopes: string[]) {
@@ -42,6 +70,13 @@ export class AuthState {
 
   getGrantedScopes(provider: OauthProvider) {
     return this.providers[provider].scopes
+  }
+
+  destroy() {
+    if (this.storageListenerBound) {
+      browser.storage.local.onChanged.removeListener(this.handleStorageChange)
+      this.storageListenerBound = false
+    }
   }
 }
 

@@ -5,6 +5,10 @@
   import { createMutation, useQueryClient } from '@tanstack/svelte-query'
   import { useTasksQuery, useTasksListQuery } from '@/queries/tasks'
   import type { Task } from '@/interfaces/tasks'
+  import { getAuthContext } from '@/oauth2/auth.state.svelte'
+  import { TASKS_SCOPE } from '@/oauth2/scope-registry'
+
+  const authState = getAuthContext()
 
   export type TasksPanelContentProps = {
     controller: TaskControllerInterface
@@ -20,15 +24,23 @@
   )
   let newTaskTitle = $state('')
 
+  const isEnabled = $derived(
+    providerId === 'google'
+      ? authState.hasScopes('google', [TASKS_SCOPE])
+      : authState.hasScopes('github', ['repo'])
+  )
+
   const taskListsQuery = useTasksListQuery(() => ({
     providerId,
     controller,
+    enabled: isEnabled,
   }))
 
   const tasksQuery = useTasksQuery(() => ({
     providerId,
     controller,
     taskListId: selectedTaskList,
+    enabled: isEnabled,
   }))
 
   const createTaskMutation = createMutation(() => ({
@@ -77,12 +89,8 @@
     }}
   >
     {#if taskListsQuery.data}
-      {#each taskListsQuery.data as list, i (list.id)}
-        <option
-          value={i === 0 && controller.defaultListId
-            ? controller.defaultListId
-            : list.id}>{list.title}</option
-        >
+      {#each taskListsQuery.data as list (list.id)}
+        <option value={list.id}>{list.title}</option>
       {/each}
     {/if}
   </select>

@@ -10,14 +10,14 @@
   } from '@/oauth2/clients'
   import Input from '@melledijkstra/ui/svelte/Input.svelte'
   import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
-  import { onMount, onDestroy } from 'svelte'
-  import browser from 'webextension-polyfill'
   import { Logger } from '@/logger'
   import type { AuthClient } from '@melledijkstra/extension'
   import { getAuthContext } from '@/oauth2/auth.state.svelte'
   import Card from '@melledijkstra/ui/svelte/Card.svelte'
   import { scopeRegistry } from '@/oauth2/scope-registry'
   import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
+
+  let isAuthenticating = $state(false)
 
   const logger = new Logger('AuthenticationTab')
 
@@ -30,58 +30,44 @@
 
   const authState = getAuthContext()
 
-  function handleStorageChange(
-    changes: Record<string, browser.Storage.StorageChange>
-  ) {
-    for (const key of Object.keys(clients)) {
-      const provider = key as OauthProvider
-      const storageKey = clients[provider].storageKey
-      if (changes[storageKey]) {
-        authState.update(provider, !!changes[storageKey].newValue, [])
-        if (authState.providers[provider].isAuthenticated) {
-          clients[provider].getGrantedScopes().then((scopes) => {
-            authState.update(provider, true, scopes)
-          })
-        }
-      }
-    }
-  }
-
-  onMount(() => {
-    browser.storage.local.onChanged.addListener(handleStorageChange)
-  })
-
-  onDestroy(() => {
-    browser.storage.local.onChanged.removeListener(handleStorageChange)
-  })
-
-  async function retrieveAuthState() {
-    logger.log('Retrieving authentication state from all providers...')
-    for (const key of Object.keys(authState.providers)) {
-      const provider = key as OauthProvider
-      const isAuthenticated = await clients[provider].isAuthenticated()
-      if (isAuthenticated) {
-        const scopes = await clients[provider].getGrantedScopes()
-        authState.update(provider, true, scopes)
-      } else {
-        authState.deauthenticated(provider)
-      }
-    }
-  }
-
-  const loadAuthState = retrieveAuthState()
+  const loadAuthState = authState.initialize()
 
   async function authenticate(provider: OauthProvider) {
     logger.log('Authenticating with', provider)
-    const authToken = await clients[provider].getAuthToken(true)
-    const scopes = await clients[provider].getGrantedScopes()
-    authState.update(provider, !!authToken, scopes)
+    isAuthenticating = true
+    try {
+      const authToken = await clients[provider].getAuthToken(true)
+      const scopes = await clients[provider].getGrantedScopes()
+      logger.log(
+        'Authenticated with',
+        provider,
+        'token:',
+        authToken,
+        'scopes:',
+        scopes
+      )
+      authState.update(provider, !!authToken, scopes)
+    } catch (e) {
+      logger.error('Failed to authenticate with', provider, e)
+    } finally {
+      isAuthenticating = false
+    }
   }
 
   async function deauthenticate(provider: OauthProvider) {
     logger.log('Deauthenticating from', provider)
-    await clients[provider].deauthenticate()
+    await clients[provider].deauthenticate(true)
     authState.deauthenticated(provider)
+  }
+
+  async function authenticateScope(scopes: string[]) {
+    try {
+      await googleAuthClient.authenticate(scopes)
+      const grantedScopes = await googleAuthClient.getGrantedScopes()
+      authState.update('google', true, grantedScopes)
+    } catch (e) {
+      logger.error('Failed to authenticate scopes', e)
+    }
   }
 </script>
 
@@ -135,7 +121,7 @@
         <div class="flex flex-row justify-between">
           <h2 class="text-lg">Google</h2>
           <Toggle
-            bind:checked={providerState.isAuthenticated}
+            checked={isAuthenticating || providerState.isAuthenticated}
             onclick={() =>
               providerState.isAuthenticated
                 ? deauthenticate(provider)
@@ -156,8 +142,7 @@
               class={[
                 'size-10 p-1 rounded transition-colors hover:bg-gray-200/20 cursor-pointer',
               ]}
-              onclick={() =>
-                !hasScopes && googleAuthClient.authenticate(scope.scopes)}
+              onclick={() => !hasScopes && authenticateScope(scope.scopes)}
             >
               <img
                 src={scope.icon}

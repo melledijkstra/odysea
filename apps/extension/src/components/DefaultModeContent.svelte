@@ -6,17 +6,23 @@
   import { useTasksQuery } from '@/queries/tasks'
   import { useAccountQuery } from '@/queries/account'
   import { GoogleTasksController } from '@/controllers/GoogleTasksController'
+  import { TASKS_SCOPE } from '@/oauth2/scope-registry'
 
   const taskListId = '@default'
 
   const authState = getAuthContext()
   const accountQuery = useAccountQuery()
 
+  const isTasksEnabled = $derived(
+    settingsStore.ui.showCurrentTask &&
+      authState.hasScopes('google', [TASKS_SCOPE])
+  )
+
   const tasksQuery = useTasksQuery(() => ({
     providerId: 'google',
     controller: new GoogleTasksController(),
     taskListId,
-    enabled: authState.providers.google.isAuthenticated,
+    enabled: isTasksEnabled,
   }))
 
   const currentTask = $derived(

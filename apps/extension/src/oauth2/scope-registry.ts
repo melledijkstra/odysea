@@ -4,7 +4,15 @@ export const HEALTH_SCOPE =
 export const SLEEP_SCOPE =
   'https://www.googleapis.com/auth/googlehealth.sleep.readonly'
 
-export const scopeRegistry = {
+export type ScopeRegistry = {
+  [key: string]: {
+    icon: string
+    scopes: string[]
+    message?: string
+  }
+}
+
+export const scopeRegistry: ScopeRegistry = {
   tasks: {
     icon: '/icons/google-tasks.svg',
     scopes: [TASKS_SCOPE],
@@ -24,5 +32,17 @@ export const scopeRegistry = {
   calendar: {
     icon: '/icons/google-calendar.svg',
     scopes: ['https://www.googleapis.com/auth/calendar.calendars.readonly'],
+    message:
+      'This app only reads your Google Calendar events.\n' +
+      'It will not modify or delete any events.\n' +
+      'This is purely to show you your upcoming events in your Google Calendar.',
+  },
+  gmail: {
+    icon: '/icons/google-gmail.svg',
+    scopes: ['https://www.googleapis.com/auth/gmail.readonly'],
+    message:
+      'This app only reads your unread Gmail email messages count.\n' +
+      'It will not modify or delete any messages.\n' +
+      'This is purely to show you how many unread messages you have in your Gmail inbox.',
   },
 }
