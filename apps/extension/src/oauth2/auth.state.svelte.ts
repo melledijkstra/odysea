@@ -20,6 +20,7 @@ export class AuthState {
 
   async initialize() {
     this.setupStorageListener()
+    if (this.isInitialized) return
     await Promise.all(
       allAuthClients.map(async (client) => {
         const isAuthenticated = await client.isAuthenticated()
@@ -36,7 +37,7 @@ export class AuthState {
     this.storageListenerBound = true
   }
 
-  private handleStorageChange = async (
+  private readonly handleStorageChange = async (
     changes: Storage.StorageAreaOnChangedChangesType
   ) => {
     for (const client of allAuthClients) {

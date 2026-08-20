@@ -16,8 +16,11 @@
   import Card from '@melledijkstra/ui/svelte/Card.svelte'
   import { scopeRegistry } from '@/oauth2/scope-registry'
   import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
+  import { clearAccountCache } from '@/queries/account'
+  import { queryClient } from '@/queryClient'
 
   let isAuthenticating = $state(false)
+  let authenticatingScope = $state<string | null>(null)
 
   const logger = new Logger('AuthenticationTab')
 
@@ -58,15 +61,26 @@
     logger.log('Deauthenticating from', provider)
     await clients[provider].deauthenticate(true)
     authState.deauthenticated(provider)
+    if (provider === 'google') {
+      await clearAccountCache()
+      queryClient.removeQueries({ queryKey: ['account', 'google'] })
+    }
   }
 
-  async function authenticateScope(scopes: string[]) {
+  async function authenticateScope(scopeKey: string, scopes: string[]) {
+    isAuthenticating = true
+    authenticatingScope = scopeKey
     try {
-      await googleAuthClient.authenticate(scopes)
-      const grantedScopes = await googleAuthClient.getGrantedScopes()
-      authState.update('google', true, grantedScopes)
+      const success = await googleAuthClient.authenticate(scopes)
+      if (success) {
+        const grantedScopes = await googleAuthClient.getGrantedScopes()
+        authState.update('google', true, grantedScopes)
+      }
     } catch (e) {
       logger.error('Failed to authenticate scopes', e)
+    } finally {
+      isAuthenticating = false
+      authenticatingScope = null
     }
   }
 </script>
@@ -122,6 +136,7 @@
           <h2 class="text-lg">Google</h2>
           <Toggle
             checked={isAuthenticating || providerState.isAuthenticated}
+            disabled={isAuthenticating}
             onclick={() =>
               providerState.isAuthenticated
                 ? deauthenticate(provider)
@@ -139,16 +154,22 @@
               authState.hasScopes(provider, scope.scopes)}
             <button
               title={scope.scopes.join(', ')}
+              disabled={isAuthenticating}
               class={[
-                'size-10 p-1 rounded transition-colors hover:bg-gray-200/20 cursor-pointer',
+                'size-10 p-1 rounded transition-colors hover:bg-gray-200/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center',
               ]}
-              onclick={() => !hasScopes && authenticateScope(scope.scopes)}
+              onclick={() =>
+                !hasScopes && authenticateScope(scopeKey, scope.scopes)}
             >
-              <img
-                src={scope.icon}
-                alt={scopeKey}
-                class={[!hasScopes && 'grayscale']}
-              />
+              {#if authenticatingScope === scopeKey}
+                <Spinner class="size-6 text-gray-400" />
+              {:else}
+                <img
+                  src={scope.icon}
+                  alt={scopeKey}
+                  class={[!hasScopes && 'grayscale']}
+                />
+              {/if}
             </button>
           {/each}
         </div>

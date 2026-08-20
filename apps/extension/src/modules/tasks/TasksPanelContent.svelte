@@ -24,6 +24,13 @@
   )
   let newTaskTitle = $state('')
 
+  $effect(() => {
+    // Reset manual list selection when provider changes
+    if (providerId) {
+      manualSelectedListId = null
+    }
+  })
+
   const isEnabled = $derived(
     providerId === 'google'
       ? authState.hasScopes('google', [TASKS_SCOPE])

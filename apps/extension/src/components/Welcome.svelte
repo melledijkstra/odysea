@@ -63,14 +63,16 @@
   {#if name}
     <span>
       Good {dayPart},
-      <button
-        class={[
-          'text-shadow-lg/30',
-          // indicate that the username can be cleared
-          onClearUsername && 'cursor-pointer hover:line-through',
-        ]}
-        onclick={() => onClearUsername?.()}>{name}</button
-      >
+      {#if onClearUsername}
+        <button
+          class="text-shadow-lg/30 cursor-pointer hover:line-through"
+          onclick={() => onClearUsername?.()}
+        >
+          {name}
+        </button>
+      {:else}
+        <span class="text-shadow-lg/30">{name}</span>
+      {/if}
     </span>
   {:else if onUsernameChange}
     {@render prompt()}

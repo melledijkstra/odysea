@@ -44,6 +44,15 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
     this.auth = githubAuthClient
   }
 
+  private async getOctokit(): Promise<Octokit | null> {
+    if (this.octokit) return this.octokit
+    const token = await this.auth.getAuthToken(false)
+    if (token) {
+      this.octokit = new Octokit({ auth: token })
+    }
+    return this.octokit
+  }
+
   async authenticate(): Promise<boolean> {
     return await this.auth.authenticate()
   }
@@ -53,10 +62,7 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
   }
 
   async initialize() {
-    const token = await this.auth.getAuthToken(false)
-    if (token) {
-      this.octokit = new Octokit({ auth: token })
-    }
+    await this.getOctokit()
   }
 
   async isEnabled(): Promise<boolean> {
@@ -69,7 +75,8 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
   }
 
   async getTasks(taskListId?: string): Promise<Task[]> {
-    if (!this.octokit) {
+    const octokit = await this.getOctokit()
+    if (!octokit) {
       this.logger.error('Octokit not initialized')
       return []
     }
@@ -84,7 +91,7 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
     }
 
     try {
-      const response = await this.octokit.search.issuesAndPullRequests({
+      const response = await octokit.search.issuesAndPullRequests({
         q: query,
         per_page: 50,
       })
@@ -114,10 +121,11 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
   }
 
   async setTaskStatus(taskId: string, status: boolean): Promise<boolean> {
-    if (!this.octokit) return false
+    const octokit = await this.getOctokit()
+    if (!octokit) return false
     const target = githubDataFromId(taskId)
     try {
-      await this.octokit.issues.update({
+      await octokit.issues.update({
         owner: target.owner,
         repo: target.repo,
         issue_number: target.number,
@@ -132,10 +140,11 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
   }
 
   async updateTask(task: Task): Promise<boolean> {
-    if (!this.octokit) return false
+    const octokit = await this.getOctokit()
+    if (!octokit) return false
     const target = githubDataFromId(task.id)
     try {
-      await this.octokit.issues.update({
+      await octokit.issues.update({
         owner: target.owner,
         repo: target.repo,
         issue_number: target.number,

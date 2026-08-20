@@ -31,3 +31,7 @@ export function useAccountQuery() {
     staleTime: 60 * 60 * 1000, // 1 hour
   }))
 }
+
+export async function clearAccountCache(): Promise<void> {
+  await storage.delete(ACCOUNT_CACHE_KEY)
+}

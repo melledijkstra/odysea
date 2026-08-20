@@ -9,6 +9,7 @@
   import { TASKS_SCOPE } from '@/oauth2/scope-registry'
 
   const taskListId = '@default'
+  const controller = new GoogleTasksController()
 
   const authState = getAuthContext()
   const accountQuery = useAccountQuery()
@@ -20,7 +21,7 @@
 
   const tasksQuery = useTasksQuery(() => ({
     providerId: 'google',
-    controller: new GoogleTasksController(),
+    controller,
     taskListId,
     enabled: isTasksEnabled,
   }))

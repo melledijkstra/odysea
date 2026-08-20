@@ -34,6 +34,7 @@
   let isAuthenticating = $state(false)
 
   async function triggerAuthFlow() {
+    isAuthenticating = true
     try {
       const isAuthenticated = await activeController.authenticate()
       const grantedScopes = await activeController.auth.getGrantedScopes()
