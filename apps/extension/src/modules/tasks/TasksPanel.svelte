@@ -5,16 +5,23 @@
   import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import TasksPanelContent from './TasksPanelContent.svelte'
   import { addNotification } from '@/stores/notifications.svelte'
+  import { getAuthContext } from '@/oauth2/auth.state.svelte'
+  import { TASKS_SCOPE } from '@/oauth2/scope-registry'
 
   type Provider = 'google' | 'github'
+
   const STORAGE_KEY = 'tasks::activeProvider'
+
   let activeProvider = $state<Provider>(
     (localStorage.getItem(STORAGE_KEY) as Provider) ?? 'google'
   )
 
-  $effect(() => {
-    localStorage.setItem(STORAGE_KEY, activeProvider)
-  })
+  const authState = getAuthContext()
+
+  const providerState = $derived(authState.providers[activeProvider])
+  const requiredScopes = $derived(
+    activeProvider === 'google' ? [TASKS_SCOPE] : ['repo']
+  )
 
   const googleController = new GoogleTasksController()
   const githubController = new GithubTasksController()
@@ -23,14 +30,15 @@
     activeProvider === 'google' ? googleController : githubController
   )
 
-  let isAuthenticated = $state(false)
   let isInitializing = $state(true)
   let isAuthenticating = $state(false)
 
   async function triggerAuthFlow() {
     isAuthenticating = true
     try {
-      isAuthenticated = await activeController.authenticate()
+      const isAuthenticated = await activeController.authenticate()
+      const grantedScopes = await activeController.auth.getGrantedScopes()
+      authState.update(activeProvider, isAuthenticated, grantedScopes)
     } catch (e: unknown) {
       console.error('Authentication error:', e)
       const errorMessage = e instanceof Error ? e.message : 'Unknown error'
@@ -41,12 +49,13 @@
   }
 
   $effect(() => {
+    localStorage.setItem(STORAGE_KEY, activeProvider)
+  })
+
+  $effect(() => {
     isInitializing = true
-    activeController.initialize().then(() => {
-      activeController.isAuthenticated().then((auth) => {
-        isAuthenticated = auth
-        isInitializing = false
-      })
+    activeController.initialize().finally(() => {
+      isInitializing = false
     })
   })
 </script>
@@ -75,7 +84,7 @@
 
   {#if isInitializing}
     <p class="text-sm text-gray-400">Loading...</p>
-  {:else if isAuthenticated}
+  {:else if providerState.isAuthenticated && authState.hasScopes(activeProvider, requiredScopes)}
     <TasksPanelContent
       controller={activeController}
       providerId={activeProvider}

@@ -11,13 +11,23 @@
   import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools'
   import { QueryClientProvider } from '@tanstack/svelte-query'
   import { queryClient } from '@/queryClient'
+  import { AuthState, setAuthContext } from './oauth2/auth.state.svelte'
+
+  const authState = new AuthState()
+
+  setAuthContext(authState)
+
+  const initPromise = Promise.allSettled([
+    settings.initialize(),
+    authState.initialize(),
+  ])
 </script>
 
 <svelte:head>
   <title>{appState.title}</title>
 </svelte:head>
 
-{#await settings.initialize() then}
+{#await initPromise then}
   <QueryClientProvider client={queryClient}>
     <SvelteQueryDevtools buttonPosition="top-right" />
     <ModulesInitializer />

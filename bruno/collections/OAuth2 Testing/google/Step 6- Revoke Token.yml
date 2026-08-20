@@ -1,0 +1,35 @@
+info:
+  name: 'Step 6: Revoke Token'
+  type: http
+  seq: 14
+
+http:
+  method: POST
+  url: https://oauth2.googleapis.com/revoke
+  headers:
+    - name: Authorization
+      value: Bearer {{access_token}}
+    - name: Content-Type
+      value: application/x-www-form-urlencoded
+  body:
+    type: form-urlencoded
+    data:
+      - name: client_id
+        value: '{{process.env.GOOGLE_CLIENT_ID_BROWSER}}'
+      - name: token
+        value: '{{access_token}}'
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200) {
+          bru.deleteVar('access_token')
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

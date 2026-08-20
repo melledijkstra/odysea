@@ -1,55 +1,38 @@
 <script lang="ts">
-  import { appState } from '@/app-state.svelte'
-  import { storeUsername, clearUsername, retrieveUsername } from '@/browser'
   import Clock from '@/components/Clock.svelte'
   import Welcome from '@/components/Welcome.svelte'
-  import { googleAuthClient } from '@/oauth2/clients'
   import { settingsStore } from '@/settings/index.svelte'
-  import { GoogleTasksApiClient } from '@melledijkstra/api'
-  import { createQuery } from '@tanstack/svelte-query'
-  import { onMount } from 'svelte'
+  import { getAuthContext } from '@/oauth2/auth.state.svelte'
+  import { useTasksQuery } from '@/queries/tasks'
+  import { useAccountQuery } from '@/queries/account'
+  import { GoogleTasksController } from '@/controllers/GoogleTasksController'
+  import { TASKS_SCOPE } from '@/oauth2/scope-registry'
 
   const taskListId = '@default'
+  const controller = new GoogleTasksController()
 
-  const tasksQuery = createQuery(() => ({
-    queryKey: ['tasks', 'google', 'tasks', taskListId],
-    queryFn: async () => {
-      const isAuthenticated = await googleAuthClient.isAuthenticated()
-      if (!isAuthenticated) return []
-      const client = new GoogleTasksApiClient(googleAuthClient)
-      return (await client.fetchTasks(taskListId)) ?? []
-    },
-    staleTime: 5 * 60 * 1000,
+  const authState = getAuthContext()
+  const accountQuery = useAccountQuery()
+
+  const isTasksEnabled = $derived(
+    settingsStore.ui.showCurrentTask &&
+      authState.hasScopes('google', [TASKS_SCOPE])
+  )
+
+  const tasksQuery = useTasksQuery(() => ({
+    providerId: 'google',
+    controller,
+    taskListId,
+    enabled: isTasksEnabled,
   }))
 
   const currentTask = $derived(
     tasksQuery.data?.find((task) => task.status === 'needsAction')
   )
-
-  function onUsernameChange(name: string) {
-    storeUsername(name)
-    appState.user = {
-      name,
-    }
-  }
-
-  function onClearUsername() {
-    clearUsername()
-    appState.user = undefined
-  }
-
-  onMount(async () => {
-    const username = await retrieveUsername()
-    if (username) {
-      appState.user = {
-        name: username,
-      }
-    }
-  })
 </script>
 
 <Clock />
-<Welcome user={appState.user} {onUsernameChange} {onClearUsername} />
+<Welcome name={accountQuery.data?.given_name} />
 
 <div class="mt-4 text-lg empty:h-7">
   {#if settingsStore.ui.showCurrentTask && currentTask}

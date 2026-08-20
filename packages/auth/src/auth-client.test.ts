@@ -314,7 +314,7 @@ describe('AuthClient', () => {
       )
 
       const token = await client.getAuthToken(true, ['tasks'])
-      expect(client.createAuthUrl).toHaveBeenCalledWith(['tasks'])
+      expect(client.createAuthUrl).toHaveBeenCalledWith(['tasks'], undefined)
       expect(token).toBe('new-access-token')
     })
 

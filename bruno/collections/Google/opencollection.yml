@@ -1,0 +1,45 @@
+opencollection: 1.0.0
+
+info:
+  name: Google
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ''
+      port: ''
+      auth:
+        username: ''
+        password: ''
+      bypassProxy: ''
+
+request:
+  auth:
+    type: oauth2
+    flow: authorization_code
+    authorizationUrl: https://accounts.google.com/o/oauth2/v2/auth
+    accessTokenUrl: https://oauth2.googleapis.com/token
+    credentials:
+      clientId: '{{process.env.GOOGLE_CLIENT_ID}}'
+      clientSecret: '{{process.env.GOOGLE_CLIENT_SECRET}}'
+      placement: basic_auth_header
+    scope: '{{process.env.GOOGLE_SCOPES}}'
+    pkce: {}
+    tokenConfig:
+      id: credentials
+      placement:
+        header: Bearer
+      source: access_token
+    settings:
+      autoFetchToken: true
+      autoRefreshToken: false
+  variables:
+    - name: host
+      value: https://www.googleapis.com
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

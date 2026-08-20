@@ -1,7 +1,7 @@
 info:
   name: 'Step 4.1: Call Protected API (calendar)'
   type: http
-  seq: 9
+  seq: 10
 
 http:
   method: GET

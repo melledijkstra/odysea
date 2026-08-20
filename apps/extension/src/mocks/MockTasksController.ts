@@ -2,12 +2,6 @@ import type { TaskControllerInterface } from '../controllers/GoogleTasksControll
 import type { Task, TaskList } from '@/interfaces/tasks'
 
 export class MockTasksController implements TaskControllerInterface {
-  async authenticate(): Promise<boolean> {
-    return true
-  }
-  async isAuthenticated(): Promise<boolean> {
-    return true
-  }
   canCreateTask = true
   defaultListId = 'default'
   private tasks: Task[] = []
@@ -16,6 +10,18 @@ export class MockTasksController implements TaskControllerInterface {
   constructor(initialData?: { tasks?: Task[]; taskLists?: TaskList[] }) {
     if (initialData?.tasks) this.tasks = initialData.tasks
     if (initialData?.taskLists) this.taskLists = initialData.taskLists
+  }
+
+  async authenticate(): Promise<boolean> {
+    return true
+  }
+
+  async isAuthenticated(): Promise<boolean> {
+    return true
+  }
+
+  async isEnabled(): Promise<boolean> {
+    return true
   }
 
   async getTasks(): Promise<Task[]> {

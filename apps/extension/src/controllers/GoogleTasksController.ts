@@ -5,6 +5,7 @@ import { AuthClient } from '@melledijkstra/extension'
 import { googleAuthClient } from '@/oauth2/clients'
 import { addNotification } from '@/stores/notifications.svelte'
 import type { Task, TaskList } from '@/interfaces/tasks'
+import { scopeRegistry, TASKS_SCOPE } from '@/oauth2/scope-registry'
 
 export type TaskControllerInterface = {
   canCreateTask: boolean
@@ -21,6 +22,7 @@ export type TaskControllerInterface = {
   updateTask: (task: Task, taskListId?: string) => Promise<boolean>
   authenticate: () => Promise<boolean>
   isAuthenticated: () => Promise<boolean>
+  isEnabled: () => Promise<boolean>
 }
 
 export class GoogleTasksController implements TaskControllerInterface, ILogger {
@@ -40,19 +42,26 @@ export class GoogleTasksController implements TaskControllerInterface, ILogger {
     const success = await this.api.deleteTask(taskId, taskListId)
     return success
   }
-  private readonly tasksScope = 'https://www.googleapis.com/auth/tasks'
 
   async authenticate(): Promise<boolean> {
-    return await this.auth.authenticate([this.tasksScope])
+    return await this.auth.authenticate([TASKS_SCOPE])
   }
 
   async isAuthenticated(): Promise<boolean> {
-    const token = await this.auth.getAuthToken(false, [this.tasksScope])
-    return !!token
+    return await this.auth.isAuthenticated()
   }
 
   async initialize() {
     await this.isAuthenticated()
+  }
+
+  async isEnabled(): Promise<boolean> {
+    const isAuthenticated = await this.isAuthenticated()
+    const grantedScopes = await this.auth.getGrantedScopes()
+    const allScopesGranted = scopeRegistry['tasks'].scopes.every((scope) =>
+      grantedScopes.includes(scope)
+    )
+    return isAuthenticated && allScopesGranted
   }
 
   async getTaskLists(): Promise<TaskList[]> {

@@ -2,12 +2,13 @@
   import TaskList from '@/components/atoms/tasks/TaskList.svelte'
   import ScrollArea from '@melledijkstra/ui/svelte/ScrollArea.svelte'
   import type { TaskControllerInterface } from '@/controllers/GoogleTasksController'
-  import {
-    createQuery,
-    createMutation,
-    useQueryClient,
-  } from '@tanstack/svelte-query'
+  import { createMutation, useQueryClient } from '@tanstack/svelte-query'
+  import { useTasksQuery, useTasksListQuery } from '@/queries/tasks'
   import type { Task } from '@/interfaces/tasks'
+  import { getAuthContext } from '@/oauth2/auth.state.svelte'
+  import { TASKS_SCOPE } from '@/oauth2/scope-registry'
+
+  const authState = getAuthContext()
 
   export type TasksPanelContentProps = {
     controller: TaskControllerInterface
@@ -17,33 +18,36 @@
   const { controller, providerId }: TasksPanelContentProps = $props()
   const queryClient = useQueryClient()
 
-  let selectedTaskList = $state<string>('')
+  let manualSelectedListId = $state<string | null>(null)
+  let selectedTaskList = $derived(
+    manualSelectedListId ?? controller.defaultListId ?? ''
+  )
   let newTaskTitle = $state('')
 
   $effect(() => {
-    // Make sure we update when provider changes
+    // Reset manual list selection when provider changes
     if (providerId) {
-      selectedTaskList = controller.defaultListId
+      manualSelectedListId = null
     }
   })
 
-  const taskListsQuery = createQuery(() => ({
-    queryKey: ['tasks', providerId, 'lists'],
-    queryFn: async () => {
-      const lists = await controller.getTaskLists()
-      if (lists.length > 0 && !selectedTaskList) {
-        selectedTaskList = controller.defaultListId
-      }
-      return lists
-    },
-    staleTime: 5 * 60 * 1000,
+  const isEnabled = $derived(
+    providerId === 'google'
+      ? authState.hasScopes('google', [TASKS_SCOPE])
+      : authState.hasScopes('github', ['repo'])
+  )
+
+  const taskListsQuery = useTasksListQuery(() => ({
+    providerId,
+    controller,
+    enabled: isEnabled,
   }))
 
-  const tasksQuery = createQuery(() => ({
-    queryKey: ['tasks', providerId, 'tasks', selectedTaskList],
-    queryFn: () => controller.getTasks(selectedTaskList),
-    enabled: !!selectedTaskList,
-    staleTime: 5 * 60 * 1000,
+  const tasksQuery = useTasksQuery(() => ({
+    providerId,
+    controller,
+    taskListId: selectedTaskList,
+    enabled: isEnabled,
   }))
 
   const createTaskMutation = createMutation(() => ({
@@ -86,15 +90,14 @@
   <select
     name="task-list-selector"
     class="w-full text-black dark:text-white text-lg bg-transparent border-none focus:outline-hidden"
-    bind:value={selectedTaskList}
+    value={selectedTaskList}
+    onchange={(e) => {
+      manualSelectedListId = e.currentTarget.value
+    }}
   >
     {#if taskListsQuery.data}
-      {#each taskListsQuery.data as list, i (list.id)}
-        <option
-          value={i === 0 && controller.defaultListId
-            ? controller.defaultListId
-            : list.id}>{list.title}</option
-        >
+      {#each taskListsQuery.data as list (list.id)}
+        <option value={list.id}>{list.title}</option>
       {/each}
     {/if}
   </select>

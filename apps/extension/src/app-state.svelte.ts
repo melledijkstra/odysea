@@ -12,7 +12,6 @@ export type User = {
 
 export type AppState = {
   mode: AppMode
-  user?: User
   title: string
   weather?: WeatherInfo
   geolocation?: LocationInfo

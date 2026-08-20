@@ -115,15 +115,20 @@ export class AuthClient {
     return !token || Date.now() > token.expires_at - 60_000
   }
 
-  async authenticate(requestedScopes?: string[]): Promise<boolean> {
-    const token = await this.getAuthToken(true, requestedScopes)
+  async authenticate(
+    requestedScopes?: string[],
+    loginHint?: string
+  ): Promise<boolean> {
+    const token = await this.getAuthToken(true, requestedScopes, loginHint)
     return !!token
   }
 
-  async deauthenticate(): Promise<boolean> {
+  async deauthenticate(serverRevoke: boolean = false): Promise<boolean> {
     this._logger.log('deauthenticating')
     const token = await this.getAuthTokenFromStorage()
-    if (token && !this.provider.skipServerRevoke) {
+    // force revoke the token if serverRevoke is true
+    // or if the provider does not skip server revocation
+    if (token && (serverRevoke || !this.provider.skipServerRevoke)) {
       await this.revokeAuthToken(token.access_token)
     }
     await this.removeAuthTokenFromStorage()
@@ -138,6 +143,11 @@ export class AuthClient {
   async getGrantedScopes(): Promise<string[]> {
     const storeToken = await this.getAuthTokenFromStorage()
     return storeToken?.scopes ?? []
+  }
+
+  async hasGrantedScopes(scopes: string[]): Promise<boolean> {
+    const grantedScopes = await this.getGrantedScopes()
+    return scopes.every((scope) => grantedScopes.includes(scope))
   }
 
   async revokeAuthToken(token: string) {
@@ -295,7 +305,8 @@ export class AuthClient {
   }
 
   async createAuthUrl(
-    requestedScopes: string[] = []
+    requestedScopes: string[] = [],
+    loginHint?: string
   ): Promise<URL | undefined> {
     this._state = generateState()
     this._codeVerifier = generateCodeVerifier()
@@ -328,6 +339,10 @@ export class AuthClient {
         this._codeVerifier,
         allScopes
       )
+      // add login_hint if provided, to pre-fill the email field in the Google login form
+      if (loginHint) {
+        url.searchParams.set('login_hint', loginHint ?? '')
+      }
     } else if (this._arcticClient instanceof GitHub) {
       url = this._arcticClient.createAuthorizationURL(this._state, allScopes)
     } else {
@@ -389,7 +404,8 @@ export class AuthClient {
 
   async getAuthToken(
     interactive = false,
-    requestedScopes?: string[]
+    requestedScopes?: string[],
+    loginHint?: string
   ): Promise<string | undefined> {
     const storedToken = await this.getTokenFromStoreOrRefreshToken()
     const grantedScopes = await this.getGrantedScopes()
@@ -418,7 +434,7 @@ export class AuthClient {
       'no token retrieved or missing scopes, continue with normal oauth2 flow...'
     )
 
-    const url = await this.createAuthUrl(requestedScopes)
+    const url = await this.createAuthUrl(requestedScopes, loginHint)
 
     if (!url) {
       this._logger.error('Failed to create auth URL')

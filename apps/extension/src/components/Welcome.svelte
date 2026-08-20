@@ -1,15 +1,14 @@
 <script lang="ts">
   import { getMomentOfDay, repeatEvery } from '@melledijkstra/toolbox'
-  import type { User } from '@/app-state.svelte'
   import { onPageVisible } from '@/utils/visibility'
 
   type WelcomeProps = {
-    user?: User
-    onUsernameChange: (name: string) => void
-    onClearUsername: () => void
+    name?: string
+    onUsernameChange?: (name: string) => void
+    onClearUsername?: () => void
   }
 
-  const { user, onUsernameChange, onClearUsername }: WelcomeProps = $props()
+  const { name, onUsernameChange, onClearUsername }: WelcomeProps = $props()
 
   const MINUTE = 60 * 1000
 
@@ -43,7 +42,7 @@
       bind:value={nameInput}
       onkeypress={(event) => {
         if (event.key === 'Enter' && nameInput) {
-          onUsernameChange(nameInput)
+          onUsernameChange?.(nameInput)
         }
       }}
     />
@@ -61,16 +60,24 @@
     'relative before:absolute before:inset-[-0.05em] before:bg-black/10 before:blur-xl before:rounded-lg before:z-[-1]',
   ]}
 >
-  {#if user?.name}
+  {#if name}
     <span>
       Good {dayPart},
-      <button
-        class="cursor-pointer hover:line-through text-shadow-lg/30"
-        onclick={onClearUsername}>{user.name}</button
-      >
+      {#if onClearUsername}
+        <button
+          class="text-shadow-lg/30 cursor-pointer hover:line-through"
+          onclick={() => onClearUsername?.()}
+        >
+          {name}
+        </button>
+      {:else}
+        <span class="text-shadow-lg/30">{name}</span>
+      {/if}
     </span>
-  {:else}
+  {:else if onUsernameChange}
     {@render prompt()}
+  {:else}
+    <span>Good {dayPart}!</span>
   {/if}
 </h2>
 

@@ -11,7 +11,7 @@
     title: 'Atoms/Welcome',
     component: Welcome,
     args: {
-      user,
+      name: user.name,
       onUsernameChange: (name: string) => {
         user.name = name
       },
@@ -24,4 +24,4 @@
 
 <Story name="Default" />
 
-<Story name="Without username" args={{ user: undefined }} />
+<Story name="Without username" args={{ name: undefined }} />
