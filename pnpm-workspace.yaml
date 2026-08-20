@@ -39,12 +39,12 @@ catalog:
   bits-ui: ^2.18.1
 
   # Linting & Formatting
-  eslint: ^10.8.0
+  eslint: ^10.8.1
   prettier: ^3.9.6
   prettier-plugin-svelte: ^4.1.1
   prettier-plugin-tailwindcss: ^0.8.1
   eslint-config-prettier: ^10.1.8
-  eslint-plugin-turbo: ^2.10.8
+  eslint-plugin-turbo: ^2.10.10
 
   # Testing
   vitest: ^4.1.10
