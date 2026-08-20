@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{host}}/oauth2/v2/userinfo"
+  url: '{{host}}/oauth2/v2/userinfo'
   auth: inherit
 
 settings:
@@ -17,7 +17,7 @@ settings:
 examples:
   - name: v3 example
     request:
-      url: "{{host}}/oauth2/v3/userinfo"
+      url: '{{host}}/oauth2/v3/userinfo'
       method: GET
     response:
       status: 200
@@ -38,7 +38,7 @@ examples:
         - name: server
           value: ESF
         - name: x-xss-protection
-          value: "0"
+          value: '0'
         - name: x-frame-options
           value: SAMEORIGIN
         - name: x-content-type-options
@@ -61,7 +61,7 @@ examples:
           }
   - name: v2 example
     request:
-      url: "{{host}}/oauth2/v2/userinfo"
+      url: '{{host}}/oauth2/v2/userinfo'
       method: GET
     response:
       status: 200
@@ -82,7 +82,7 @@ examples:
         - name: server
           value: ESF
         - name: x-xss-protection
-          value: "0"
+          value: '0'
         - name: x-frame-options
           value: SAMEORIGIN
         - name: x-content-type-options

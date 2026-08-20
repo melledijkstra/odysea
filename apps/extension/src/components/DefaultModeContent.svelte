@@ -1,15 +1,16 @@
 <script lang="ts">
-  import { appState } from '@/app-state.svelte'
   import Clock from '@/components/Clock.svelte'
   import Welcome from '@/components/Welcome.svelte'
   import { settingsStore } from '@/settings/index.svelte'
   import { getAuthContext } from '@/oauth2/auth.state.svelte'
   import { useTasksQuery } from '@/queries/tasks'
+  import { useAccountQuery } from '@/queries/account'
   import { GoogleTasksController } from '@/controllers/GoogleTasksController'
 
   const taskListId = '@default'
 
   const authState = getAuthContext()
+  const accountQuery = useAccountQuery()
 
   const tasksQuery = useTasksQuery(() => ({
     providerId: 'google',
@@ -24,7 +25,7 @@
 </script>
 
 <Clock />
-<Welcome name={appState.account?.given_name} />
+<Welcome name={accountQuery.data?.given_name} />
 
 <div class="mt-4 text-lg empty:h-7">
   {#if settingsStore.ui.showCurrentTask && currentTask}
