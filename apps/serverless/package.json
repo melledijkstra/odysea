@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "deno": "catalog:",
-    "hono": "jsr:@hono/hono@^4.13.0"
+    "hono": "jsr:@hono/hono@^4.13.3"
   },
   "devDependencies": {
     "eslint": "catalog:"

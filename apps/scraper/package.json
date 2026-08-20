@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "crawlee": "^3.18.0",
+    "crawlee": "^3.18.1",
     "playwright": "catalog:",
     "turndown": "^7.2.4"
   },
