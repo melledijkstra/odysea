@@ -26,10 +26,10 @@
       "outputs": []
     },
     "lint": {
-      "dependsOn": ["^build", "^lint"]
+      "dependsOn": ["^build"]
     },
     "typecheck": {
-      "dependsOn": ["^build", "^typecheck"]
+      "dependsOn": ["^build"]
     },
     "//#format": {},
     "//#format:fix": {
@@ -40,11 +40,11 @@
       "outputs": []
     },
     "test:e2e": {
-      "dependsOn": ["^build", "^test:e2e"],
+      "dependsOn": ["^build"],
       "outputs": ["playwright-report/**", "test-results/**"]
     },
     "storybook:build": {
-      "dependsOn": ["^build", "^storybook:build"],
+      "dependsOn": ["^build"],
       "outputs": ["storybook-static/**"]
     }
   }

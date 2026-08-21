@@ -10,32 +10,79 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  # ------------------------------------------------------------------
+  # Job 1: Build, Lint, Typecheck, Storybook & Unit Tests (in parallel)
+  # ------------------------------------------------------------------
+  validate:
+    name: Build, Lint & Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86
+        with:
+          cache: true
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # Cache Turborepo build artifacts
+      # This speeds up subsequent builds
+      - name: Cache turbo build setup
+        uses: actions/cache@v6
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      # Main turbo pipeline
+      - name: Turbo Pipeline (Build, Lint, Typecheck, Storybook)
+        run: pnpm turbo run build lint typecheck format storybook:build
+
+      - name: Test Packages
+        run: pnpm test
+
+  # ------------------------------------------------------------------
+  # Job 2: E2E Tests Real Browser (Runs concurrently)
+  # ------------------------------------------------------------------
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86
         with:
           cache: true
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build Packages
-        run: pnpm build
-      - name: Build storybook
-        run: pnpm storybook:build
-      - name: Lint Packages
-        run: pnpm lint
-      - name: Test Packages
-        run: pnpm test
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "version=$(pnpm --filter @odysea/extension exec playwright --version)" >> $GITHUB_OUTPUT
+
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v6
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+
       - name: Install Playwright Browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm --filter @odysea/extension exec playwright install chromium --with-deps
+
+      - name: Build Extension
+        run: pnpm turbo build --filter=@odysea/extension
+
       - name: Run E2E Tests
-        timeout-minutes: 60
+        timeout-minutes: 30
         run: xvfb-run -a pnpm --filter @odysea/extension test:e2e
+
       - name: Upload Report
         uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
           path: apps/extension/playwright-report/
-          retention-days: 10
+          retention-days: 5
