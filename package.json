@@ -27,10 +27,10 @@
     "packages": "pnpm --filter=@melledijkstra/* run",
     "cli": "pnpm --filter=@odysea/cli run",
     "ui": "pnpm --filter=@melledijkstra/ui run",
-    "storybook:build": "pnpm --filter=@odysea/extension run storybook:build && pnpm --filter=@melledijkstra/ui run storybook:build",
+    "storybook:build": "turbo run storybook:build",
     "local:ci": "CI=true turbo run build format lint typecheck && CI=true pnpm test",
-    "local:ci:full": "CI=true turbo run build format lint typecheck && CI=true turbo run test test:e2e",
-    "cleanup": "rm -rf .turbo node_modules && rm -fr apps/*/node_modules && pnpm cache delete"
+    "local:ci:full": "CI=true pnpm install --frozen-lockfile && CI=true turbo run build lint typecheck format storybook:build && CI=true turbo run test test:e2e",
+    "cleanup": "rm -rf .turbo node_modules && rm -fr */node_modules && pnpm cache delete"
   },
   "engines": {
     "node": ">=20"
