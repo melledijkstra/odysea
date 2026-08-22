@@ -48,7 +48,7 @@
     try {
       fetchedUnread = await client.getUnreadCount('INBOX')
       metric?.setUnread(fetchedUnread)
-      await cache.set(STORAGE_KEY, fetchedUnread, 5 * 60 * 1000) // Cache for 5 minutes
+      await cache.set(STORAGE_KEY, fetchedUnread, 30 * 1000) // Cache for 30 seconds
     } catch (error) {
       console.error('Error fetching Gmail data:', error)
       addNotification({
