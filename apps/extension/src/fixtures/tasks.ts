@@ -1,4 +1,4 @@
-import type { Task, TaskList } from '@/interfaces/tasks'
+import type { Task, TaskList } from '@/modules/tasks/types'
 
 export const mockTaskLists: TaskList[] = [
   {

@@ -1,6 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import CircleCalendar from '@/components/atoms/CircleCalendar.svelte'
+  import CircleCalendar from '@/svelte/CircleCalendar.svelte'
 
   const { Story } = defineMeta({
     title: 'Atoms/Calendar/CircleCalendar',

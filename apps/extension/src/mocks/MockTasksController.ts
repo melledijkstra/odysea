@@ -1,5 +1,5 @@
 import type { TaskControllerInterface } from '@/controllers/TaskController.interface'
-import type { Task, TaskList } from '@/interfaces/tasks'
+import type { Task, TaskList } from '@/modules/tasks/types'
 
 export class MockTasksController implements TaskControllerInterface {
   canCreateTask = true

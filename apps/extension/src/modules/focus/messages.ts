@@ -1,5 +1,5 @@
 import type { Mode, PomodoroState } from '@/modules/focus/types'
-import { createMessage } from '@/messaging'
+import { createMessage } from '@melledijkstra/extension'
 
 export const startPomodoro = createMessage<void, void>('startPomodoro')
 

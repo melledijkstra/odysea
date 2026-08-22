@@ -5,7 +5,6 @@
     mdiDelete,
     mdiPin,
     mdiPinOff,
-    mdiPlus,
     mdiClockOutline,
     mdiCalendarClock,
     mdiNumeric,
@@ -14,18 +13,24 @@
   } from '@mdi/js'
   import CountdownForm from './countdown/Form.svelte'
   import CounterForm from './counter/Form.svelte'
-  import WorldClockForm from './world-clocks/Form.svelte'
-  import Countdown from '@/components/atoms/metrics/Countdown.svelte'
-  import Clock from '@/components/atoms/metrics/WorldClock.svelte'
+  import WorldClockForm from './worldclock/Form.svelte'
+  import Countdown from '@/components/trackers/Countdown.svelte'
+  import Clock from '@/components/trackers/WorldClockTracker.svelte'
   import { trackers } from './state.svelte'
   import type { AnyMetric } from './types'
   import { Popover } from 'bits-ui'
   import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
   import { dndzone, type DndEvent } from 'svelte-dnd-action'
-  import { untrack } from 'svelte'
+  import { untrack, type Snippet } from 'svelte'
 
   type FormType = 'countdown' | 'worldclock' | 'counter'
+
+  export type TriggerProps = {
+    isOpen: boolean
+  }
+
+  let { trigger }: { trigger: Snippet<[TriggerProps]> } = $props()
 
   let currentForm = $state<FormType>()
 
@@ -71,25 +76,17 @@
 </script>
 
 <Popover.Root bind:open={isOpen}>
-  <Popover.Trigger
-    class={[
-      isOpen ? 'opacity-100' : 'opacity-0',
-      'group-hover:opacity-100 focus:opacity-100 transition-opacity duration-300 flex flex-col cursor-pointer',
-      'text-center dark:text-white/70 dark:hover:text-white text-zinc-500 hover:text-zinc-700',
-      'cursor-pointer transition-colors',
-    ]}
-  >
-    <Icon path={mdiPlus} size={24} class="mx-auto" />
-    <span class="text-xs">Add</span>
-  </Popover.Trigger>
+  {@render trigger({ isOpen })}
   <PopPanel panelProps={{ size: 'small' }}>
     {#if currentForm}
-      <IconButton
-        icon={mdiArrowLeft}
-        size={20}
-        onclick={() => backToMain()}
-        class="mb-2"
-      />
+      <div class="flex flex-row gap-2 items-center mb-3">
+        <IconButton
+          icon={mdiArrowLeft}
+          size={20}
+          onclick={() => backToMain()}
+        />
+        <h2 class="capitalize text-lg">{currentForm}</h2>
+      </div>
     {/if}
     {#if !currentForm}
       <p class="text-lg text-center mb-6 font-bold dark:text-white text-black">
@@ -223,13 +220,10 @@
         </div>
       {/if}
     {:else if currentForm === 'countdown'}
-      <h2 class="text-lg mb-3">Countdowns 🗓️</h2>
       <CountdownForm onSubmitted={backToMain} />
     {:else if currentForm === 'worldclock'}
-      <h2 class="text-lg mb-3">World Clocks 🌎</h2>
       <WorldClockForm onSubmitted={backToMain} />
     {:else if currentForm === 'counter'}
-      <h2 class="text-lg mb-3">Counters 🔢</h2>
       <CounterForm onSubmitted={backToMain} />
     {/if}
   </PopPanel>

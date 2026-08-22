@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest'
 import { AuthClient } from '@melledijkstra/extension'
 import { githubAuthClient } from '@/oauth2/clients'
-import type { Task, TaskList } from '@/interfaces/tasks'
+import type { Task, TaskList } from '@/modules/tasks/types'
 import type { TaskControllerInterface } from './TaskController.interface'
 import type { ILogger } from '@/interfaces/logger.interface'
 import { Logger } from '@/logger'

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Task } from '@/interfaces/tasks'
+  import type { Task } from '@/modules/tasks/types'
   import ContextMenu from '@melledijkstra/ui/svelte/ContextMenu.svelte'
   import Icon from '@melledijkstra/ui/svelte/Icon.svelte'
   import { mdiDotsVertical, mdiOpenInNew } from '@mdi/js'

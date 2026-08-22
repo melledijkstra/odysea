@@ -3,7 +3,7 @@
   import ScrollArea from '@melledijkstra/ui/svelte/ScrollArea.svelte'
   import type { TaskControllerInterface } from '@/controllers/TaskController.interface'
   import { useTasksQuery, useTasksListQuery } from '@/queries/tasks'
-  import type { Task } from '@/interfaces/tasks'
+  import type { Task } from '@/modules/tasks/types'
   import { getAuthContext } from '@/oauth2/auth.state.svelte'
   import { TASKS_SCOPE } from '@/oauth2/scope-registry'
   import { createMutation, useQueryClient } from '@tanstack/svelte-query'

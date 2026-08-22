@@ -1,6 +1,6 @@
 <script lang="ts">
   import { loadModule, type ModuleID } from '@/modules'
-  import { mdiHomeOutline } from '@mdi/js'
+  import { mdiHomeOutline, mdiPlus } from '@mdi/js'
   import { appState, switchAppMode } from '@/app-state.svelte'
   import { settingsStore } from '@/settings/index.svelte'
   import MetricsPanel from '@/modules/trackers/MetricsPanel.svelte'
@@ -8,6 +8,8 @@
   import Metrics from './MetricsBar.svelte'
   import MenuButton from '@melledijkstra/ui/svelte/MenuButton.svelte'
   import { spotifyState } from '@/modules/spotify/spotify.state.svelte'
+  import Icon from '@melledijkstra/ui/svelte/Icon.svelte'
+  import { Popover } from 'bits-ui'
 </script>
 
 {#snippet module(moduleId: ModuleID)}
@@ -47,7 +49,23 @@
       'group float-right flex flex-row items-center justify-end align-middle gap-5',
     ]}
   >
-    <MetricsPanel />
+    <MetricsPanel>
+      {#snippet trigger({ isOpen })}
+        <Popover.Trigger
+          class={[
+            isOpen
+              ? 'opacity-100 dark:text-white'
+              : 'opacity-0 dark:text-white/70 dark:hover:text-white hover:text-zinc-700 text-zinc-500',
+            'group-hover:opacity-100 focus:opacity-100 transition-opacity duration-300 flex flex-col cursor-pointer',
+            'text-center',
+            'cursor-pointer transition-colors',
+          ]}
+        >
+          <Icon path={mdiPlus} size={24} class="mx-auto" />
+          <span class="text-xs">Add</span>
+        </Popover.Trigger>
+      {/snippet}
+    </MetricsPanel>
     <Metrics />
     {@render module('weather')}
     <Account />

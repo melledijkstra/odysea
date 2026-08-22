@@ -1,6 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import Sleep from '@/components/atoms/metrics/Sleep.svelte'
+  import Sleep from '@/components/trackers/Sleep.svelte'
 
   const { Story } = defineMeta({
     title: 'Metrics (localstorage)/Sleep',

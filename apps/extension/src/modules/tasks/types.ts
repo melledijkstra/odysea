@@ -1,10 +1,10 @@
-export interface TaskList {
+export type TaskList = {
   id: string
   title: string
   updated?: string
 }
 
-export interface Task {
+export type Task = {
   id: string
   title: string
   status?: 'needsAction' | 'completed'

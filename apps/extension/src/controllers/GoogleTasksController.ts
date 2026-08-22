@@ -4,7 +4,7 @@ import { Logger } from '@/logger'
 import { AuthClient } from '@melledijkstra/extension'
 import { googleAuthClient } from '@/oauth2/clients'
 import { addNotification } from '@/stores/notifications.svelte'
-import type { Task, TaskList } from '@/interfaces/tasks'
+import type { Task, TaskList } from '@/modules/tasks/types'
 import { scopeRegistry, TASKS_SCOPE } from '@/oauth2/scope-registry'
 import type { TaskControllerInterface } from './TaskController.interface'
 

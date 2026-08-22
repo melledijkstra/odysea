@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Task } from '@/interfaces/tasks'
+  import type { Task } from '@/modules/tasks/types'
   import TaskItem from './TaskItem.svelte'
   import type { HTMLAttributes } from 'svelte/elements'
   import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
