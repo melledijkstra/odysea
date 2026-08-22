@@ -1,23 +1,22 @@
-import type {
-  AnyMetric,
-  CountdownMetric,
-  CounterMetric,
-  SleepMetric,
-  WorldClockMetric,
-} from './types'
+import { Countdown } from './countdown/countdown.svelte'
+import { Counter } from './counter/counter.svelte'
+import { Sleep } from './sleep/sleep.svelte'
+import type { Tracker } from './tracker.svelte'
+import type { AnyTracker } from './types'
+import { WorldClock } from './worldclock/worldclock.svelte'
 
 const STORAGE_KEYS = {
   metrics: 'metrics',
 } as const
 
 export class Trackers {
-  metrics = $state<AnyMetric[]>([])
+  metrics = $state<Tracker[]>([])
 
   constructor() {
     this.loadMetrics()
   }
 
-  get allMetrics() {
+  get allMetrics(): Tracker[] {
     return this.metrics
   }
 
@@ -25,7 +24,8 @@ export class Trackers {
     const stored = localStorage.getItem(STORAGE_KEYS.metrics)
     try {
       if (stored) {
-        this.metrics = JSON.parse(stored) as AnyMetric[]
+        const rawMetrics = JSON.parse(stored) as AnyTracker[]
+        this.metrics = rawMetrics.map(this.toTracker)
       }
     } catch {
       this.metrics = []
@@ -33,58 +33,65 @@ export class Trackers {
     }
   }
 
-  private storeMetrics(metrics: AnyMetric[]) {
-    localStorage.setItem(STORAGE_KEYS.metrics, JSON.stringify(metrics))
+  private toTracker = (rawMetric: AnyTracker): Tracker => {
+    switch (rawMetric.type) {
+      case 'countdown':
+        return Countdown.fromDTO(rawMetric)
+      case 'counter':
+        return Counter.fromDTO(rawMetric)
+      case 'worldClock':
+        return WorldClock.fromDTO(rawMetric)
+      case 'sleep':
+        return Sleep.fromDTO(rawMetric)
+      default: {
+        const _exhaustive: never = rawMetric
+        throw new Error(`Unknown tracker type: ${JSON.stringify(_exhaustive)}`)
+      }
+    }
   }
 
-  public setMetrics(metrics: AnyMetric[]) {
+  private storeMetrics(metrics: Tracker[]) {
+    localStorage.setItem(
+      STORAGE_KEYS.metrics,
+      JSON.stringify(metrics.map((m) => m.toJSON()))
+    )
+  }
+
+  public setMetrics(metrics: Tracker[]) {
     this.metrics = metrics
     this.storeMetrics(metrics)
   }
 
   addCountdown(name: string, date: string, pinned: boolean) {
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const countdownDate = new Date(date)
-    const newCountdown: CountdownMetric = {
-      id: crypto.randomUUID(),
-      type: 'countdown',
+    const countdownDate = Date.parse(date)
+    const newCountdown = new Countdown(
+      crypto.randomUUID(),
       name,
-      date: countdownDate.valueOf(),
-      pinned,
-    }
+      countdownDate,
+      pinned
+    )
     this.setMetrics([...this.metrics, newCountdown])
   }
 
   addCounter(name: string, value: number, pinned: boolean) {
-    const newCounter: CounterMetric = {
-      id: crypto.randomUUID(),
-      type: 'counter',
-      name,
-      value,
-      pinned,
-    }
+    const newCounter = new Counter(crypto.randomUUID(), name, value, pinned)
     this.setMetrics([...this.metrics, newCounter])
   }
 
   addWorldClock(name: string, timeZone: string, pinned: boolean) {
-    const newWorldClock: WorldClockMetric = {
-      id: crypto.randomUUID(),
-      type: 'worldClock',
+    const newWorldClock = new WorldClock(
+      crypto.randomUUID(),
       name,
       timeZone,
-      pinned,
-    }
+      pinned
+    )
     this.setMetrics([...this.metrics, newWorldClock])
   }
 
   setSleepEnabled(enabled: boolean) {
     const hasSleep = this.metrics.some((m) => m.type === 'sleep')
     if (enabled && !hasSleep) {
-      const sleepMetric: SleepMetric = {
-        id: 'sleep',
-        type: 'sleep',
-        pinned: true,
-      }
+      const sleepMetric = new Sleep(true)
       this.setMetrics([...this.metrics, sleepMetric])
     } else if (!enabled && hasSleep) {
       this.setMetrics(this.metrics.filter((m) => m.type !== 'sleep'))
@@ -99,10 +106,11 @@ export class Trackers {
     this.setMetrics(this.metrics.filter((m) => m.id !== id))
   }
 
-  updateMetric(id: string, payload: Partial<AnyMetric>) {
+  updateMetric(id: string, payload: Partial<AnyTracker>) {
     const newMetrics = this.metrics.map((metric) => {
       if (metric.id === id) {
-        return { ...metric, ...payload } as AnyMetric
+        const dto = { ...metric.toJSON(), ...payload } as AnyTracker
+        return this.toTracker(dto)
       }
       return metric
     })
@@ -110,7 +118,11 @@ export class Trackers {
   }
 
   pinMetric(id: string, pinned: boolean) {
-    this.updateMetric(id, { pinned })
+    const metric = this.metrics.find((m) => m.id === id)
+    if (metric) {
+      metric.setPinned(pinned)
+      this.storeMetrics(this.metrics)
+    }
   }
 }
 

@@ -1,11 +1,12 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import Countdown from '@/components/trackers/Countdown.svelte'
+  import CountdownComponent from '@/components/trackers/Countdown.svelte'
+  import { Countdown } from '@/modules/trackers/countdown/countdown.svelte'
 
   // More on how to set up stories at: https://storybook.js.org/docs/writing-stories
   const { Story } = defineMeta({
     title: 'Metrics (localstorage)/Countdown',
-    component: Countdown,
+    component: CountdownComponent,
     argTypes: {
       metric: {
         type: 'symbol',
@@ -14,13 +15,12 @@
       },
     },
     args: {
-      metric: {
-        id: '1',
-        type: 'countdown',
-        name: '5 days until vacation',
-        pinned: true,
-        date: Date.now() + 1000 * 60 * 60 * 24 * 5, // 5 days from now
-      },
+      metric: new Countdown(
+        '1',
+        '5 days until vacation',
+        Date.now() + 1000 * 60 * 60 * 24 * 5, // 5 days from now
+        true
+      ),
     },
   })
 </script>

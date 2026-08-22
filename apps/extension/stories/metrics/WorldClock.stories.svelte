@@ -1,11 +1,12 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import WorldClock from '@/components/trackers/WorldClockTracker.svelte'
+  import WorldClockComponent from '@/components/trackers/WorldClockTracker.svelte'
+  import { WorldClock } from '@/modules/trackers/worldclock/worldclock.svelte'
 
   // More on how to set up stories at: https://storybook.js.org/docs/writing-stories
   const { Story } = defineMeta({
     title: 'Metrics (localstorage)/World Clock',
-    component: WorldClock,
+    component: WorldClockComponent,
     argTypes: {
       metric: {
         type: 'symbol',
@@ -19,25 +20,13 @@
 <Story
   name="Amsterdam"
   args={{
-    metric: {
-      id: '1',
-      type: 'worldClock',
-      name: 'Amsterdam',
-      pinned: true,
-      timeZone: 'Europe/Amsterdam',
-    },
+    metric: new WorldClock('1', 'Amsterdam', 'Europe/Amsterdam', true),
   }}
 />
 
 <Story
   name="Tokyo"
   args={{
-    metric: {
-      id: '2',
-      type: 'worldClock',
-      name: 'Tokyo',
-      pinned: true,
-      timeZone: 'Asia/Tokyo',
-    },
+    metric: new WorldClock('2', 'Tokyo', 'Asia/Tokyo', true),
   }}
 />

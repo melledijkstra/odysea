@@ -14,10 +14,8 @@
   import CountdownForm from './countdown/Form.svelte'
   import CounterForm from './counter/Form.svelte'
   import WorldClockForm from './worldclock/Form.svelte'
-  import Countdown from '@/components/trackers/Countdown.svelte'
-  import Clock from '@/components/trackers/WorldClockTracker.svelte'
   import { trackers } from './state.svelte'
-  import type { AnyMetric } from './types'
+  import type { Tracker } from './tracker.svelte'
   import { Popover } from 'bits-ui'
   import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
@@ -34,7 +32,7 @@
 
   let currentForm = $state<FormType>()
 
-  let items = $state<AnyMetric[]>([])
+  let items = $state<Tracker[]>([])
   let isDragging = $state(false)
   let isOpen = $state(false)
 
@@ -63,14 +61,14 @@
     })
   })
 
-  function handleDndConsider(dragEvent: CustomEvent<DndEvent<AnyMetric>>) {
+  function handleDndConsider(dragEvent: CustomEvent<DndEvent<Tracker>>) {
     isDragging = true
-    items = dragEvent.detail.items as AnyMetric[]
+    items = dragEvent.detail.items
   }
 
-  function handleDndFinalize(dragEvent: CustomEvent<DndEvent<AnyMetric>>) {
+  function handleDndFinalize(dragEvent: CustomEvent<DndEvent<Tracker>>) {
     isDragging = false
-    items = dragEvent.detail.items as AnyMetric[]
+    items = dragEvent.detail.items
     trackers.setMetrics(items)
   }
 </script>
@@ -173,40 +171,26 @@
                   <Icon path={mdiDrag} size={20} />
                 </div>
                 <div class="flex-1 min-w-0">
-                  {#if item.type === 'countdown'}
-                    <Countdown metric={item} />
-                  {:else if item.type === 'worldClock'}
-                    <Clock metric={item} />
-                  {:else if item.type === 'counter'}
-                    <p
-                      class="text-sm font-bold truncate leading-tight dark:text-white text-black"
-                    >
-                      {item.name}
-                    </p>
-                    <p
-                      class="text-xs opacity-70 truncate dark:text-white text-black"
-                    >
-                      {item.value}
-                    </p>
-                  {:else if item.type === 'sleep'}
-                    <div
-                      class="text-sm font-bold truncate leading-tight dark:text-white text-black"
-                    >
-                      Sleep
-                    </div>
-                  {/if}
+                  <p
+                    class="text-sm font-bold truncate leading-tight dark:text-white text-black"
+                  >
+                    {item.name ?? item.type}
+                  </p>
+                  <p
+                    class="text-xs opacity-70 truncate dark:text-white text-black"
+                  >
+                    {item.formatValue?.()}
+                  </p>
                 </div>
                 <div
                   class="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity"
                 >
-                  {#if item.type === 'worldClock'}
-                    <IconButton
-                      icon={item.pinned ? mdiPin : mdiPinOff}
-                      size={18}
-                      onclick={() => trackers.pinMetric(item.id, !item.pinned)}
-                      class={item.pinned ? 'text-primary' : ''}
-                    />
-                  {/if}
+                  <IconButton
+                    icon={item.pinned ? mdiPin : mdiPinOff}
+                    size={18}
+                    onclick={() => trackers.pinMetric(item.id, !item.pinned)}
+                    class={item.pinned ? 'text-primary' : ''}
+                  />
                   <IconButton
                     icon={mdiDelete}
                     size={18}

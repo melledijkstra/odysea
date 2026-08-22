@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { WorldClockMetric } from '@/modules/trackers/types'
+  import { WorldClock } from '@/modules/trackers/worldclock/worldclock.svelte'
   import { onPageVisible } from '@/utils/visibility'
-  import { renderTimezone, repeatEvery } from '@melledijkstra/toolbox'
+  import { repeatEvery } from '@melledijkstra/toolbox'
   import { onDestroy, onMount } from 'svelte'
   import { fade } from 'svelte/transition'
   import { Tracker } from '@melledijkstra/ui/svelte'
 
-  const { metric }: { metric: WorldClockMetric } = $props()
+  const { metric }: { metric: WorldClock } = $props()
 
   let updateKey = $state(Date.now())
 
@@ -32,7 +32,7 @@
 <div transition:fade>
   <Tracker.Root>
     {#key updateKey}
-      <Tracker.Metric>{renderTimezone(metric.timeZone)}</Tracker.Metric>
+      <Tracker.Metric>{metric.formatValue()}</Tracker.Metric>
     {/key}
     <Tracker.Title>{metric.name}</Tracker.Title>
   </Tracker.Root>

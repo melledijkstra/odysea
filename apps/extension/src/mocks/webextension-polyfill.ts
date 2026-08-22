@@ -16,6 +16,12 @@ export const browser = {
       set: vi.fn(() => Promise.resolve()),
     },
   },
+  identity: {
+    getRedirectURL: vi.fn(
+      (path?: string) => `https://mock.redirect/${path || ''}`
+    ),
+    launchWebAuthFlow: vi.fn(),
+  },
   tabs: {
     query: vi.fn(() => Promise.resolve([])),
   },

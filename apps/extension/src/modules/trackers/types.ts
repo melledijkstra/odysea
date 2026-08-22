@@ -1,31 +1,32 @@
-export type BaseMetric = {
+export interface BaseTracker {
   id: string
   type: string
   pinned: boolean
+  name?: string
 }
 
-export type CounterMetric = BaseMetric & {
+export interface CounterTracker extends BaseTracker {
   type: 'counter'
   name: string
   value: number
 }
 
-export type CountdownMetric = BaseMetric & {
+export interface CountdownTracker extends BaseTracker {
   type: 'countdown'
   name: string
   date: number
 }
 
-export type WorldClockMetric = BaseMetric & {
+export interface WorldClockTracker extends BaseTracker {
   type: 'worldClock'
   name: string
   timeZone: string
 }
 
-export type SleepMetric = BaseMetric & {
+export interface SleepTracker extends BaseTracker {
   type: 'sleep'
   id: 'sleep'
 }
 
-export type AnyMetric =
-  CounterMetric | CountdownMetric | WorldClockMetric | SleepMetric
+export type AnyTracker =
+  CounterTracker | CountdownTracker | WorldClockTracker | SleepTracker
