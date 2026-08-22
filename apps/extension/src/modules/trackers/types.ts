@@ -28,5 +28,14 @@ export interface SleepTracker extends BaseTracker {
   id: 'sleep'
 }
 
+export interface GmailTracker extends BaseTracker {
+  type: 'gmail'
+  id: 'gmail'
+}
+
 export type AnyTracker =
-  CounterTracker | CountdownTracker | WorldClockTracker | SleepTracker
+  | CounterTracker
+  | CountdownTracker
+  | WorldClockTracker
+  | SleepTracker
+  | GmailTracker

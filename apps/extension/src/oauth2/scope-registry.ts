@@ -3,6 +3,7 @@ export const HEALTH_SCOPE =
   'https://www.googleapis.com/auth/fitness.activity.read'
 export const SLEEP_SCOPE =
   'https://www.googleapis.com/auth/googlehealth.sleep.readonly'
+export const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly'
 
 export type ScopeRegistry = {
   [key: string]: {
@@ -39,7 +40,7 @@ export const scopeRegistry: ScopeRegistry = {
   },
   gmail: {
     icon: '/icons/google-gmail.svg',
-    scopes: ['https://www.googleapis.com/auth/gmail.readonly'],
+    scopes: [GMAIL_SCOPE],
     message:
       'This app only reads your unread Gmail email messages count.\n' +
       'It will not modify or delete any messages.\n' +

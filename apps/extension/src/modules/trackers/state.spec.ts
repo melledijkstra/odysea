@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { Countdown } from './countdown/countdown.svelte'
 import { Counter } from './counter/counter.svelte'
+import { Gmail } from './gmail/gmail.svelte'
 import { Sleep } from './sleep/sleep.svelte'
 import { Trackers } from './state.svelte'
 import type { AnyTracker } from './types'
@@ -63,6 +64,21 @@ describe('Trackers', () => {
 
     trackers.setSleepEnabled(false)
     expect(trackers.sleepEnabled).toBe(false)
+    expect(trackers.allMetrics).toHaveLength(0)
+  })
+
+  it('enables and disables gmail metric', () => {
+    const trackers = new Trackers()
+    expect(trackers.gmailEnabled).toBe(false)
+
+    trackers.setGmailEnabled(true)
+    expect(trackers.gmailEnabled).toBe(true)
+    expect(trackers.allMetrics).toHaveLength(1)
+    expect(trackers.allMetrics[0]).toBeInstanceOf(Gmail)
+    expect(trackers.allMetrics[0].id).toBe('gmail')
+
+    trackers.setGmailEnabled(false)
+    expect(trackers.gmailEnabled).toBe(false)
     expect(trackers.allMetrics).toHaveLength(0)
   })
 

@@ -52,6 +52,14 @@
     }
   }
 
+  function toggleGmailTracker() {
+    if (trackers.gmailEnabled) {
+      trackers.setGmailEnabled(false)
+    } else {
+      trackers.setGmailEnabled(true)
+    }
+  }
+
   $effect(() => {
     const currentMetrics = trackers.allMetrics
     untrack(() => {
@@ -144,6 +152,22 @@
           />
           <span class="text-xs font-medium dark:text-white text-black"
             >Sleep</span
+          >
+        </button>
+        <button
+          onclick={toggleGmailTracker}
+          class={[
+            'flex flex-col items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border group',
+            trackers.gmailEnabled ? 'border-primary' : 'border-white/10',
+          ]}
+        >
+          <img
+            src="/icons/google-gmail.svg"
+            alt="Gmail"
+            class="w-6 h-6 mb-2 group-hover:scale-110 transition-transform"
+          />
+          <span class="text-xs font-medium dark:text-white text-black"
+            >Gmail</span
           >
         </button>
       </div>

@@ -1,5 +1,6 @@
 import { Countdown } from './countdown/countdown.svelte'
 import { Counter } from './counter/counter.svelte'
+import { Gmail } from './gmail/gmail.svelte'
 import { Sleep } from './sleep/sleep.svelte'
 import type { Tracker } from './tracker.svelte'
 import type { AnyTracker } from './types'
@@ -43,6 +44,8 @@ export class Trackers {
         return WorldClock.fromDTO(rawMetric)
       case 'sleep':
         return Sleep.fromDTO(rawMetric)
+      case 'gmail':
+        return Gmail.fromDTO(rawMetric)
       default: {
         const _exhaustive: never = rawMetric
         throw new Error(`Unknown tracker type: ${JSON.stringify(_exhaustive)}`)
@@ -100,6 +103,20 @@ export class Trackers {
 
   get sleepEnabled() {
     return this.metrics.some((m) => m.type === 'sleep')
+  }
+
+  setGmailEnabled(enabled: boolean) {
+    const hasGmail = this.metrics.some((m) => m.type === 'gmail')
+    if (enabled && !hasGmail) {
+      const gmailMetric = new Gmail(true)
+      this.setMetrics([...this.metrics, gmailMetric])
+    } else if (!enabled && hasGmail) {
+      this.setMetrics(this.metrics.filter((m) => m.type !== 'gmail'))
+    }
+  }
+
+  get gmailEnabled() {
+    return this.metrics.some((m) => m.type === 'gmail')
   }
 
   deleteMetric(id: string) {
