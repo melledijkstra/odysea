@@ -6,24 +6,7 @@ import { googleAuthClient } from '@/oauth2/clients'
 import { addNotification } from '@/stores/notifications.svelte'
 import type { Task, TaskList } from '@/interfaces/tasks'
 import { scopeRegistry, TASKS_SCOPE } from '@/oauth2/scope-registry'
-
-export type TaskControllerInterface = {
-  canCreateTask: boolean
-  defaultListId: string
-  getTasks: (taskListId?: string) => Promise<Task[]>
-  getTaskLists: () => Promise<TaskList[]>
-  createTask: (taskTitle: string, taskListId?: string) => Promise<boolean>
-  setTaskStatus: (
-    taskId: string,
-    status: boolean,
-    taskListId?: string
-  ) => Promise<boolean>
-  deleteTask: (taskId: string, taskListId?: string) => Promise<boolean>
-  updateTask: (task: Task, taskListId?: string) => Promise<boolean>
-  authenticate: () => Promise<boolean>
-  isAuthenticated: () => Promise<boolean>
-  isEnabled: () => Promise<boolean>
-}
+import type { TaskControllerInterface } from './TaskController.interface'
 
 export class GoogleTasksController implements TaskControllerInterface, ILogger {
   canCreateTask = true

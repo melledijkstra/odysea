@@ -1,12 +1,12 @@
 <script lang="ts">
   import TaskList from '@/components/atoms/tasks/TaskList.svelte'
   import ScrollArea from '@melledijkstra/ui/svelte/ScrollArea.svelte'
-  import type { TaskControllerInterface } from '@/controllers/GoogleTasksController'
-  import { createMutation, useQueryClient } from '@tanstack/svelte-query'
+  import type { TaskControllerInterface } from '@/controllers/TaskController.interface'
   import { useTasksQuery, useTasksListQuery } from '@/queries/tasks'
   import type { Task } from '@/interfaces/tasks'
   import { getAuthContext } from '@/oauth2/auth.state.svelte'
   import { TASKS_SCOPE } from '@/oauth2/scope-registry'
+  import { createMutation, useQueryClient } from '@tanstack/svelte-query'
 
   const authState = getAuthContext()
 
@@ -17,19 +17,6 @@
 
   const { controller, providerId }: TasksPanelContentProps = $props()
   const queryClient = useQueryClient()
-
-  let manualSelectedListId = $state<string | null>(null)
-  let selectedTaskList = $derived(
-    manualSelectedListId ?? controller.defaultListId ?? ''
-  )
-  let newTaskTitle = $state('')
-
-  $effect(() => {
-    // Reset manual list selection when provider changes
-    if (providerId) {
-      manualSelectedListId = null
-    }
-  })
 
   const isEnabled = $derived(
     providerId === 'google'
@@ -43,6 +30,22 @@
     enabled: isEnabled,
   }))
 
+  let manualSelectedListId = $state<string | null>(null)
+  let selectedTaskList = $derived(
+    manualSelectedListId ??
+      taskListsQuery.data?.[0]?.id ??
+      controller.defaultListId ??
+      ''
+  )
+  let newTaskTitle = $state('')
+
+  $effect(() => {
+    // Reset manual list selection when provider changes
+    if (providerId) {
+      manualSelectedListId = null
+    }
+  })
+
   const tasksQuery = useTasksQuery(() => ({
     providerId,
     controller,
@@ -50,39 +53,32 @@
     enabled: isEnabled,
   }))
 
+  const invalidate = () =>
+    queryClient.invalidateQueries({
+      queryKey: ['tasks', providerId, 'tasks', selectedTaskList],
+    })
+
   const createTaskMutation = createMutation(() => ({
     mutationFn: (title: string) =>
       controller.createTask(title, selectedTaskList),
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: ['tasks', providerId, 'tasks', selectedTaskList],
-      }),
+    onSuccess: invalidate,
   }))
 
   const setTaskStatusMutation = createMutation(() => ({
     mutationFn: ({ taskId, status }: { taskId: string; status: boolean }) =>
       controller.setTaskStatus(taskId, status, selectedTaskList),
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: ['tasks', providerId, 'tasks', selectedTaskList],
-      }),
+    onSuccess: invalidate,
   }))
 
   const updateTaskMutation = createMutation(() => ({
     mutationFn: (task: Task) => controller.updateTask(task, selectedTaskList),
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: ['tasks', providerId, 'tasks', selectedTaskList],
-      }),
+    onSuccess: invalidate,
   }))
 
   const deleteTaskMutation = createMutation(() => ({
     mutationFn: (taskId: string) =>
       controller.deleteTask(taskId, selectedTaskList),
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: ['tasks', providerId, 'tasks', selectedTaskList],
-      }),
+    onSuccess: invalidate,
   }))
 </script>
 
@@ -95,11 +91,9 @@
       manualSelectedListId = e.currentTarget.value
     }}
   >
-    {#if taskListsQuery.data}
-      {#each taskListsQuery.data as list (list.id)}
-        <option value={list.id}>{list.title}</option>
-      {/each}
-    {/if}
+    {#each taskListsQuery.data ?? [] as list (list.id)}
+      <option value={list.id}>{list.title}</option>
+    {/each}
   </select>
 </h3>
 <ScrollArea

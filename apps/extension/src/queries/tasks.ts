@@ -1,4 +1,4 @@
-import type { TaskControllerInterface } from '@/controllers/GoogleTasksController'
+import type { TaskControllerInterface } from '@/controllers/TaskController.interface'
 import { createQuery } from '@tanstack/svelte-query'
 
 export interface TaskListQueryParams {

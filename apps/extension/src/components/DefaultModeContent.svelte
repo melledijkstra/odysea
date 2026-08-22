@@ -3,12 +3,11 @@
   import Welcome from '@/components/Welcome.svelte'
   import { settingsStore } from '@/settings/index.svelte'
   import { getAuthContext } from '@/oauth2/auth.state.svelte'
-  import { useTasksQuery } from '@/queries/tasks'
+  import { useTasksQuery, useTasksListQuery } from '@/queries/tasks'
   import { useAccountQuery } from '@/queries/account'
   import { GoogleTasksController } from '@/controllers/GoogleTasksController'
   import { TASKS_SCOPE } from '@/oauth2/scope-registry'
 
-  const taskListId = '@default'
   const controller = new GoogleTasksController()
 
   const authState = getAuthContext()
@@ -19,11 +18,17 @@
       authState.hasScopes('google', [TASKS_SCOPE])
   )
 
+  const taskListsQuery = useTasksListQuery(() => ({
+    providerId: 'google',
+    controller,
+    enabled: isTasksEnabled,
+  }))
+
   const tasksQuery = useTasksQuery(() => ({
     providerId: 'google',
     controller,
-    taskListId,
-    enabled: isTasksEnabled,
+    taskListId: taskListsQuery.data?.[0]?.id ?? '',
+    enabled: isTasksEnabled && !!taskListsQuery.data?.[0]?.id,
   }))
 
   const currentTask = $derived(
