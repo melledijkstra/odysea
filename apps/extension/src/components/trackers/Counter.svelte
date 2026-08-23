@@ -33,12 +33,16 @@
         size={16}
         onclick={decrement}
         class="hover:text-primary p-0.5 rounded-none rounded-br h-1/2 w-5 flex items-center justify-center"
+        aria-label="Decrement"
+        title="Decrement"
       />
       <IconButton
         icon={mdiPlus}
         size={16}
         onclick={increment}
         class="hover:text-primary p-0.5 rounded-none rounded-tr border-b border-white/10 h-1/2 w-5 flex items-center justify-center"
+        aria-label="Increment"
+        title="Increment"
       />
     </div>
   </Tracker.Root>
