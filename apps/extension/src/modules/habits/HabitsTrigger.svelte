@@ -25,7 +25,11 @@
 
 <Popover.Root>
   <Popover.Trigger>
-    <IconButton icon={mdiProgressCheck} />
+    <IconButton
+      icon={mdiProgressCheck}
+      aria-label="Open habit tracker"
+      title="Open habit tracker"
+    />
   </Popover.Trigger>
   <PopPanel>
     <h1 class="text-xl font-bold">Habit Tracker</h1>

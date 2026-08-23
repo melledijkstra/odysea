@@ -23,5 +23,10 @@
 {:else if isPending}
   <WeatherInfoSkeleton displayUnit="C" />
 {:else if failed}
-  <IconButton icon={mdiCloudOff} onclick={() => weatherQuery.refetch()} />
+  <IconButton
+    icon={mdiCloudOff}
+    onclick={() => weatherQuery.refetch()}
+    aria-label="Retry fetching weather"
+    title="Retry fetching weather"
+  />
 {/if}

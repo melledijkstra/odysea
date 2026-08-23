@@ -41,4 +41,6 @@
   disabled={!settingsStore.loaded}
   onclick={refreshBackround}
   icon={mdiCameraRetakeOutline}
+  aria-label="Refresh background image"
+  title="Refresh background image"
 />

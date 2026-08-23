@@ -90,6 +90,8 @@
           icon={mdiArrowLeft}
           size={20}
           onclick={() => backToMain()}
+          aria-label="Back"
+          title="Back"
         />
         <h2 class="capitalize text-lg">{currentForm}</h2>
       </div>
@@ -214,12 +216,16 @@
                     size={18}
                     onclick={() => trackers.pinMetric(item.id, !item.pinned)}
                     class={item.pinned ? 'text-primary' : ''}
+                    aria-label={item.pinned ? 'Unpin metric' : 'Pin metric'}
+                    title={item.pinned ? 'Unpin metric' : 'Pin metric'}
                   />
                   <IconButton
                     icon={mdiDelete}
                     size={18}
                     onclick={() => trackers.deleteMetric(item.id)}
                     class="hover:text-red-400"
+                    aria-label="Delete metric"
+                    title="Delete metric"
                   />
                 </div>
               </div>
