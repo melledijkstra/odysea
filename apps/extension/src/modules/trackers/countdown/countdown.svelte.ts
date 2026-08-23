@@ -1,11 +1,9 @@
-import CountdownComponent from '@/components/trackers/Countdown.svelte'
 import { calculateRemainingDays } from '@melledijkstra/toolbox'
 import { Tracker, type TrackerFactory } from '../tracker.svelte'
 import type { CountdownTracker } from '../types'
 
 export class Countdown extends Tracker implements CountdownTracker {
   readonly type = 'countdown'
-  readonly component = CountdownComponent
   declare name: string
   date = $state<number>(0)
 

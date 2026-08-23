@@ -1,11 +1,9 @@
-import SleepComponent from '@/components/trackers/Sleep.svelte'
 import { Tracker, type TrackerFactory } from '../tracker.svelte'
 import type { SleepTracker } from '../types'
 
 export class Sleep extends Tracker implements SleepTracker {
   readonly id = 'sleep' as const
   readonly type = 'sleep' as const
-  readonly component = SleepComponent
   declare name: string
   minutes = $state<number | undefined>(undefined)
 

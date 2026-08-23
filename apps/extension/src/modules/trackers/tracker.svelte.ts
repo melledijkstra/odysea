@@ -1,4 +1,3 @@
-import type { Component } from 'svelte'
 import type { BaseTracker } from './types'
 
 export interface TrackerFactory<
@@ -13,8 +12,6 @@ export abstract class Tracker implements BaseTracker {
   abstract readonly type: string
   name?: string
   pinned: boolean = $state(false)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  abstract readonly component: Component<{ metric: any }>
 
   constructor(id: string, pinned?: boolean, name?: string) {
     this.id = id

@@ -61,7 +61,7 @@
   }
 
   $effect(() => {
-    const currentMetrics = trackers.allMetrics
+    const currentMetrics = trackers.metrics
     untrack(() => {
       if (!isDragging) {
         items = currentMetrics

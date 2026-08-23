@@ -17,10 +17,6 @@ export class Trackers {
     this.loadMetrics()
   }
 
-  get allMetrics(): Tracker[] {
-    return this.metrics
-  }
-
   private loadMetrics() {
     const stored = localStorage.getItem(STORAGE_KEYS.metrics)
     try {

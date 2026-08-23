@@ -1,10 +1,8 @@
-import CounterComponent from '@/components/trackers/Counter.svelte'
 import { Tracker, type TrackerFactory } from '../tracker.svelte'
 import type { CounterTracker } from '../types'
 
 export class Counter extends Tracker implements CounterTracker {
   readonly type = 'counter'
-  readonly component = CounterComponent
   declare name: string
   value = $state(0)
 

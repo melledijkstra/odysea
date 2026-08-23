@@ -1,11 +1,9 @@
-import WorldClockComponent from '@/components/trackers/WorldClockTracker.svelte'
 import { renderTimezone } from '@melledijkstra/toolbox'
 import { Tracker, type TrackerFactory } from '../tracker.svelte'
 import type { WorldClockTracker } from '../types'
 
 export class WorldClock extends Tracker implements WorldClockTracker {
   readonly type = 'worldClock'
-  readonly component = WorldClockComponent
   declare name: string
   timeZone = $state('')
 
