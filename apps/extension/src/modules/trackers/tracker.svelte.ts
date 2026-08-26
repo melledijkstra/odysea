@@ -7,11 +7,35 @@ export interface TrackerFactory<
   fromDTO(dto: D): T
 }
 
+export interface TrackerAction {
+  id: string
+  icon: string
+  ariaLabel?: string
+  onClick: () => void
+}
+
 export abstract class Tracker implements BaseTracker {
   id: string
   abstract readonly type: string
   name?: string
   pinned: boolean = $state(false)
+  icon?: string
+
+  /**
+   * Optional click handler for the whole tracker component
+   */
+  onclick?(): void
+
+  get actions(): TrackerAction[] {
+    return []
+  }
+
+  get needsAuth(): boolean {
+    return false
+  }
+
+  authenticate?(): Promise<void>
+  destroy?(): void
 
   constructor(id: string, pinned?: boolean, name?: string) {
     this.id = id

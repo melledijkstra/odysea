@@ -1,4 +1,10 @@
-import { Tracker, type TrackerFactory } from '../tracker.svelte'
+import { mdiMinus, mdiPlus } from '@mdi/js'
+import { trackers } from '../state.svelte'
+import {
+  Tracker,
+  type TrackerFactory,
+  type TrackerAction,
+} from '../tracker.svelte'
 import type { CounterTracker } from '../types'
 
 export class Counter extends Tracker implements CounterTracker {
@@ -10,6 +16,29 @@ export class Counter extends Tracker implements CounterTracker {
     super(id, pinned, name)
     this.name = name
     this.value = value
+  }
+
+  override get actions(): TrackerAction[] {
+    return [
+      {
+        id: 'decrement',
+        icon: mdiMinus,
+        ariaLabel: 'Decrement',
+        onClick: () => {
+          this.decrement()
+          trackers.setMetrics(trackers.metrics)
+        },
+      },
+      {
+        id: 'increment',
+        icon: mdiPlus,
+        ariaLabel: 'Increment',
+        onClick: () => {
+          this.increment()
+          trackers.setMetrics(trackers.metrics)
+        },
+      },
+    ]
   }
 
   increment() {
