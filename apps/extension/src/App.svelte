@@ -17,10 +17,10 @@
 
   setAuthContext(authState)
 
-  const initPromise = Promise.allSettled([
-    settings.initialize(),
-    authState.initialize(),
-  ])
+  const initPromise = (async () => {
+    await settings.initialize()
+    await authState.initialize()
+  })()
 </script>
 
 <svelte:head>

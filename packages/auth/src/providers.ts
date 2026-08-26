@@ -9,7 +9,7 @@ export interface AuthConfig {
   name: OauthProvider
   scopes: string[]
   clientId: string
-  clientSecret?: string
+  clientSecret?: string | null
   authEndpoint?: string
   tokenEndpoint?: string
   extraParams?: Record<string, string>

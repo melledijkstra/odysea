@@ -73,13 +73,13 @@ export class AuthClient {
       case 'google-health':
         return new Google(
           this.provider.clientId,
-          this.provider.clientSecret ?? '',
+          this.provider.clientSecret || (null as unknown as string),
           this._redirectUrl
         )
       case 'spotify':
         return new Spotify(
           this.provider.clientId,
-          this.provider.clientSecret ?? null,
+          this.provider.clientSecret || null,
           this._redirectUrl
         )
       case 'github':
@@ -91,7 +91,7 @@ export class AuthClient {
       default:
         return new OAuth2Client(
           this.provider.clientId,
-          this.provider.clientSecret ?? null,
+          this.provider.clientSecret || null,
           this._redirectUrl
         )
     }
@@ -187,6 +187,10 @@ export class AuthClient {
   }
 
   async refreshAccessToken(refreshToken: string): Promise<OAuth2Tokens | null> {
+    if (!this.provider.clientId) {
+      this._logger.warn('Cannot refresh token: client ID is not configured')
+      return null
+    }
     if (
       this._arcticClient instanceof Google ||
       this._arcticClient instanceof GitHub ||
@@ -222,6 +226,10 @@ export class AuthClient {
   private async tryRefreshToken(
     refresh_token: string
   ): Promise<string | undefined> {
+    if (!this.provider.clientId) {
+      this._logger.warn('Cannot refresh token: client ID is not configured')
+      return undefined
+    }
     this._logger.log('token expired, trying to refresh it')
     try {
       const newTokens = await this.refreshAccessToken(refresh_token)

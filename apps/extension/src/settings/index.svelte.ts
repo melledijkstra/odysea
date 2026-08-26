@@ -70,6 +70,7 @@ export class Settings implements ILogger {
   // this is used to prevent triggering the storage change listener when settings
   // were changed by the same source as the listener
   private isLocalSettingsChange = false
+  private storage: browser.Storage.StorageArea = browser.storage.sync
 
   public async initialize() {
     if (settingsStore.loaded || this.loading) {
@@ -95,7 +96,7 @@ export class Settings implements ILogger {
 
     this.loading = true
 
-    const { settings: storageSettings } = (await browser.storage.sync.get(
+    const { settings: storageSettings } = (await this.storage.get(
       SETTINGS_KEY
     )) as { settings: SettingsState }
 
@@ -112,7 +113,7 @@ export class Settings implements ILogger {
     Object.assign(settingsStore, mergedSettings)
 
     if (!changeListenersSet) {
-      browser.storage.sync.onChanged.addListener((changes) =>
+      this.storage.onChanged?.addListener((changes) =>
         this.onStorageSettingsChanged(changes)
       )
       changeListenersSet = true
@@ -122,7 +123,7 @@ export class Settings implements ILogger {
   }
 
   async getSettingsFromStorage(): Promise<SettingsState> {
-    const { settings: storageSettings } = (await browser.storage.sync.get(
+    const { settings: storageSettings } = (await this.storage.get(
       SETTINGS_KEY
     )) as { settings: SettingsState }
 
@@ -137,12 +138,12 @@ export class Settings implements ILogger {
     this.logger.log('Saving settings to storage', {
       settingsToStore,
     })
-    await browser.storage.sync.set({ settings: settingsToStore })
+    await this.storage.set({ settings: settingsToStore })
     this.isLocalSettingsChange = false
   }
 
   removeSettingsChangeListener() {
-    browser.storage.onChanged.removeListener((changes) =>
+    this.storage.onChanged?.removeListener((changes) =>
       this.onStorageSettingsChanged(changes)
     )
   }

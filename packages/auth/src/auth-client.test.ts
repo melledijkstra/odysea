@@ -51,7 +51,10 @@ describe('AuthClient', () => {
     handler = {
       open: vi.fn(),
     }
-    googleAuth = createGoogleAuthConfig()
+    googleAuth = {
+      ...createGoogleAuthConfig(),
+      clientId: 'mock-google-client-id',
+    }
     client = new AuthClient(googleAuth, 'http://localhost:3000/callback', {
       storage,
       handler,
