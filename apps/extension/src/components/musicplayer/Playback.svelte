@@ -86,6 +86,8 @@
     value={position_ms}
     onValueCommit={(value) => onSeek?.(value)}
     max={mediaItem?.duration_ms ?? 0}
+    aria-label="Seek track position"
+    title="Seek track position"
     class="bg-transparent relative flex w-full touch-none select-none items-center cursor-pointer group/seeker"
   >
     <span class="bg-white/50 relative h-1 w-full grow overflow-hidden">
@@ -93,6 +95,7 @@
     </span>
     <Slider.Thumb
       index={0}
+      aria-label="Seek track position"
       class={[
         'block size-2.5 bg-background shadow-sm cursor-pointer rounded-full',
         'dark:bg-white dark:shadow-black/30',
@@ -129,6 +132,8 @@
       <div class="flex flex-row gap-3 items-center">
         <button
           class="cursor-pointer"
+          aria-label={isShuffling ? 'Disable shuffle' : 'Enable shuffle'}
+          title={isShuffling ? 'Disable shuffle' : 'Enable shuffle'}
           onclick={() => {
             onToggleShuffle?.(!isShuffling)
           }}
@@ -138,20 +143,34 @@
             path={mdiShuffleVariant}
           />
         </button>
-        <button class="cursor-pointer" onclick={() => onPreviousTrack?.()}>
+        <button
+          class="cursor-pointer"
+          aria-label="Previous track"
+          title="Previous track"
+          onclick={() => onPreviousTrack?.()}
+        >
           <Icon class="size-6" path={mdiSkipPrevious} />
         </button>
         <button
           class="cursor-pointer p-1 rounded-full bg-white text-black"
+          aria-label={state?.isPlaying ? 'Pause' : 'Play'}
+          title={state?.isPlaying ? 'Pause' : 'Play'}
           onclick={() => onPlayPause?.()}
         >
           <Icon class="size-6" path={state?.isPlaying ? mdiPause : mdiPlay} />
         </button>
-        <button class="cursor-pointer" onclick={() => onNextTrack?.()}>
+        <button
+          class="cursor-pointer"
+          aria-label="Next track"
+          title="Next track"
+          onclick={() => onNextTrack?.()}
+        >
           <Icon class="size-6" path={mdiSkipNext} />
         </button>
         <button
           class="cursor-pointer disabled:text-gray-500 disabled:cursor-not-allowed"
+          aria-label={repeatMode === 0 ? 'Enable repeat' : repeatMode === 1 ? 'Repeat all' : 'Disable repeat'}
+          title={repeatMode === 0 ? 'Enable repeat' : repeatMode === 1 ? 'Repeat all' : 'Disable repeat'}
           onclick={() =>
             onSwitchRepeatMode?.(repeatMode === 2 ? 0 : repeatMode + 1)}
         >
@@ -177,6 +196,8 @@
           min={0}
           step={1}
           max={100}
+          aria-label="Adjust volume"
+          title="Adjust volume"
           class="relative flex w-full touch-none select-none items-center cursor-pointer group/volume"
         >
           <span
@@ -191,6 +212,7 @@
           </span>
           <Slider.Thumb
             index={0}
+            aria-label="Adjust volume"
             class={[
               'block size-2 bg-background shadow-sm cursor-pointer rounded-full',
               'dark:bg-white dark:shadow-black/30',
