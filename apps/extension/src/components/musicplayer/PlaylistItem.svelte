@@ -17,6 +17,8 @@
 >
   <button
     class="cursor-pointer hover:opacity-30 shrink-0"
+    title="Play playlist {playlist.title}"
+    aria-label="Play playlist {playlist.title}"
     onclick={() => onPlaylistPlay(playlist)}
   >
     <img
@@ -28,6 +30,8 @@
   <div class="flex flex-col overflow-hidden text-sm items-start">
     <button
       class="inline-block truncate hover:underline cursor-pointer"
+      title="View playlist {playlist.title}"
+      aria-label="View playlist {playlist.title}"
       onclick={() => onPlaylistSelected(playlist)}>{playlist.title}</button
     >
     <p class="text-xs italic">{playlist.trackCount ?? 0} songs</p>
