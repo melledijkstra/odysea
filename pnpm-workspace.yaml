@@ -21,7 +21,7 @@ onlyBuiltDependencies:
 catalog:
   # Building & Bundling
   turbo: ^2.10.11
-  vite: ^8.2.1
+  vite: ^8.2.2
   tsx: ^4.23.12
   tsdown: ^0.22.14
   deno: ^2.9.5
