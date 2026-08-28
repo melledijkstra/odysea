@@ -1,0 +1,73 @@
+$ NODE_ENV=development vite build --watch --mode development
+vite v8.2.1 building client environment for development...
+
+watching for file changes...
+
+build started...
+[2Ktransforming...✓ 911 modules transformed.
+rendering chunks...
+[vite-plugin-static-copy] Copied 1 items.
+computing gzip size...
+dist/popup.html                                    0.34 kB │ gzip:  0.23 kB
+dist/debug.html                                    0.42 kB │ gzip:  0.26 kB
+dist/options.html                                  0.43 kB │ gzip:  0.26 kB
+dist/index.html                                    0.50 kB │ gzip:  0.28 kB
+dist/assets/debug.uZYB_s_X.css                     0.03 kB │ gzip:  0.05 kB
+dist/assets/index-client.hJP038h8.css              0.15 kB │ gzip:  0.12 kB
+dist/assets/well-being.VF7fu_oI.css                0.16 kB │ gzip:  0.10 kB
+dist/assets/ScrollArea.DqQg4ig9.css                0.48 kB │ gzip:  0.25 kB
+dist/assets/spotify.DTG1Ia7P.css                   0.58 kB │ gzip:  0.36 kB
+dist/assets/home.BU2ejDCq.css                      1.40 kB │ gzip:  0.60 kB
+dist/assets/app.CZ99Bnml.css                      76.55 kB │ gzip: 11.35 kB
+dist/scripts/legacy.DpXQkhaK.js                    0.25 kB │ gzip:  0.19 kB
+dist/scripts/logger.D2besb4f.js                    0.26 kB │ gzip:  0.19 kB
+dist/scripts/spotify.state.svelte.CUX_i8Em.js      0.29 kB │ gzip:  0.21 kB
+dist/scripts/on-mount-effect.svelte.5ri-8WkQ.js    0.38 kB │ gzip:  0.27 kB
+dist/scripts/messages.CqgbytqW.js                  0.56 kB │ gzip:  0.24 kB
+dist/scripts/app-state.svelte.BkYua_g3.js          0.62 kB │ gzip:  0.36 kB
+dist/scripts/transition.B4gQLlWO.js                0.64 kB │ gzip:  0.40 kB
+dist/scripts/notes.By0UghFk.js                     0.70 kB │ gzip:  0.36 kB
+dist/scripts/habits.58lPBs2X.js                    0.72 kB │ gzip:  0.36 kB
+dist/scripts/rolldown-runtime.BPOCksWG.js          1.18 kB │ gzip:  0.57 kB
+dist/scripts/Spinner.CX2GFluP.js                   1.24 kB │ gzip:  0.70 kB
+dist/scripts/databaseStore.svelte.cGxvlnOV.js      1.27 kB │ gzip:  0.52 kB
+dist/scripts/Button.BOfiNXyM.js                    1.51 kB │ gzip:  0.78 kB
+dist/debug.js                                      1.80 kB │ gzip:  0.88 kB
+dist/options.js                                    1.89 kB │ gzip:  0.92 kB
+dist/scripts/IconButton.D1TTvVCi.js                2.00 kB │ gzip:  0.97 kB
+dist/scripts/modules.DcL2omjd.js                   2.23 kB │ gzip:  0.89 kB
+dist/scripts/Input.Da8F9Ves.js                     2.24 kB │ gzip:  1.00 kB
+dist/scripts/preload-helper.CKu8ATxC.js            2.41 kB │ gzip:  1.07 kB
+dist/popup.js                                      3.13 kB │ gzip:  1.31 kB
+dist/scripts/dev.BSxRTciX.js                       3.32 kB │ gzip:  1.07 kB
+dist/scripts/index.svelte.CLAdXxZl.js              3.48 kB │ gzip:  1.19 kB
+dist/scripts/GoogleTasksController.CdumatZs.js     3.97 kB │ gzip:  1.34 kB
+dist/scripts/well-being.B165hc4t.js                5.08 kB │ gzip:  1.96 kB
+dist/scripts/dist.Boo_NRHP.js                      5.33 kB │ gzip:  1.58 kB
+dist/background.js                                 5.48 kB │ gzip:  1.83 kB
+dist/scripts/dist.fAXmWK3Y.js                      6.68 kB │ gzip:  2.14 kB
+dist/scripts/weather.DUhLbgv9.js                   8.12 kB │ gzip:  2.38 kB
+dist/scripts/db.BfIv8ZC5.js                        8.17 kB │ gzip:  2.43 kB
+dist/scripts/notes.D-bwrjEb.js                     9.89 kB │ gzip:  2.84 kB
+dist/scripts/focus.Da9STTZd.js                    10.21 kB │ gzip:  3.06 kB
+dist/scripts/AuthButton.6dCyb8Nf.js               12.80 kB │ gzip:  4.74 kB
+dist/scripts/habits.K9dF5PJu.js                   12.95 kB │ gzip:  3.37 kB
+dist/scripts/queryClient.DjszdYNS.js              23.78 kB │ gzip:  5.64 kB
+dist/scripts/browser-polyfill.BvKcviTc.js         28.87 kB │ gzip:  5.94 kB
+dist/scripts/PopPanel.BD28se55.js                 30.17 kB │ gzip:  6.02 kB
+dist/scripts/index-client.DM6W1nZ9.js             30.26 kB │ gzip: 11.17 kB
+dist/scripts/MenuButton.DmAVPPrm.js               43.73 kB │ gzip:  8.33 kB
+dist/scripts/create-id.B-RcrOMT.js                44.08 kB │ gzip: 11.68 kB
+dist/scripts/SettingsMenu.B_5JSjfz.js             60.97 kB │ gzip: 12.55 kB
+dist/scripts/createQuery.eSaRHctl.js              66.45 kB │ gzip: 16.37 kB
+dist/scripts/dist.BBIPwiKA.js                     71.44 kB │ gzip: 15.84 kB
+dist/scripts/M4GWWVAC.BYuVCYrR.js                 84.02 kB │ gzip: 21.60 kB
+dist/scripts/ScrollArea.BU61Fy0F.js               84.36 kB │ gzip: 13.04 kB
+dist/scripts/spotify.B-_F4t9f.js                  95.99 kB │ gzip: 19.71 kB
+dist/home.js                                     192.65 kB │ gzip: 43.07 kB
+dist/scripts/tasks.RyeG0Sxg.js                   199.73 kB │ gzip: 39.32 kB
+dist/scripts/safe-polygon.svelte.cmQHropv.js     223.94 kB │ gzip: 47.69 kB
+dist/scripts/disclose-version.BZnAx_Ft.js        245.74 kB │ gzip: 61.66 kB
+dist/scripts/SO26Z5QU.COVz2Gv3.js                406.24 kB │ gzip: 84.84 kB
+
+built in 3888ms.

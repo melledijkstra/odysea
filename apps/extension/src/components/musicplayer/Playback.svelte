@@ -132,28 +132,44 @@
           onclick={() => {
             onToggleShuffle?.(!isShuffling)
           }}
+          aria-label={isShuffling ? 'Disable shuffle' : 'Enable shuffle'}
+          title={isShuffling ? 'Disable shuffle' : 'Enable shuffle'}
         >
           <Icon
             class="size-6 {isShuffling && 'text-green-500'}"
             path={mdiShuffleVariant}
           />
         </button>
-        <button class="cursor-pointer" onclick={() => onPreviousTrack?.()}>
+        <button
+          class="cursor-pointer"
+          onclick={() => onPreviousTrack?.()}
+          aria-label="Previous track"
+          title="Previous track"
+        >
           <Icon class="size-6" path={mdiSkipPrevious} />
         </button>
         <button
           class="cursor-pointer p-1 rounded-full bg-white text-black"
           onclick={() => onPlayPause?.()}
+          aria-label={state?.isPlaying ? 'Pause' : 'Play'}
+          title={state?.isPlaying ? 'Pause' : 'Play'}
         >
           <Icon class="size-6" path={state?.isPlaying ? mdiPause : mdiPlay} />
         </button>
-        <button class="cursor-pointer" onclick={() => onNextTrack?.()}>
+        <button
+          class="cursor-pointer"
+          onclick={() => onNextTrack?.()}
+          aria-label="Next track"
+          title="Next track"
+        >
           <Icon class="size-6" path={mdiSkipNext} />
         </button>
         <button
           class="cursor-pointer disabled:text-gray-500 disabled:cursor-not-allowed"
           onclick={() =>
             onSwitchRepeatMode?.(repeatMode === 2 ? 0 : repeatMode + 1)}
+          aria-label="Toggle repeat mode"
+          title="Toggle repeat mode"
         >
           <Icon
             class="size-6 {repeatMode > 0 ? 'text-green-500' : ''}"
