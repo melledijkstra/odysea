@@ -1,5 +1,9 @@
 <script lang="ts">
+  import { supabase } from '@/db/supabase'
+  import { Logger } from '@/logger'
   import { addNotification } from '@/stores/notifications.svelte'
+
+  const logger = new Logger('quotes')
 
   type Quote = {
     text: string
@@ -20,6 +24,14 @@
   const randomQuote = $derived(
     quotes[Math.floor(Math.random() * quotes.length)]
   )
+
+  $effect(() => {
+    logger.log('Quotes effect started')
+    ;(async () => {
+      const data = await supabase.from('quotes').select('*')
+      logger.debug(data)
+    })()
+  })
 </script>
 
 <div class="group relative text-center">
