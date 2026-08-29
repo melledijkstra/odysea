@@ -20,31 +20,31 @@ onlyBuiltDependencies:
 
 catalog:
   # Building & Bundling
-  turbo: ^2.10.11
-  vite: ^8.2.1
+  turbo: ^2.10.12
+  vite: ^8.2.2
   tsx: ^4.23.12
   tsdown: ^0.22.14
-  deno: ^2.9.5
+  deno: ^2.9.6
 
   # UI related
   '@mdi/js': ^7.4.47
   react: ^19.2.8
   react-dom: ^19.2.8
   '@types/react': ^19.2.18
-  '@types/react-dom': ^19.2.4
-  svelte: ^5.56.9
+  '@types/react-dom': ^19.2.5
+  svelte: ^5.56.10
   svelte-check: ^4.7.6
   tailwindcss: ^4.3.3
   tailwind-animations: ^1.0.2
-  bits-ui: ^2.18.2
+  bits-ui: ^2.19.0
 
   # Linting & Formatting
-  eslint: ^10.8.1
+  eslint: ^10.9.1
   prettier: ^3.9.6
   prettier-plugin-svelte: ^4.1.1
   prettier-plugin-tailwindcss: ^0.8.1
   eslint-config-prettier: ^10.1.8
-  eslint-plugin-turbo: ^2.10.11
+  eslint-plugin-turbo: ^2.10.12
 
   # Testing
   vitest: ^4.1.11
@@ -57,10 +57,10 @@ catalog:
   '@types/webextension-polyfill': ^0.12.5
 
   # Storybook
-  storybook: ^10.5.9
+  storybook: ^10.5.10
   '@storybook/addon-svelte-csf': ^5.1.2
-  '@storybook/svelte': ^10.5.9
-  '@storybook/svelte-vite': ^10.5.9
+  '@storybook/svelte': ^10.5.10
+  '@storybook/svelte-vite': ^10.5.10
 
   # Vite Plugins
   '@sveltejs/vite-plugin-svelte': ^7.3.0
