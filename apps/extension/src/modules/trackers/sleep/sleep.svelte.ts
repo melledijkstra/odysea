@@ -81,7 +81,7 @@ export class Sleep extends Tracker implements SleepTracker {
   }
 
   async authenticate(): Promise<void> {
-    const tokenData = await googleHealthAuthClient.authenticate([SLEEP_SCOPE])
+    const tokenData = await googleHealthAuthClient.getAuthToken(true, [SLEEP_SCOPE])
     if (tokenData) {
       await this.checkAuth()
       if (this.authenticated) {

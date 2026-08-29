@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/rest'
-import { AuthClient } from '@melledijkstra/extension'
+import type { AuthClient } from '@melledijkstra/auth'
 import { githubAuthClient } from '@/oauth2/clients'
 import type { Task, TaskList } from '@/modules/tasks/types'
 import type { TaskControllerInterface } from './TaskController.interface'
@@ -54,7 +54,7 @@ export class GithubTasksController implements TaskControllerInterface, ILogger {
   }
 
   async authenticate(): Promise<boolean> {
-    return await this.auth.authenticate()
+    return !!(await this.auth.getAuthToken(true))
   }
 
   async isAuthenticated(): Promise<boolean> {

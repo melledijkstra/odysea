@@ -1,4 +1,4 @@
-import { AuthClient, createGoogleAuthConfig } from '@melledijkstra/auth'
+import { GoogleAuthClient, createGoogleAuthConfig } from '@melledijkstra/auth'
 import { FileStorage } from '@melledijkstra/storage'
 import path from 'path'
 import dotenv from 'dotenv'
@@ -18,6 +18,6 @@ if (process.env['GOOGLE_SCOPES']) {
   config.scopes = process.env['GOOGLE_SCOPES'].split(' ')
 }
 
-export const authClient = new AuthClient(config, redirectUri, {
+export const authClient = new GoogleAuthClient(config, redirectUri, {
   storage,
 })

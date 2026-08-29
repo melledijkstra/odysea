@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill'
 import { Logger } from '@/logger'
-import type { AuthClient } from '@melledijkstra/extension'
+import type { AuthClient } from '@melledijkstra/auth'
 
 const logger = new Logger('SpotifySDK')
 

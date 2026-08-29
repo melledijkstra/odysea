@@ -1,24 +1,21 @@
-import { AuthConfig } from '@melledijkstra/auth'
-import { AuthClient } from './auth'
+import { describe, it, expect, vi } from 'vitest'
+import { ExtensionAuthFlowHandler } from './auth'
 import * as browser from 'webextension-polyfill'
 
-describe('Extension AuthClient', () => {
-  it('should create an instance of AuthClient', async () => {
-    browser.storage.local.get = vi.fn().mockResolvedValue({})
+describe('Extension AuthFlowHandler', () => {
+  it('should create an instance of ExtensionAuthFlowHandler and call webAuthFlow', async () => {
+    browser.identity.launchWebAuthFlow = vi.fn().mockResolvedValue('https://example.com/callback')
 
-    const provider: AuthConfig = {
-      name: 'google',
-      get clientId() {
-        return 'test-client-id'
-      },
-      tokenEndpoint: 'https://oauth2.googleapis.com/token',
-      scopes: ['openid', 'profile', 'email'],
-    }
-    const authClient = new AuthClient(provider)
-    expect(authClient).toBeInstanceOf(AuthClient)
+    const handler = new ExtensionAuthFlowHandler()
+    expect(handler).toBeInstanceOf(ExtensionAuthFlowHandler)
 
-    const result = await authClient.getAuthToken()
+    const testUrl = new URL('https://example.com/auth')
+    const result = await handler.open(testUrl)
 
-    expect(result).toBeUndefined()
+    expect(browser.identity.launchWebAuthFlow).toHaveBeenCalledWith({
+      url: testUrl.toString(),
+      interactive: true
+    })
+    expect(result.toString()).toBe('https://example.com/callback')
   })
 })

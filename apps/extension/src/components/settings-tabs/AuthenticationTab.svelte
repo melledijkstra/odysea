@@ -11,7 +11,7 @@
   import Input from '@melledijkstra/ui/svelte/Input.svelte'
   import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
   import { Logger } from '@/logger'
-  import type { AuthClient } from '@melledijkstra/extension'
+  import type { AuthClient } from '@melledijkstra/auth'
   import { getAuthContext } from '@/oauth2/auth.state.svelte'
   import Card from '@melledijkstra/ui/svelte/Card.svelte'
   import { scopeRegistry } from '@/oauth2/scope-registry'
@@ -59,7 +59,7 @@
 
   async function deauthenticate(provider: OauthProvider) {
     logger.log('Deauthenticating from', provider)
-    await clients[provider].deauthenticate(true)
+    await clients[provider].revokeToken()
     authState.deauthenticated(provider)
     if (provider === 'google') {
       await clearAccountCache()
@@ -71,7 +71,7 @@
     isAuthenticating = true
     authenticatingScope = scopeKey
     try {
-      const success = await googleAuthClient.authenticate(scopes)
+      const success = await googleAuthClient.getAuthToken(true, scopes)
       if (success) {
         const grantedScopes = await googleAuthClient.getGrantedScopes()
         authState.update('google', true, grantedScopes)

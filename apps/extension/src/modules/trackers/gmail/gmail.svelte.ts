@@ -81,7 +81,7 @@ export class Gmail extends Tracker implements GmailTracker {
   }
 
   async authenticate(): Promise<void> {
-    const tokenData = await googleAuthClient.authenticate([GMAIL_SCOPE])
+    const tokenData = await googleAuthClient.getAuthToken(true, [GMAIL_SCOPE])
     if (tokenData) {
       await this.checkAuth()
       if (this.authenticated) {

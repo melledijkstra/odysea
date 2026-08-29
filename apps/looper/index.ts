@@ -56,11 +56,11 @@ app.get('/oauth/callback', async (req, res) => {
 
   try {
     const tokens = await authClient.validate(code, state)
-    const refreshToken = tokens.hasRefreshToken() ? tokens.refreshToken() : ''
+    const refreshToken = tokens.refreshToken ?? null
     await authClient.cacheAuthToken(
-      tokens.accessToken(),
+      tokens.accessToken,
       refreshToken,
-      tokens.accessTokenExpiresInSeconds()
+      tokens.expiresAt
     )
     res.send(`
       <html>

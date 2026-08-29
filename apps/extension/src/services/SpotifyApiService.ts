@@ -1,5 +1,5 @@
 import { SpotifyApiClient } from '@melledijkstra/api'
-import type { AuthClient } from '@melledijkstra/extension'
+import type { AuthClient } from '@melledijkstra/auth'
 import type { Playlist, Track } from 'MusicPlayer'
 import {
   convertSpotifyPlaylist,
