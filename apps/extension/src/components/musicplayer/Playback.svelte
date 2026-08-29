@@ -129,6 +129,8 @@
       <div class="flex flex-row gap-3 items-center">
         <button
           class="cursor-pointer"
+          aria-label="Toggle shuffle"
+          title="Toggle shuffle"
           onclick={() => {
             onToggleShuffle?.(!isShuffling)
           }}
@@ -138,20 +140,34 @@
             path={mdiShuffleVariant}
           />
         </button>
-        <button class="cursor-pointer" onclick={() => onPreviousTrack?.()}>
+        <button
+          class="cursor-pointer"
+          aria-label="Previous track"
+          title="Previous track"
+          onclick={() => onPreviousTrack?.()}
+        >
           <Icon class="size-6" path={mdiSkipPrevious} />
         </button>
         <button
           class="cursor-pointer p-1 rounded-full bg-white text-black"
+          aria-label={state?.isPlaying ? 'Pause' : 'Play'}
+          title={state?.isPlaying ? 'Pause' : 'Play'}
           onclick={() => onPlayPause?.()}
         >
           <Icon class="size-6" path={state?.isPlaying ? mdiPause : mdiPlay} />
         </button>
-        <button class="cursor-pointer" onclick={() => onNextTrack?.()}>
+        <button
+          class="cursor-pointer"
+          aria-label="Next track"
+          title="Next track"
+          onclick={() => onNextTrack?.()}
+        >
           <Icon class="size-6" path={mdiSkipNext} />
         </button>
         <button
           class="cursor-pointer disabled:text-gray-500 disabled:cursor-not-allowed"
+          aria-label="Switch repeat mode"
+          title="Switch repeat mode"
           onclick={() =>
             onSwitchRepeatMode?.(repeatMode === 2 ? 0 : repeatMode + 1)}
         >
