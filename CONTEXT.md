@@ -8,7 +8,7 @@ The codebase is organized into two main directories: `apps/` for deployable appl
 
 ### Apps (`apps/`)
 
-- **`extension`**: A browser extension built with Svelte. It provides a customizable new-tab page with various modules.
+- **`extension`**: A browser extension built with Svelte 5. It provides a customizable new-tab page with various modules.
 - **`serverless`**: Serverless functions running on Deno using the Hono framework. Used to proxy API calls that require sensitive secrets (e.g., Unsplash API keys).
 - **`server`**: A Node.js + Express backend designed to run on a Raspberry Pi. It connects to a local SQLite database using Knex.js for persistent data storage.
 - **`cli`**: Command-line interface utilities for the ecosystem.

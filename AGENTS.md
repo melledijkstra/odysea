@@ -23,3 +23,17 @@ Issues are tracked in GitHub. See `docs/agents/issue-tracker.md`.
 ### Domain docs
 
 Domain documentation uses a single-context layout (`CONTEXT.md`). See `docs/agents/domain.md`.
+
+### Extension Inspection & Testing
+
+- **Interactive Playwright CLI**: For interactive debugging and inspection during development (without polluting or running the E2E test suite), use `pnpm inspect` (or `pnpm --filter @odysea/extension inspect <command>`). It launches and maintains a live Playwright Chromium session with `--load-extension` and exposes fast CLI commands:
+  - `pnpm inspect open [home|popup|options|debug|<url>]`: Open/navigate to an extension page.
+  - `pnpm inspect snapshot`: Output visible text and DOM state from the active page.
+  - `pnpm inspect network`: Print recent network requests (status, size, duration, headers).
+  - `pnpm inspect console`: Print recent console logs, warnings, and errors.
+  - `pnpm inspect eval "<js code>"`: Evaluate JavaScript in the active extension tab context.
+  - `pnpm inspect click "<selector>"` / `pnpm inspect fill "<selector>" "<text>"`: Interact with elements.
+  - `pnpm inspect screenshot [path]`: Capture full-page screenshot.
+  - `pnpm inspect close`: Close the live browser session.
+- **Automated Verification**: For formal test validation, run Playwright E2E tests (`pnpm --filter @odysea/extension test:e2e`).
+- **Storybook UI Inspection**: For isolated component styling and layout changes, run and inspect Storybook on port 6006 (`pnpm --filter @odysea/extension storybook`).

@@ -15,6 +15,7 @@
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "turbo run test:e2e",
+    "inspect": "pnpm --filter @odysea/extension inspect",
     "lint": "turbo run lint",
     "format": "prettier --check --cache .",
     "format:fix": "prettier --list-different --write --cache .",
