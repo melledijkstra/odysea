@@ -53,6 +53,7 @@
     "@octokit/rest": "^22.0.1",
     "@tanstack/svelte-query": "^6.3.0",
     "@tanstack/svelte-query-devtools": "^6.3.0",
+    "@supabase/supabase-js": "^2.112.4",
     "bits-ui": "catalog:",
     "idb": "^8.0.3",
     "svelte-dnd-action": "^0.9.79",
