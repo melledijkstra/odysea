@@ -50,6 +50,7 @@
     "@melledijkstra/toolbox": "workspace:*",
     "@melledijkstra/ui": "workspace:*",
     "@octokit/rest": "^22.0.1",
+    "@supabase/supabase-js": "^2.112.4",
     "@tanstack/svelte-query": "^6.1.38",
     "@tanstack/svelte-query-devtools": "^6.1.38",
     "bits-ui": "catalog:",
