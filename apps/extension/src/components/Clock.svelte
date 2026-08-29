@@ -5,6 +5,7 @@
     getTime,
     getTimePercentage,
   } from '@melledijkstra/toolbox'
+  import { onPageVisible } from '@/utils/visibility'
 
   const ONE_MINUTE = 60 * 1000 // in ms
 
@@ -17,6 +18,7 @@
   let time = $state()
   let mode = $state<ClockMode>()
   let cancelTick = $state<() => void>()
+  let cleanup = $state<() => void>()
 
   function getDisplayTime() {
     return mode === 'time' ? getTime() : getTimePercentage()
@@ -31,9 +33,14 @@
   function startClock() {
     // run the clock 1 time when executed, then update every second
     time = getDisplayTime()
+
     cancelTick = repeatEvery(() => {
       time = getDisplayTime()
     }, ONE_MINUTE)
+
+    cleanup = onPageVisible(() => {
+      time = getDisplayTime()
+    })
   }
 
   onMount(async () => {
@@ -50,6 +57,7 @@
 
   onDestroy(() => {
     cancelTick?.()
+    cleanup?.()
   })
 </script>
 
