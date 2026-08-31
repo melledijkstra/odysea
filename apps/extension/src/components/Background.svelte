@@ -10,10 +10,12 @@
 ></div>
 
 {#if background.url}
-  <div
-    class="fixed inset-0 -z-20 bg-center bg-no-repeat bg-cover bg-fixed"
-    style="background-image: url({background.url})"
-    transition:fade={{ duration: 300 }}
-    data-testid="background-image"
-  ></div>
+  {#key background.url}
+    <div
+      class="fixed inset-0 -z-20 bg-center bg-no-repeat bg-cover bg-fixed"
+      style="background-image: url({background.url})"
+      transition:fade={{ duration: 300 }}
+      data-testid="background-image"
+    ></div>
+  {/key}
 {/if}
