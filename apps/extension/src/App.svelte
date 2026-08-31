@@ -8,7 +8,6 @@
   import ModuleLoader from './components/ModuleLoader.svelte'
   import Footer from './components/Footer.svelte'
   import DefaultModeContent from './components/DefaultModeContent.svelte'
-  import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools'
   import { QueryClientProvider } from '@tanstack/svelte-query'
   import { queryClient } from '@/queryClient'
   import { AuthState, setAuthContext } from './oauth2/auth.state.svelte'
@@ -29,7 +28,11 @@
 
 {#await initPromise then}
   <QueryClientProvider client={queryClient}>
-    <SvelteQueryDevtools buttonPosition="top-right" />
+    {#if import.meta.env.DEV}
+      {#await import('@tanstack/svelte-query-devtools') then { SvelteQueryDevtools }}
+        <SvelteQueryDevtools buttonPosition="top-right" />
+      {/await}
+    {/if}
     <ModulesInitializer />
 
     <NotificationCenter position="bottom-right" />
