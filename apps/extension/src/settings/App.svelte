@@ -1,11 +1,7 @@
 <script lang="ts">
   import SettingsMenu from '@/components/SettingsMenu.svelte'
   import { settings } from './index.svelte'
-  import { AuthState, setAuthContext } from '@/oauth2/auth.state.svelte'
-
-  const authState = new AuthState()
-
-  setAuthContext(authState)
+  import { authState } from '@/oauth2/auth.state.svelte'
 
   let initPromise = Promise.allSettled([
     settings.initialize(),

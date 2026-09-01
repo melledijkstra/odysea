@@ -2,7 +2,7 @@ import { Tracker, type TrackerFactory } from '../tracker.svelte'
 import type { GmailTracker } from '../types'
 import { WebLocalStorage } from '@melledijkstra/storage'
 import { GMAIL_SCOPE } from '@/oauth2/scope-registry'
-import { googleAuthClient } from '@/oauth2/clients'
+import { authState } from '@/oauth2/auth.state.svelte'
 import { GoogleGmailApiClient } from '@melledijkstra/api'
 import { repeatEvery } from '@melledijkstra/toolbox'
 import browser from 'webextension-polyfill'
@@ -17,7 +17,7 @@ export class Gmail extends Tracker implements GmailTracker {
   authenticated = $state(false)
 
   private cache = new WebLocalStorage()
-  private client = new GoogleGmailApiClient(googleAuthClient)
+  private client = new GoogleGmailApiClient(authState.clients.google)
   private cancelUpdater?: () => void
 
   constructor(pinned: boolean = true) {
@@ -60,7 +60,7 @@ export class Gmail extends Tracker implements GmailTracker {
   private handleStorageChange = async (
     changes: Record<string, browser.Storage.StorageChange>
   ) => {
-    if (changes[googleAuthClient.storageKey]) {
+    if (changes[authState.clients.google.storageKey]) {
       await this.checkAuth()
       if (this.authenticated) {
         this.fetchData()
@@ -71,17 +71,19 @@ export class Gmail extends Tracker implements GmailTracker {
   }
 
   private async checkAuth() {
-    const hasToken = await googleAuthClient.isAuthenticated()
+    const hasToken = await authState.clients.google.isAuthenticated()
     if (!hasToken) {
       this.authenticated = false
       return
     }
-    const scopes = await googleAuthClient.getGrantedScopes()
+    const scopes = await authState.clients.google.getGrantedScopes()
     this.authenticated = scopes.includes(GMAIL_SCOPE)
   }
 
   async authenticate(): Promise<void> {
-    const tokenData = await googleAuthClient.getAuthToken(true, [GMAIL_SCOPE])
+    const tokenData = await authState.clients.google.getAuthToken(true, [
+      GMAIL_SCOPE,
+    ])
     if (tokenData) {
       await this.checkAuth()
       if (this.authenticated) {

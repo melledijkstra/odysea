@@ -2,7 +2,7 @@ import { Tracker, type TrackerFactory } from '../tracker.svelte'
 import type { SleepTracker } from '../types'
 import { WebLocalStorage } from '@melledijkstra/storage'
 import { SLEEP_SCOPE } from '@/oauth2/scope-registry'
-import { googleHealthAuthClient } from '@/oauth2/clients'
+import { authState } from '@/oauth2/auth.state.svelte'
 import { GoogleHealthApiClient } from '@melledijkstra/api'
 import { repeatEvery } from '@melledijkstra/toolbox'
 import browser from 'webextension-polyfill'
@@ -17,7 +17,7 @@ export class Sleep extends Tracker implements SleepTracker {
   authenticated = $state(false)
 
   private cache = new WebLocalStorage()
-  private client = new GoogleHealthApiClient(googleHealthAuthClient)
+  private client = new GoogleHealthApiClient(authState.clients['google-health'])
   private cancelUpdater?: () => void
 
   constructor(pinned: boolean = true, minutes?: number) {
@@ -60,7 +60,7 @@ export class Sleep extends Tracker implements SleepTracker {
   private handleStorageChange = async (
     changes: Record<string, browser.Storage.StorageChange>
   ) => {
-    if (changes[googleHealthAuthClient.storageKey]) {
+    if (changes[authState.clients['google-health'].storageKey]) {
       await this.checkAuth()
       if (this.authenticated) {
         this.fetchData()
@@ -71,19 +71,20 @@ export class Sleep extends Tracker implements SleepTracker {
   }
 
   private async checkAuth() {
-    const hasToken = await googleHealthAuthClient.isAuthenticated()
+    const hasToken = await authState.clients['google-health'].isAuthenticated()
     if (!hasToken) {
       this.authenticated = false
       return
     }
-    const scopes = await googleHealthAuthClient.getGrantedScopes()
+    const scopes = await authState.clients['google-health'].getGrantedScopes()
     this.authenticated = scopes.includes(SLEEP_SCOPE)
   }
 
   async authenticate(): Promise<void> {
-    const tokenData = await googleHealthAuthClient.getAuthToken(true, [
-      SLEEP_SCOPE,
-    ])
+    const tokenData = await authState.clients['google-health'].getAuthToken(
+      true,
+      [SLEEP_SCOPE]
+    )
     if (tokenData) {
       await this.checkAuth()
       if (this.authenticated) {

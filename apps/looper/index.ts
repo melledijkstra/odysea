@@ -166,5 +166,6 @@ app.get('/status', async (_req, res) => {
 // ---------------------------------------------------------------------------
 app.listen(PORT, () => {
   logger.log(`Webhook server listening on port ${PORT}`)
+  logger.log(`Open http://localhost:${PORT}/status to view workflows`)
   scheduler.start()
 })

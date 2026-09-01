@@ -6,9 +6,6 @@ import {
   CliAuthFlowHandler,
   AuthConfig,
   OAuthProvider,
-  createSpotifyAuthConfig,
-  createGithubAuthConfig,
-  createGoogleAuthConfig,
 } from '../src'
 
 const rl = readline.createInterface({ input, output })
@@ -32,13 +29,29 @@ try {
 
   switch (providerName) {
     case 'google':
-      config = createGoogleAuthConfig()
+      config = {
+        name: 'google',
+        clientId: process.env['GOOGLE_CLIENT_ID'] ?? '',
+        clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
+        initialScope: ['openid', 'profile'],
+        extraParams: { access_type: 'offline', prompt: 'consent' },
+      }
       break
     case 'github':
-      config = createGithubAuthConfig()
+      config = {
+        name: 'github',
+        clientId: process.env['GITHUB_CLIENT_ID'] ?? '',
+        clientSecret: process.env['GITHUB_CLIENT_SECRET'],
+        initialScope: ['user'],
+      }
       break
     case 'spotify':
-      config = createSpotifyAuthConfig()
+      config = {
+        name: 'spotify',
+        clientId: process.env['SPOTIFY_CLIENT_ID'] ?? '',
+        clientSecret: process.env['SPOTIFY_CLIENT_SECRET'],
+        initialScope: ['user'],
+      }
       break
     default:
       console.error(`Error: Unsupported provider '${providerName}'`)

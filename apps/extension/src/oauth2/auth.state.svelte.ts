@@ -1,7 +1,12 @@
-import { getContext, setContext } from 'svelte'
 import type { OAuthProvider } from '@melledijkstra/auth'
-import { allAuthClients } from './clients'
 import browser, { type Storage } from 'webextension-polyfill'
+import { ExtensionAuthClient } from '@melledijkstra/extension'
+import {
+  getGithubAuthConfig,
+  getGoogleAuthConfig,
+  getGoogleHealthAuthConfig,
+  getSpotifyAuthConfig,
+} from './providers'
 
 export interface ProviderState {
   isAuthenticated: boolean
@@ -16,13 +21,19 @@ export class AuthState {
     github: { isAuthenticated: false, scopes: [] },
     'google-health': { isAuthenticated: false, scopes: [] },
   })
+  clients = {
+    google: new ExtensionAuthClient(getGoogleAuthConfig()),
+    github: new ExtensionAuthClient(getGithubAuthConfig()),
+    spotify: new ExtensionAuthClient(getSpotifyAuthConfig()),
+    'google-health': new ExtensionAuthClient(getGoogleHealthAuthConfig()),
+  }
   private storageListenerBound = false
 
   async initialize() {
     this.setupStorageListener()
     if (this.isInitialized) return
     await Promise.all(
-      allAuthClients.map(async (client) => {
+      Object.values(this.clients).map(async (client) => {
         const isAuthenticated = await client.isAuthenticated()
         const grantedScopes = await client.getGrantedScopes()
         this.update(client.config.name, isAuthenticated, grantedScopes)
@@ -40,7 +51,7 @@ export class AuthState {
   private readonly handleStorageChange = async (
     changes: Storage.StorageAreaOnChangedChangesType
   ) => {
-    for (const client of allAuthClients) {
+    for (const client of Object.values(this.clients)) {
       const provider = client.config.name as OAuthProvider
       const storageKey = client.storageKey
       if (changes[storageKey]) {
@@ -81,12 +92,4 @@ export class AuthState {
   }
 }
 
-const AUTH_CONTEXT_KEY = Symbol('auth')
-
-export function setAuthContext(authState: AuthState) {
-  setContext(AUTH_CONTEXT_KEY, authState)
-}
-
-export function getAuthContext(): AuthState {
-  return getContext(AUTH_CONTEXT_KEY)
-}
+export const authState = new AuthState()

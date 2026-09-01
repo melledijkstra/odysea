@@ -6,7 +6,7 @@ import {
   OAuth2Token,
   generateCodeVerifier,
 } from '@badgateway/oauth2-client'
-import { AuthConfig, OAuthProvider, PROVIDER_DEFINITIONS } from './providers'
+import { AuthConfig, OAuthProvider, PROVIDER_DEFINITIONS } from './config'
 import type { AuthFlowHandler } from './flows/flow.interface'
 
 const OAUTH2_STORAGE_KEY = 'oauth2'
@@ -55,11 +55,7 @@ export class AuthClient {
   }
 
   get initialScope(): string[] {
-    return (
-      this.config.initialScope ??
-      PROVIDER_DEFINITIONS[this.name]?.defaultScopes ??
-      []
-    )
+    return this.config.initialScope ?? []
   }
 
   /**

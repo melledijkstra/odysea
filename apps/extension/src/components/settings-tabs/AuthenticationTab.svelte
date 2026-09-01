@@ -2,17 +2,12 @@
   import { settingsStore, settings } from '@/settings/index.svelte'
   import AuthButton from '@/components/AuthButton.svelte'
   import type { OAuthProvider } from '@melledijkstra/auth'
-  import {
-    googleAuthClient,
-    spotifyAuthClient,
-    githubAuthClient,
-    googleHealthAuthClient,
-  } from '@/oauth2/clients'
+
   import Input from '@melledijkstra/ui/svelte/Input.svelte'
   import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
   import { Logger } from '@/logger'
   import type { AuthClient } from '@melledijkstra/auth'
-  import { getAuthContext } from '@/oauth2/auth.state.svelte'
+  import { authState } from '@/oauth2/auth.state.svelte'
   import Card from '@melledijkstra/ui/svelte/Card.svelte'
   import { scopeRegistry } from '@/oauth2/scope-registry'
   import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
@@ -24,14 +19,7 @@
 
   const logger = new Logger('AuthenticationTab')
 
-  const clients: Record<OAuthProvider, AuthClient> = {
-    google: googleAuthClient,
-    spotify: spotifyAuthClient,
-    github: githubAuthClient,
-    'google-health': googleHealthAuthClient,
-  } as const
-
-  const authState = getAuthContext()
+  const clients: Record<OAuthProvider, AuthClient> = authState.clients
 
   const loadAuthState = authState.initialize()
 
@@ -71,9 +59,9 @@
     isAuthenticating = true
     authenticatingScope = scopeKey
     try {
-      const success = await googleAuthClient.getAuthToken(true, scopes)
+      const success = await authState.clients.google.getAuthToken(true, scopes)
       if (success) {
-        const grantedScopes = await googleAuthClient.getGrantedScopes()
+        const grantedScopes = await authState.clients.google.getGrantedScopes()
         authState.update('google', true, grantedScopes)
       }
     } catch (e) {
@@ -83,9 +71,6 @@
       authenticatingScope = null
     }
   }
-
-  $inspect(authState)
-  $inspect(googleAuthClient)
 </script>
 
 <h1 class="text-xl mb-3">Authentication Configurations</h1>

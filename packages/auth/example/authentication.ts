@@ -1,10 +1,19 @@
 import { createServer } from 'node:http'
-import { AuthClient, createGoogleAuthConfig } from '../src'
+import { AuthClient } from '../src'
 
 const PORT = 8000
 const redirectUrl = `http://localhost:${PORT}/oauth/callback`
 
-const authClient = new AuthClient(createGoogleAuthConfig(), redirectUrl)
+const authClient = new AuthClient(
+  {
+    name: 'google',
+    clientId: process.env['GOOGLE_CLIENT_ID'] ?? '',
+    clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
+    initialScope: ['openid', 'profile'],
+    extraParams: { access_type: 'offline', prompt: 'consent' },
+  },
+  redirectUrl
+)
 
 console.log('Trying to authenticate...')
 

@@ -5,7 +5,7 @@
   import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import TasksPanelContent from './TasksPanelContent.svelte'
   import { addNotification } from '@/stores/notifications.svelte'
-  import { getAuthContext } from '@/oauth2/auth.state.svelte'
+  import { authState } from '@/oauth2/auth.state.svelte'
   import { TASKS_SCOPE } from '@/oauth2/scope-registry'
 
   type Provider = 'google' | 'github'
@@ -15,8 +15,6 @@
   let activeProvider = $state<Provider>(
     (localStorage.getItem(STORAGE_KEY) as Provider) ?? 'google'
   )
-
-  const authState = getAuthContext()
 
   const providerState = $derived(authState.providers[activeProvider])
   const requiredScopes = $derived(

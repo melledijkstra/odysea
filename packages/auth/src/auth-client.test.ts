@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { AuthClient, AuthConfig } from './auth-client'
+import { AuthClient } from './auth-client'
+import type { AuthConfig } from './config'
 import type { AuthFlowHandler } from './flows'
 import { MemoryCache } from '@melledijkstra/storage'
 import { OAuth2Token } from '@badgateway/oauth2-client'

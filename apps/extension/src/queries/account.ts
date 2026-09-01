@@ -1,6 +1,5 @@
-import { getAuthContext } from '@/oauth2/auth.state.svelte'
+import { authState } from '@/oauth2/auth.state.svelte'
 import { GoogleAccountApiClient, type Account } from '@melledijkstra/api'
-import { googleAuthClient } from '@/oauth2/clients'
 import { WebLocalStorage, hours } from '@melledijkstra/storage'
 import { ACCOUNT_CACHE_KEY } from '@/constants'
 import { createQuery } from '@tanstack/svelte-query'
@@ -8,8 +7,7 @@ import { createQuery } from '@tanstack/svelte-query'
 const storage = new WebLocalStorage()
 
 export function useAccountQuery() {
-  const authState = getAuthContext()
-  const client = new GoogleAccountApiClient(googleAuthClient)
+  const client = new GoogleAccountApiClient(authState.clients.google)
 
   return createQuery<Account | null>(() => ({
     queryKey: ['account', 'google'],
