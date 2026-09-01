@@ -1,6 +1,5 @@
-import type { AuthConfig, OauthProvider } from '@melledijkstra/auth'
+import type { AuthConfig } from '@melledijkstra/auth'
 import { settingsStore } from '@/settings/index.svelte'
-export type { OauthProvider }
 
 export const getGithubAuthConfig = (): AuthConfig => ({
   name: 'github',
@@ -10,7 +9,7 @@ export const getGithubAuthConfig = (): AuthConfig => ({
   get clientSecret() {
     return settingsStore.apiKeys.github_client_secret || ''
   },
-  scopes: ['repo'],
+  initialScope: ['repo'],
 })
 
 export const getGoogleAuthConfig = (): AuthConfig => ({
@@ -22,7 +21,7 @@ export const getGoogleAuthConfig = (): AuthConfig => ({
   get clientSecret() {
     return settingsStore.apiKeys.google_client_secret || ''
   },
-  scopes: [
+  initialScope: [
     'profile',
     'email',
     'openid',
@@ -37,8 +36,9 @@ export const getGoogleAuthConfig = (): AuthConfig => ({
 })
 
 export const getGoogleHealthAuthConfig = (): AuthConfig => ({
-  // google health uses the same client id and secret as google, but with different scopes
   ...getGoogleAuthConfig(),
+  // getters don't get copied when spreading, duplicated
+  // TODO: find a better way to handle this
   get clientId() {
     return settingsStore.apiKeys.google_client_id || ''
   },
@@ -46,7 +46,7 @@ export const getGoogleHealthAuthConfig = (): AuthConfig => ({
     return settingsStore.apiKeys.google_client_secret || ''
   },
   name: 'google-health',
-  scopes: ['https://www.googleapis.com/auth/googlehealth.sleep.readonly'],
+  initialScope: ['https://www.googleapis.com/auth/googlehealth.sleep.readonly'],
   extraParams: {
     include_granted_scopes: 'false',
     access_type: 'offline',
@@ -60,7 +60,7 @@ export const getSpotifyAuthConfig = (): AuthConfig => ({
   get clientId() {
     return settingsStore.apiKeys.spotify || ''
   },
-  scopes: [
+  initialScope: [
     'streaming',
     'app-remote-control',
     'user-read-playback-state',

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { settingsStore, settings } from '@/settings/index.svelte'
   import AuthButton from '@/components/AuthButton.svelte'
-  import { type OauthProvider } from '@/oauth2/providers'
+  import type { OAuthProvider } from '@melledijkstra/auth'
   import {
     googleAuthClient,
     spotifyAuthClient,
@@ -24,7 +24,7 @@
 
   const logger = new Logger('AuthenticationTab')
 
-  const clients: Record<OauthProvider, AuthClient> = {
+  const clients: Record<OAuthProvider, AuthClient> = {
     google: googleAuthClient,
     spotify: spotifyAuthClient,
     github: githubAuthClient,
@@ -35,7 +35,7 @@
 
   const loadAuthState = authState.initialize()
 
-  async function authenticate(provider: OauthProvider) {
+  async function authenticate(provider: OAuthProvider) {
     logger.log('Authenticating with', provider)
     isAuthenticating = true
     try {
@@ -57,7 +57,7 @@
     }
   }
 
-  async function deauthenticate(provider: OauthProvider) {
+  async function deauthenticate(provider: OAuthProvider) {
     logger.log('Deauthenticating from', provider)
     await clients[provider].revokeToken()
     authState.deauthenticated(provider)
@@ -83,6 +83,9 @@
       authenticatingScope = null
     }
   }
+
+  $inspect(authState)
+  $inspect(googleAuthClient)
 </script>
 
 <h1 class="text-xl mb-3">Authentication Configurations</h1>
@@ -127,7 +130,7 @@
   </div>
 {:then}
   {#each Object.keys(clients) as key (key)}
-    {@const provider = key as OauthProvider}
+    {@const provider = key as OAuthProvider}
     {@const providerState = authState.providers[provider]}
 
     {#if provider === 'google'}

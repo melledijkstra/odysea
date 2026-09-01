@@ -2,92 +2,93 @@ import { IStorage, MemoryCache } from '@melledijkstra/storage'
 import { Logger } from '@melledijkstra/toolbox'
 import {
   OAuth2Client,
+  OAuth2Error,
   OAuth2Token,
   generateCodeVerifier,
 } from '@badgateway/oauth2-client'
-import type { AuthConfig, OauthProvider } from './providers'
-export type { OauthProvider }
+import { AuthConfig, OAuthProvider, PROVIDER_DEFINITIONS } from './providers'
+import type { AuthFlowHandler } from './flows/flow.interface'
 
 const OAUTH2_STORAGE_KEY = 'oauth2'
 
-// Make it match OAuth2Token from badgateway mostly
-export type TokenStore = {
-  accessToken: string
-  expiresAt: number | null
-  refreshToken: string | null
-  scopes?: string[]
-}
-
-export interface AuthFlowHandler {
-  /**
-   * Opens the authentication URL and returns the redirect URL with the code.
-   * @param url The authorization URL to open
-   */
-  open(url: URL): Promise<URL>
-}
-
-// Generate state logic extracted from badgateway/oauth2-client or just simple random string
-function generateState(): string {
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-    const array = new Uint32Array(4)
-    crypto.getRandomValues(array)
-    return Array.from(array, (dec) => ('0' + dec.toString(16)).substr(-2)).join('')
-  }
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+export interface AuthClientOptions {
+  storage?: IStorage
+  handler?: AuthFlowHandler
 }
 
 export class AuthClient {
-  protected _storage: IStorage
-  protected _redirectUrl: string
-  protected _state: string | undefined
-  protected _codeVerifier: string | undefined
-  protected _logger: Logger
-  protected _handler: AuthFlowHandler | undefined
-  protected _tokenPromise: Promise<string | undefined> | null = null
-  provider: AuthConfig
+  public readonly name: OAuthProvider
+  public readonly config: AuthConfig
+  protected readonly _redirectUrl: string
+  protected readonly _storage: IStorage
+  protected readonly _handler?: AuthFlowHandler
+  protected readonly _logger: Logger
+  protected _tokenPromise: Promise<OAuth2Token | undefined> | null = null
 
   constructor(
-    provider: AuthConfig,
+    config: AuthConfig,
     redirectUrl: string,
-    {
-      storage = new MemoryCache(),
-      handler,
-    }: {
-      storage?: IStorage
-      handler?: AuthFlowHandler
-    } = {}
+    options: AuthClientOptions = {}
   ) {
-    this._logger = new Logger(`auth:${provider.name}`)
-    this.provider = provider
+    this.name = config.name
+    this.config = config
     this._redirectUrl = redirectUrl
-    this._storage = storage
-    this._handler = handler
+    this._storage = options.storage ?? new MemoryCache()
+    this._handler = options.handler
+    this._logger = new Logger(`auth:${config.name}`)
+  }
+
+  get clientId(): string {
+    return this.config.clientId
+  }
+
+  get clientSecret(): string | undefined {
+    return this.config.clientSecret
+  }
+
+  get extraParams(): Record<string, string> {
+    const defaults = PROVIDER_DEFINITIONS[this.name]?.extraParams
+    return {
+      ...defaults,
+      ...this.config.extraParams,
+    }
+  }
+
+  get initialScope(): string[] {
+    return (
+      this.config.initialScope ??
+      PROVIDER_DEFINITIONS[this.name]?.defaultScopes ??
+      []
+    )
   }
 
   /**
-   * Intentionally instantiates a new OAuth2Client on every call rather than caching.
-   * This ensures that if the underlying credentials change dynamically at runtime,
-   * the latest credentials are always used.
+   * Instantiates an OAuth2Client using the provider defaults and custom config.
    */
   protected get _oauth2Client(): OAuth2Client {
-    // We assume server is required by OAuth2Client but we can just use the authEndpoint domain as base if not provided.
-    // Or we provide a dummy server if we have explicit endpoints.
-    const serverUrl = this.provider.authEndpoint
-      ? new URL(this.provider.authEndpoint).origin
-      : 'https://example.com' // Fallback for some reason
+    const defaults = PROVIDER_DEFINITIONS[this.name]
+    const server =
+      this.config.server ?? defaults?.server ?? 'https://example.com'
 
     return new OAuth2Client({
-      server: serverUrl,
-      clientId: this.provider.clientId,
-      clientSecret: this.provider.clientSecret ?? undefined,
-      authorizationEndpoint: this.provider.authEndpoint,
-      tokenEndpoint: this.provider.tokenEndpoint,
-      discoveryEndpoint: this.provider.discoveryEndpoint,
+      server,
+      clientId: this.clientId,
+      clientSecret: this.clientSecret,
+      authorizationEndpoint: this.config.authEndpoint ?? defaults?.authEndpoint,
+      tokenEndpoint: this.config.tokenEndpoint ?? defaults?.tokenEndpoint,
+      discoveryEndpoint:
+        this.config.discoveryEndpoint ?? defaults?.discoveryEndpoint,
+      revocationEndpoint:
+        this.config.revocationEndpoint ?? defaults?.revocationEndpoint,
     })
   }
 
-  get storageKey() {
-    return `${OAUTH2_STORAGE_KEY}.${this.provider.name}`
+  get storageKey(): string {
+    return `${OAUTH2_STORAGE_KEY}.${this.name}`
+  }
+
+  get authStateKey(): string {
+    return `${OAUTH2_STORAGE_KEY}.state.${this.name}`
   }
 
   async isAuthenticated(): Promise<boolean> {
@@ -100,19 +101,29 @@ export class AuthClient {
     return scopes.every((scope) => grantedScopes.includes(scope))
   }
 
-  static isExpired(token: TokenStore): boolean {
+  protected generateState(): string {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID()
+    }
+
+    const bytes = new Uint8Array(16)
+    crypto.getRandomValues(bytes)
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+  }
+
+  static isExpired(token: OAuth2Token): boolean {
     if (!token.expiresAt) return false
-    // we subtract 1 minute to make sure we don't try to use a token that is about to expire
+    // Subtract 1 minute to avoid edge-case expiry during flight
     return Date.now() >= token.expiresAt - 60000
   }
 
-  async getAuthTokenFromStorage(): Promise<TokenStore | undefined> {
-    return this._storage.get<TokenStore>(this.storageKey)
+  async getAuthTokenFromStorage(): Promise<OAuth2Token | undefined> {
+    return this._storage.get<OAuth2Token>(this.storageKey)
   }
 
   async getGrantedScopes(): Promise<string[]> {
     const token = await this.getAuthTokenFromStorage()
-    return token?.scopes || []
+    return token?.scope || []
   }
 
   async revokeToken(): Promise<void> {
@@ -123,89 +134,71 @@ export class AuthClient {
       return
     }
 
-    const token = tokenStore.accessToken
-
-    this._logger.log('revoke token starting')
+    this._logger.debug('revoke token starting')
 
     await this.removeAuthTokenFromStorage()
 
-    if (this.provider.skipServerRevoke) {
-      this._logger.log('skipping server revoke for this provider')
+    const skipServerRevoke =
+      this.config.skipServerRevoke ??
+      PROVIDER_DEFINITIONS[this.name]?.skipServerRevoke ??
+      false
+
+    if (skipServerRevoke) {
+      this._logger.debug('skipping server revoke for this provider')
       return
     }
 
     try {
-      // badgateway currently does not have a high level revokeToken like arctic, but we can do it via introspection / revoke endpoint if discovery gives it,
-      // but in absence of a clear API we might skip or let consumer handle it?
-      // OAuth2Client in badgateway has no explicit revokeToken, we might just have to clear storage.
-      this._logger.warn('Server side revoke is not fully supported without a revoke endpoint. Only cleared from storage.')
+      await this._oauth2Client.revoke(tokenStore)
+      this._logger.log('Server side revoke completed')
     } catch (e) {
-      this._logger.error('Unknown error while revoking token', {
-        e,
-        token,
-      })
+      this._logger.error('Unknown error while revoking token on server', { e })
     }
   }
 
-  async removeAuthTokenFromStorage() {
+  async removeAuthTokenFromStorage(): Promise<void> {
     await this._storage.delete(this.storageKey)
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<OAuth2Token | null> {
-    if (!this.provider.clientId) {
-      this._logger.warn('Cannot refresh token: client ID is not configured')
-      return null
+  async refreshAccessToken(tokenStore: OAuth2Token): Promise<OAuth2Token> {
+    if (!this.clientId) {
+      throw new Error('Cannot refresh token: client ID is not configured')
     }
 
-    const tokenObj: OAuth2Token = {
-      accessToken: '',
-      refreshToken: refreshToken,
-      expiresAt: null
-    }
-
-    try {
-      return await this._oauth2Client.refreshToken(tokenObj)
-    } catch (e) {
-      this._logger.error('Failed to refresh token', { e })
-      return null
-    }
+    return await this._oauth2Client.refreshToken(tokenStore)
   }
 
   protected isInvalidTokenError(error: unknown): boolean {
-    // Basic heuristic since we don't have OAuth2RequestError exported from badgateway yet
+    if (error instanceof OAuth2Error) {
+      return error.oauth2Code === 'invalid_grant'
+    }
     return String(error).includes('invalid_grant')
   }
 
   private async tryRefreshToken(
-    refreshTokenStr: string
-  ): Promise<string | undefined> {
-    if (!this.provider.clientId) {
+    tokenStore: OAuth2Token
+  ): Promise<OAuth2Token | undefined> {
+    if (!this.clientId) {
       this._logger.warn('Cannot refresh token: client ID is not configured')
       return undefined
     }
     this._logger.log('token expired, trying to refresh it')
     try {
-      const newTokens = await this.refreshAccessToken(refreshTokenStr)
-      if (!newTokens) {
-        throw new Error('Failed to refresh token - user must re-authenticate.')
-      }
-
-      const newAccessToken = newTokens.accessToken
+      const newTokens = await this.refreshAccessToken(tokenStore)
       this._logger.log('refreshed new access token, storing it and continue')
 
-      const storeToken = await this.getAuthTokenFromStorage()
-
       await this.cacheAuthToken(
-        newAccessToken,
-        newTokens.refreshToken ?? refreshTokenStr,
+        newTokens.accessToken,
+        newTokens.refreshToken ?? tokenStore.refreshToken,
         newTokens.expiresAt,
-        storeToken?.scopes // badgateway refreshToken doesn't return scopes usually
+        newTokens.scope ?? tokenStore.scope
       )
-      return newAccessToken
+
+      return newTokens
     } catch (error) {
       if (this.isInvalidTokenError(error)) {
         this._logger.warn('Refresh token is invalid, clearing storage')
-        await this._storage.delete(this.storageKey)
+        await this.removeAuthTokenFromStorage()
       } else {
         this._logger.error('Failed to refresh access token', { error })
       }
@@ -213,9 +206,9 @@ export class AuthClient {
     }
   }
 
-  async getTokenFromStoreOrRefreshToken(): Promise<string | undefined> {
+  async getTokenFromStoreOrRefreshToken(): Promise<OAuth2Token | undefined> {
     if (this._tokenPromise) {
-      this._logger.log(
+      this._logger.debug(
         'token retrieval already in progress, returning pending promise'
       )
       return this._tokenPromise
@@ -223,17 +216,17 @@ export class AuthClient {
 
     this._tokenPromise = (async () => {
       try {
-        const storeToken = await this.getAuthTokenFromStorage()
-        this._logger.debug('token in storage?', !!storeToken)
+        const tokenStore = await this.getAuthTokenFromStorage()
+        this._logger.debug('token in storage?', !!tokenStore)
 
-        if (!storeToken) return undefined
+        if (!tokenStore) return undefined
 
-        if (!AuthClient.isExpired(storeToken)) {
-          return storeToken.accessToken
+        if (!AuthClient.isExpired(tokenStore)) {
+          return tokenStore
         }
 
-        if (storeToken.refreshToken) {
-          return await this.tryRefreshToken(storeToken.refreshToken)
+        if (tokenStore.refreshToken) {
+          return await this.tryRefreshToken(tokenStore)
         }
 
         return undefined
@@ -249,59 +242,47 @@ export class AuthClient {
     accessToken: string,
     refreshToken: string | null,
     expiresAt: number | null,
-    scopes?: string[]
-  ) {
-    const tokenStore: TokenStore = {
+    scope?: string[]
+  ): Promise<void> {
+    const tokenStore: OAuth2Token = {
       accessToken,
       refreshToken,
       expiresAt,
-      scopes,
+      scope,
     }
 
     await this._storage.set(this.storageKey, tokenStore)
-  }
-
-  get authStateKey() {
-    return `${OAUTH2_STORAGE_KEY}.state.${this.provider.name}`
   }
 
   async createAuthUrl(
     requestedScopes: string[] = [],
     loginHint?: string
   ): Promise<URL | undefined> {
-    this._state = generateState()
-
-    // badgateway's generateCodeVerifier is async
-    this._codeVerifier = await generateCodeVerifier()
+    const state = this.generateState()
+    const codeVerifier = await generateCodeVerifier()
 
     const previousScopes = await this.getGrantedScopes()
     const allScopes = Array.from(
-      new Set([...this.provider.scopes, ...previousScopes, ...requestedScopes])
+      new Set([...this.initialScope, ...previousScopes, ...requestedScopes])
     )
 
     await this._storage.set(this.authStateKey, {
-      state: this._state,
-      codeVerifier: this._codeVerifier,
+      state,
+      codeVerifier,
     })
 
     const url = await this._oauth2Client.authorizationCode.getAuthorizeUri({
       redirectUri: this._redirectUrl,
-      state: this._state,
-      codeVerifier: this._codeVerifier,
+      state,
+      codeVerifier,
       scope: allScopes,
+      extraParams: this.extraParams,
     })
 
     const finalUrl = new URL(url)
 
-    // add login_hint if provided
     if (loginHint) {
       finalUrl.searchParams.set('login_hint', loginHint)
-    }
-
-    if (this.provider.extraParams) {
-      for (const [key, value] of Object.entries(this.provider.extraParams)) {
-        finalUrl.searchParams.set(key, value)
-      }
     }
 
     return finalUrl
@@ -312,6 +293,7 @@ export class AuthClient {
       state: string
       codeVerifier: string
     }>(this.authStateKey)
+
     const { state: savedState, codeVerifier: savedCodeVerifier } =
       storedState ?? {}
 
@@ -324,30 +306,16 @@ export class AuthClient {
       savedCode: savedCodeVerifier,
     })
 
-    const urlWithCode = new URL(this._redirectUrl)
-    urlWithCode.searchParams.set('code', code)
-    urlWithCode.searchParams.set('state', state)
+    const tokens = await this._oauth2Client.authorizationCode.getToken({
+      code,
+      redirectUri: this._redirectUrl,
+      state,
+      codeVerifier: savedCodeVerifier,
+    })
 
-    const tokens = await this._oauth2Client.authorizationCode.getTokenFromCodeRedirect(
-      urlWithCode.toString(),
-      {
-        redirectUri: this._redirectUrl,
-        state: savedState,
-        codeVerifier: savedCodeVerifier
-      }
-    )
-
-    // Clean up auth state
     await this._storage.delete(this.authStateKey)
 
     return tokens
-  }
-
-  getContext() {
-    return {
-      state: this._state,
-      codeVerifier: this._codeVerifier,
-    }
   }
 
   async getAuthToken(
@@ -358,14 +326,13 @@ export class AuthClient {
     const storedToken = await this.getTokenFromStoreOrRefreshToken()
     const grantedScopes = await this.getGrantedScopes()
 
-    // Check if we need to request new scopes
     const hasAllRequestedScopes = requestedScopes
       ? requestedScopes.every((scope) => grantedScopes.includes(scope))
       : true
 
     if (storedToken && hasAllRequestedScopes) {
       this._logger.log('using stored token with all necessary scopes')
-      return storedToken
+      return storedToken.accessToken
     } else if (!interactive && !hasAllRequestedScopes) {
       this._logger.log(
         'missing requested scopes but not interactive, returning nothing'
@@ -375,7 +342,7 @@ export class AuthClient {
       this._logger.log(
         'no token retrieved, but not interactive, so returning nothing'
       )
-      return
+      return undefined
     }
 
     this._logger.log(
@@ -386,14 +353,14 @@ export class AuthClient {
 
     if (!url) {
       this._logger.error('Failed to create auth URL')
-      return
+      return undefined
     }
 
     this._logger.debug('Generated Auth URL:', url.href, {
-      provider: this.provider.name,
+      provider: this.name,
       scopes: requestedScopes,
-      clientId: this.provider.clientId,
-      clientSecret: this.provider.clientSecret ? '***' : undefined,
+      clientId: this.clientId,
+      clientSecret: this.clientSecret ? '***' : undefined,
     })
 
     if (this._handler) {
@@ -401,7 +368,10 @@ export class AuthClient {
     }
   }
 
-  private async handleRedirectFlow(url: URL, requestedScopes: string[] = []): Promise<string | undefined> {
+  private async handleRedirectFlow(
+    url: URL,
+    requestedScopes: string[] = []
+  ): Promise<string | undefined> {
     try {
       const redirectUrl = await this._handler!.open(url)
       const code = redirectUrl.searchParams.get('code')
@@ -418,10 +388,13 @@ export class AuthClient {
 
       const refreshToken = tokens.refreshToken ?? null
 
-      let scopesToSave: string[] | undefined = undefined
-      // badgateway might not parse scopes from the token response if it doesn't return them
-      // we'll use the requested/granted scopes
-      scopesToSave = Array.from(new Set([...(await this.getGrantedScopes()), ...requestedScopes]))
+      // If token response returned scopes, use them; otherwise union granted + requested
+      const scopesToSave =
+        tokens.scope && tokens.scope.length > 0
+          ? tokens.scope
+          : Array.from(
+              new Set([...(await this.getGrantedScopes()), ...requestedScopes])
+            )
 
       await this.cacheAuthToken(
         tokens.accessToken,

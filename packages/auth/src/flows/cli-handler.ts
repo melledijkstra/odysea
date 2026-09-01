@@ -1,6 +1,6 @@
 import * as readline from 'node:readline/promises'
 import { stdin as input, stdout as output } from 'node:process'
-import { AuthFlowHandler } from './auth-client'
+import type { AuthFlowHandler } from './flow.interface'
 
 export class CliAuthFlowHandler implements AuthFlowHandler {
   async open(url: URL): Promise<URL> {

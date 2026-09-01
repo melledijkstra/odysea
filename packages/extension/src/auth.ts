@@ -1,17 +1,13 @@
 import * as browser from 'webextension-polyfill'
-import {
-  AuthConfig,
-  AuthClient as BaseAuthClient,
-  AuthFlowHandler,
-} from '@melledijkstra/auth'
+import { AuthClient, AuthConfig } from '@melledijkstra/auth'
 import { ExtensionStorage } from './storage'
+import { ExtensionAuthFlowHandler } from './auth-flow-handler'
 
-export class ExtensionAuthFlowHandler implements AuthFlowHandler {
-  async open(url: URL): Promise<URL> {
-    const resultUrl = await browser.identity.launchWebAuthFlow({
-      url: url.toString(),
-      interactive: true,
+export class ExtensionAuthClient extends AuthClient {
+  constructor(config: AuthConfig) {
+    super(config, browser.identity.getRedirectURL(config.redirectPath), {
+      storage: new ExtensionStorage(),
+      handler: new ExtensionAuthFlowHandler(),
     })
-    return new URL(resultUrl)
   }
 }

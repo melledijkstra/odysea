@@ -1,5 +1,5 @@
 import { getContext, setContext } from 'svelte'
-import type { OauthProvider } from '@/oauth2/providers'
+import type { OAuthProvider } from '@melledijkstra/auth'
 import { allAuthClients } from './clients'
 import browser, { type Storage } from 'webextension-polyfill'
 
@@ -10,7 +10,7 @@ export interface ProviderState {
 
 export class AuthState {
   isInitialized = $state(false)
-  providers = $state<Record<OauthProvider, ProviderState>>({
+  providers = $state<Record<OAuthProvider, ProviderState>>({
     google: { isAuthenticated: false, scopes: [] },
     spotify: { isAuthenticated: false, scopes: [] },
     github: { isAuthenticated: false, scopes: [] },
@@ -25,7 +25,7 @@ export class AuthState {
       allAuthClients.map(async (client) => {
         const isAuthenticated = await client.isAuthenticated()
         const grantedScopes = await client.getGrantedScopes()
-        this.update(client.provider.name, isAuthenticated, grantedScopes)
+        this.update(client.config.name, isAuthenticated, grantedScopes)
       })
     )
     this.isInitialized = true
@@ -41,7 +41,7 @@ export class AuthState {
     changes: Storage.StorageAreaOnChangedChangesType
   ) => {
     for (const client of allAuthClients) {
-      const provider = client.provider.name as OauthProvider
+      const provider = client.config.name as OAuthProvider
       const storageKey = client.storageKey
       if (changes[storageKey]) {
         const hasToken = !!changes[storageKey].newValue
@@ -52,24 +52,24 @@ export class AuthState {
     }
   }
 
-  update(provider: OauthProvider, isAuthenticated: boolean, scopes: string[]) {
+  update(provider: OAuthProvider, isAuthenticated: boolean, scopes: string[]) {
     this.providers[provider].isAuthenticated = isAuthenticated
     this.providers[provider].scopes = scopes
   }
 
-  deauthenticated(provider: OauthProvider) {
+  deauthenticated(provider: OAuthProvider) {
     this.providers[provider].isAuthenticated = false
     this.providers[provider].scopes = []
   }
 
-  hasScopes(provider: OauthProvider, scopes: string[]) {
+  hasScopes(provider: OAuthProvider, scopes: string[]) {
     return (
       this.providers[provider].isAuthenticated &&
       scopes.every((scope) => this.providers[provider].scopes.includes(scope))
     )
   }
 
-  getGrantedScopes(provider: OauthProvider) {
+  getGrantedScopes(provider: OAuthProvider) {
     return this.providers[provider].scopes
   }
 

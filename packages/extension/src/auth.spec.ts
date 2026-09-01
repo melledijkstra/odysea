@@ -1,21 +1,21 @@
 import { describe, it, expect, vi } from 'vitest'
-import { ExtensionAuthFlowHandler } from './auth'
+import { ExtensionAuthClient } from './auth'
 import * as browser from 'webextension-polyfill'
 
-describe('Extension AuthFlowHandler', () => {
-  it('should create an instance of ExtensionAuthFlowHandler and call webAuthFlow', async () => {
-    browser.identity.launchWebAuthFlow = vi.fn().mockResolvedValue('https://example.com/callback')
+describe('ExtensionAuthClient', () => {
+  it('should initialize with extension storage and flow handler', () => {
+    browser.identity.getRedirectURL = vi
+      .fn()
+      .mockReturnValue('https://extension.example/callback')
 
-    const handler = new ExtensionAuthFlowHandler()
-    expect(handler).toBeInstanceOf(ExtensionAuthFlowHandler)
-
-    const testUrl = new URL('https://example.com/auth')
-    const result = await handler.open(testUrl)
-
-    expect(browser.identity.launchWebAuthFlow).toHaveBeenCalledWith({
-      url: testUrl.toString(),
-      interactive: true
+    const client = new ExtensionAuthClient({
+      name: 'google',
+      clientId: 'test-client',
+      redirectPath: 'google',
     })
-    expect(result.toString()).toBe('https://example.com/callback')
+
+    expect(client).toBeInstanceOf(ExtensionAuthClient)
+    expect(client.name).toBe('google')
+    expect(browser.identity.getRedirectURL).toHaveBeenCalledWith('google')
   })
 })

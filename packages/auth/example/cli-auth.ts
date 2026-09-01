@@ -5,13 +5,11 @@ import {
   AuthClient,
   CliAuthFlowHandler,
   AuthConfig,
-  OauthProvider,
-} from '../src'
-import {
+  OAuthProvider,
   createSpotifyAuthConfig,
   createGithubAuthConfig,
   createGoogleAuthConfig,
-} from '../src/providers'
+} from '../src'
 
 const rl = readline.createInterface({ input, output })
 
@@ -22,7 +20,7 @@ try {
     'Enter Provider (google | github | spotify) [default: github]: '
   )
   const providerName = (providerNameInput.trim().toLowerCase() ||
-    'github') as OauthProvider
+    'github') as OAuthProvider
 
   const redirectUrlInput = await rl.question(
     'Enter Redirect URL [default: http://localhost:3000/callback]: '
@@ -53,10 +51,7 @@ try {
 
   const storage = new FileStorage()
   const handler = new CliAuthFlowHandler()
-  const authClient = new AuthClient(config, redirectUrl, {
-    storage,
-    handler,
-  })
+  const authClient = new AuthClient(config, redirectUrl, { storage, handler })
 
   console.log('Executing interactive authentication flow...')
   const token = await authClient.getAuthToken(true)

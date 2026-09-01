@@ -1,120 +1,113 @@
+export type OAuthProvider = 'google' | 'spotify' | 'github' | 'google-health'
 
-import { AuthClient } from './auth-client'
-import type { AuthFlowHandler } from './auth-client'
-import type { IStorage } from '@melledijkstra/storage'
+export interface ProviderDefinition {
+  server: string
+  authEndpoint?: string | undefined
+  tokenEndpoint?: string | undefined
+  revocationEndpoint?: string | undefined
+  discoveryEndpoint?: string | undefined
+  defaultScopes?: string[] | undefined
+  extraParams?: Record<string, string> | undefined
+  skipServerRevoke?: boolean | undefined
+}
 
-export type OauthProvider = 'google' | 'spotify' | 'github' | 'google-health'
+export const PROVIDER_DEFINITIONS: Record<OAuthProvider, ProviderDefinition> = {
+  google: {
+    server: 'https://oauth2.googleapis.com/',
+    authEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+    tokenEndpoint: 'https://oauth2.googleapis.com/token',
+    revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
+    defaultScopes: ['openid', 'profile'],
+    extraParams: {
+      access_type: 'offline',
+      prompt: 'consent',
+    },
+  },
+  'google-health': {
+    server: 'https://oauth2.googleapis.com/',
+    authEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+    tokenEndpoint: 'https://oauth2.googleapis.com/token',
+    revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
+    defaultScopes: [
+      'https://www.googleapis.com/auth/googlehealth.sleep.readonly',
+    ],
+    extraParams: {
+      access_type: 'offline',
+      prompt: 'consent',
+    },
+  },
+  github: {
+    server: 'https://github.com',
+    authEndpoint: 'https://github.com/login/oauth/authorize',
+    tokenEndpoint: 'https://github.com/login/oauth/access_token',
+    defaultScopes: ['user'],
+    skipServerRevoke: true,
+  },
+  spotify: {
+    server: 'https://accounts.spotify.com',
+    authEndpoint: 'https://accounts.spotify.com/authorize',
+    tokenEndpoint: 'https://accounts.spotify.com/api/token',
+    defaultScopes: ['user'],
+  },
+}
 
 export interface AuthConfig {
-  name: OauthProvider
-  scopes: string[]
+  name: OAuthProvider
   clientId: string
-  clientSecret?: string | null
-  authEndpoint?: string
-  tokenEndpoint?: string
-  discoveryEndpoint?: string
-  extraParams?: Record<string, string>
-  redirectPath?: string
-  skipServerRevoke?: boolean
+  clientSecret?: string | undefined
+  initialScope?: string[] | undefined
+  redirectPath?: string | undefined
+  extraParams?: Record<string, string> | undefined
+  server?: string | undefined
+  authEndpoint?: string | undefined
+  tokenEndpoint?: string | undefined
+  revocationEndpoint?: string | undefined
+  discoveryEndpoint?: string | undefined
+  skipServerRevoke?: boolean | undefined
 }
 
-export class GoogleAuthClient extends AuthClient {
-  constructor(
-    config: AuthConfig,
-    redirectUrl: string,
-    options?: { storage?: IStorage; handler?: AuthFlowHandler }
-  ) {
-    super(
-      {
-        ...config,
-        authEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
-        tokenEndpoint: 'https://oauth2.googleapis.com/token',
-      },
-      redirectUrl,
-      options
-    )
-  }
-}
-
-export class GithubAuthClient extends AuthClient {
-  constructor(
-    config: AuthConfig,
-    redirectUrl: string,
-    options?: { storage?: IStorage; handler?: AuthFlowHandler }
-  ) {
-    super(
-      {
-        ...config,
-        authEndpoint: 'https://github.com/login/oauth/authorize',
-        tokenEndpoint: 'https://github.com/login/oauth/access_token',
-      },
-      redirectUrl,
-      options
-    )
-  }
-}
-
-export class SpotifyAuthClient extends AuthClient {
-  constructor(
-    config: AuthConfig,
-    redirectUrl: string,
-    options?: { storage?: IStorage; handler?: AuthFlowHandler }
-  ) {
-    super(
-      {
-        ...config,
-        authEndpoint: 'https://accounts.spotify.com/authorize',
-        tokenEndpoint: 'https://accounts.spotify.com/api/token',
-      },
-      redirectUrl,
-      options
-    )
-  }
-}
-
-export class GoogleHealthAuthClient extends GoogleAuthClient {
-  constructor(
-    config: AuthConfig,
-    redirectUrl: string,
-    options?: { storage?: IStorage; handler?: AuthFlowHandler }
-  ) {
-    super(config, redirectUrl, options)
-  }
-}
-
-export const createGoogleAuthConfig = (): AuthConfig => ({
+export const createGoogleAuthConfig = (
+  overrides?: Partial<AuthConfig> | undefined
+): AuthConfig => ({
   name: 'google',
-  scopes: ['openid', 'profile'],
   get clientId() {
-    return process.env.GOOGLE_CLIENT_ID!
+    return process.env['GOOGLE_CLIENT_ID'] ?? ''
   },
   get clientSecret() {
-    return process.env.GOOGLE_CLIENT_SECRET
+    return process.env['GOOGLE_CLIENT_SECRET']
   },
+  initialScope: ['openid', 'profile'],
   extraParams: {
     access_type: 'offline',
     prompt: 'consent',
   },
+  ...overrides,
 })
 
-export const createGithubAuthConfig = (): AuthConfig => ({
+export const createGithubAuthConfig = (
+  overrides?: Partial<AuthConfig> | undefined
+): AuthConfig => ({
   name: 'github',
-  scopes: ['user'],
   get clientId() {
-    return process.env.GITHUB_CLIENT_ID!
+    return process.env['GITHUB_CLIENT_ID'] ?? ''
   },
   get clientSecret() {
-    return process.env.GITHUB_CLIENT_SECRET
+    return process.env['GITHUB_CLIENT_SECRET']
   },
+  initialScope: ['user'],
+  ...overrides,
 })
 
-export const createSpotifyAuthConfig = (): AuthConfig => ({
+export const createSpotifyAuthConfig = (
+  overrides?: Partial<AuthConfig> | undefined
+): AuthConfig => ({
   name: 'spotify',
-  scopes: ['user'],
   get clientId() {
-    return process.env.SPOTIFY_CLIENT_ID!
+    return process.env['SPOTIFY_CLIENT_ID'] ?? ''
   },
   get clientSecret() {
-    return process.env.SPOTIFY_CLIENT_SECRET
+    return process.env['SPOTIFY_CLIENT_SECRET']
   },
+  initialScope: ['user'],
+  ...overrides,
 })
