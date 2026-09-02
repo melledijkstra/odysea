@@ -5,7 +5,7 @@ import { GMAIL_SCOPE } from '@/oauth2/scope-registry'
 import { authState } from '@/oauth2/auth.state.svelte'
 import { GoogleGmailApiClient } from '@melledijkstra/api'
 import { repeatEvery } from '@melledijkstra/toolbox'
-import browser from 'webextension-polyfill'
+import { untrack } from 'svelte'
 
 const STORAGE_KEY = 'google::gmail_unread'
 
@@ -14,11 +14,15 @@ export class Gmail extends Tracker implements GmailTracker {
   readonly type = 'gmail' as const
   declare name: string
   unread = $state<number | undefined>(undefined)
-  authenticated = $state(false)
+
+  get authenticated() {
+    return authState.hasScopes('google', [GMAIL_SCOPE])
+  }
 
   private cache = new WebLocalStorage()
   private client = new GoogleGmailApiClient(authState.clients.google)
   private cancelUpdater?: () => void
+  private effectCleanup?: () => void
 
   constructor(pinned: boolean = true) {
     super('gmail', pinned, 'Gmail')
@@ -32,16 +36,17 @@ export class Gmail extends Tracker implements GmailTracker {
   }
 
   async init() {
-    await this.checkAuth()
-
-    // Listen for auth changes via storage
-    if (browser.storage?.local?.onChanged) {
-      browser.storage.local.onChanged.addListener(this.handleStorageChange)
-    }
-
-    if (this.authenticated) {
-      this.fetchData()
-    }
+    this.effectCleanup = $effect.root(() => {
+      $effect(() => {
+        if (this.authenticated) {
+          untrack(() => {
+            this.fetchData()
+          })
+        } else {
+          this.unread = undefined
+        }
+      })
+    })
 
     this.cancelUpdater = repeatEvery(() => {
       if (this.authenticated) {
@@ -51,33 +56,8 @@ export class Gmail extends Tracker implements GmailTracker {
   }
 
   override destroy() {
-    if (browser.storage?.local?.onChanged) {
-      browser.storage.local.onChanged.removeListener(this.handleStorageChange)
-    }
+    this.effectCleanup?.()
     this.cancelUpdater?.()
-  }
-
-  private handleStorageChange = async (
-    changes: Record<string, browser.Storage.StorageChange>
-  ) => {
-    if (changes[authState.clients.google.storageKey]) {
-      await this.checkAuth()
-      if (this.authenticated) {
-        this.fetchData()
-      } else {
-        this.unread = undefined
-      }
-    }
-  }
-
-  private async checkAuth() {
-    const hasToken = await authState.clients.google.isAuthenticated()
-    if (!hasToken) {
-      this.authenticated = false
-      return
-    }
-    const scopes = await authState.clients.google.getGrantedScopes()
-    this.authenticated = scopes.includes(GMAIL_SCOPE)
   }
 
   async authenticate(): Promise<void> {
@@ -85,7 +65,6 @@ export class Gmail extends Tracker implements GmailTracker {
       GMAIL_SCOPE,
     ])
     if (tokenData) {
-      await this.checkAuth()
       if (this.authenticated) {
         await this.fetchData()
       }

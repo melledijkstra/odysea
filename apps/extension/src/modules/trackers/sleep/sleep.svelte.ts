@@ -5,7 +5,7 @@ import { SLEEP_SCOPE } from '@/oauth2/scope-registry'
 import { authState } from '@/oauth2/auth.state.svelte'
 import { GoogleHealthApiClient } from '@melledijkstra/api'
 import { repeatEvery } from '@melledijkstra/toolbox'
-import browser from 'webextension-polyfill'
+import { untrack } from 'svelte'
 
 const STORAGE_KEY = 'googlehealth::sleep_minutes'
 
@@ -14,11 +14,15 @@ export class Sleep extends Tracker implements SleepTracker {
   readonly type = 'sleep' as const
   declare name: string
   minutes = $state<number | undefined>(undefined)
-  authenticated = $state(false)
+
+  get authenticated() {
+    return authState.hasScopes('google-health', [SLEEP_SCOPE])
+  }
 
   private cache = new WebLocalStorage()
   private client = new GoogleHealthApiClient(authState.clients['google-health'])
   private cancelUpdater?: () => void
+  private effectCleanup?: () => void
 
   constructor(pinned: boolean = true, minutes?: number) {
     super('sleep', pinned, 'Sleep')
@@ -29,16 +33,17 @@ export class Sleep extends Tracker implements SleepTracker {
   }
 
   async init() {
-    await this.checkAuth()
-
-    // Listen for auth changes via storage
-    if (browser.storage?.local?.onChanged) {
-      browser.storage.local.onChanged.addListener(this.handleStorageChange)
-    }
-
-    if (this.authenticated) {
-      this.fetchData()
-    }
+    this.effectCleanup = $effect.root(() => {
+      $effect(() => {
+        if (this.authenticated) {
+          untrack(() => {
+            this.fetchData()
+          })
+        } else {
+          this.minutes = undefined
+        }
+      })
+    })
 
     this.cancelUpdater = repeatEvery(
       () => {
@@ -51,33 +56,8 @@ export class Sleep extends Tracker implements SleepTracker {
   }
 
   override destroy() {
-    if (browser.storage?.local?.onChanged) {
-      browser.storage.local.onChanged.removeListener(this.handleStorageChange)
-    }
+    this.effectCleanup?.()
     this.cancelUpdater?.()
-  }
-
-  private handleStorageChange = async (
-    changes: Record<string, browser.Storage.StorageChange>
-  ) => {
-    if (changes[authState.clients['google-health'].storageKey]) {
-      await this.checkAuth()
-      if (this.authenticated) {
-        this.fetchData()
-      } else {
-        this.minutes = undefined
-      }
-    }
-  }
-
-  private async checkAuth() {
-    const hasToken = await authState.clients['google-health'].isAuthenticated()
-    if (!hasToken) {
-      this.authenticated = false
-      return
-    }
-    const scopes = await authState.clients['google-health'].getGrantedScopes()
-    this.authenticated = scopes.includes(SLEEP_SCOPE)
   }
 
   async authenticate(): Promise<void> {
@@ -86,7 +66,6 @@ export class Sleep extends Tracker implements SleepTracker {
       [SLEEP_SCOPE]
     )
     if (tokenData) {
-      await this.checkAuth()
       if (this.authenticated) {
         await this.fetchData()
       }
