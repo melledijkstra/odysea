@@ -15,12 +15,8 @@ export class Sleep extends Tracker implements SleepTracker {
   declare name: string
   minutes = $state<number | undefined>(undefined)
 
-  get authenticated() {
-    return authState.hasScopes('google-health', [SLEEP_SCOPE])
-  }
-
   private cache = new WebLocalStorage()
-  private client = new GoogleHealthApiClient(authState.clients['google-health'])
+  private client: GoogleHealthApiClient
   private cancelUpdater?: () => void
   private effectCleanup?: () => void
 
@@ -29,7 +25,12 @@ export class Sleep extends Tracker implements SleepTracker {
     this.name = 'Sleep'
     this.minutes = minutes
     this.icon = '/icons/google-health.svg'
+    this.client = new GoogleHealthApiClient(authState.clients['google-health'])
     this.init()
+  }
+
+  get authenticated() {
+    return authState.hasScopes('google-health', [SLEEP_SCOPE])
   }
 
   async init() {

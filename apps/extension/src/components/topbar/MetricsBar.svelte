@@ -1,9 +1,14 @@
 <script lang="ts">
   import { trackers } from '@/modules/trackers/state.svelte'
   import TrackerRenderer from '@/components/trackers/TrackerRenderer.svelte'
+  import { onMount } from 'svelte'
 
   const pinnedMetrics = $derived.by(() => {
     return trackers.metrics.filter((metric) => metric.pinned)
+  })
+
+  onMount(() => {
+    trackers.initialize()
   })
 </script>
 

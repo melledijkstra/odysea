@@ -12,9 +12,13 @@ const STORAGE_KEYS = {
 
 export class Trackers {
   metrics = $state<Tracker[]>([])
+  private intialized = $state(false)
 
-  constructor() {
-    this.loadMetrics()
+  public initialize() {
+    if (!this.intialized) {
+      this.loadMetrics()
+      this.intialized = true
+    }
   }
 
   private loadMetrics() {

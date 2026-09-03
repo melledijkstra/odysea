@@ -1,26 +1,23 @@
 import type { AuthConfig } from '@melledijkstra/auth'
-import { settingsStore } from '@/settings/index.svelte'
 
-export const getGithubAuthConfig = (): AuthConfig => ({
+export const getGithubAuthConfig = (
+  clientId: string,
+  clientSecret?: string
+): AuthConfig => ({
   name: 'github',
-  get clientId() {
-    return settingsStore.apiKeys.github_client_id || ''
-  },
-  get clientSecret() {
-    return settingsStore.apiKeys.github_client_secret || ''
-  },
+  clientId,
+  clientSecret,
   initialScope: ['repo'],
 })
 
-export const getGoogleAuthConfig = (): AuthConfig => ({
+export const getGoogleAuthConfig = (
+  clientId: string,
+  clientSecret?: string
+): AuthConfig => ({
   name: 'google',
   redirectPath: 'google',
-  get clientId() {
-    return settingsStore.apiKeys.google_client_id || ''
-  },
-  get clientSecret() {
-    return settingsStore.apiKeys.google_client_secret || ''
-  },
+  clientId,
+  clientSecret,
   initialScope: [
     'profile',
     'email',
@@ -35,16 +32,11 @@ export const getGoogleAuthConfig = (): AuthConfig => ({
   skipServerRevoke: true,
 })
 
-export const getGoogleHealthAuthConfig = (): AuthConfig => ({
-  ...getGoogleAuthConfig(),
-  // getters don't get copied when spreading, duplicated
-  // TODO: find a better way to handle this
-  get clientId() {
-    return settingsStore.apiKeys.google_client_id || ''
-  },
-  get clientSecret() {
-    return settingsStore.apiKeys.google_client_secret || ''
-  },
+export const getGoogleHealthAuthConfig = (
+  clientId: string,
+  clientSecret?: string
+): AuthConfig => ({
+  ...getGoogleAuthConfig(clientId, clientSecret),
   name: 'google-health',
   initialScope: ['https://www.googleapis.com/auth/googlehealth.sleep.readonly'],
   extraParams: {
@@ -55,11 +47,9 @@ export const getGoogleHealthAuthConfig = (): AuthConfig => ({
   skipServerRevoke: true,
 })
 
-export const getSpotifyAuthConfig = (): AuthConfig => ({
+export const getSpotifyAuthConfig = (clientId: string): AuthConfig => ({
   name: 'spotify',
-  get clientId() {
-    return settingsStore.apiKeys.spotify || ''
-  },
+  clientId,
   initialScope: [
     'streaming',
     'app-remote-control',

@@ -7,6 +7,10 @@ import {
   getGoogleHealthAuthConfig,
   getSpotifyAuthConfig,
 } from './providers'
+import { settings, settingsStore } from '@/settings/index.svelte'
+import { Logger } from '@/logger'
+
+const logger = new Logger('AuthState')
 
 export interface ProviderState {
   isAuthenticated: boolean
@@ -21,17 +25,56 @@ export class AuthState {
     github: { isAuthenticated: false, scopes: [] },
     'google-health': { isAuthenticated: false, scopes: [] },
   })
-  clients = {
-    google: new ExtensionAuthClient(getGoogleAuthConfig()),
-    github: new ExtensionAuthClient(getGithubAuthConfig()),
-    spotify: new ExtensionAuthClient(getSpotifyAuthConfig()),
-    'google-health': new ExtensionAuthClient(getGoogleHealthAuthConfig()),
-  }
+  private _clients?: Record<OAuthProvider, ExtensionAuthClient>
   private storageListenerBound = false
 
+  get clients(): Record<OAuthProvider, ExtensionAuthClient> {
+    if (!this._clients) {
+      return this.setupClients()
+    }
+    return this._clients
+  }
+
+  private setupClients() {
+    logger.debug('Setting up auth clients')
+    logger.debug('API Keys loaded:', settingsStore.loaded)
+    logger.debug('API Keys:', settingsStore.apiKeys)
+    this._clients = {
+      google: new ExtensionAuthClient(
+        getGoogleAuthConfig(
+          settingsStore.apiKeys.google_client_id ?? '',
+          settingsStore.apiKeys.google_client_secret
+        )
+      ),
+      github: new ExtensionAuthClient(
+        getGithubAuthConfig(
+          settingsStore.apiKeys.github_client_id ?? '',
+          settingsStore.apiKeys.github_client_secret
+        )
+      ),
+      spotify: new ExtensionAuthClient(
+        getSpotifyAuthConfig(settingsStore.apiKeys.spotify ?? '')
+      ),
+      'google-health': new ExtensionAuthClient(
+        getGoogleHealthAuthConfig(
+          settingsStore.apiKeys.google_client_id ?? '',
+          settingsStore.apiKeys.google_client_secret
+        )
+      ),
+    }
+    return this._clients
+  }
+
   async initialize() {
-    this.setupStorageListener()
+    if (!settingsStore.loaded) {
+      await settings.initialize()
+    }
+
+    this.setupClients()
+
     if (this.isInitialized) return
+
+    this.setupStorageListener()
     await Promise.all(
       Object.values(this.clients).map(async (client) => {
         const isAuthenticated = await client.isAuthenticated()

@@ -3,10 +3,10 @@
   import { settings } from './index.svelte'
   import { authState } from '@/oauth2/auth.state.svelte'
 
-  let initPromise = Promise.allSettled([
-    settings.initialize(),
-    authState.initialize(),
-  ])
+  const initPromise = (async () => {
+    await settings.initialize()
+    await authState.initialize()
+  })()
 </script>
 
 <div class="bg-black min-h-screen text-white">
