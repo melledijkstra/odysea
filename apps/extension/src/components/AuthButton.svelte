@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { OAuthProvider } from '@melledijkstra/auth'
+  import type { OAuthProvider } from '@/oauth2/auth.state.svelte'
   import Button from '@melledijkstra/ui/svelte/Button.svelte'
   import type { HTMLButtonAttributes } from 'svelte/elements'
   import IconGoogle from '@/icons/IconGoogle.svelte'
