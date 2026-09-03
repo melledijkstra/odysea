@@ -15,7 +15,7 @@ export interface TrackerAction {
 }
 
 export abstract class Tracker implements BaseTracker {
-  id: string
+  readonly id: string
   abstract readonly type: string
   name?: string
   pinned: boolean = $state(false)

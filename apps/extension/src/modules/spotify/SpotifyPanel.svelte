@@ -3,6 +3,7 @@
   import { SpotifyController } from '@/controllers/SpotifyController'
   import MusicPlayer from '@/components/musicplayer/MusicPlayer.svelte'
   import { spotifyState } from './spotify.state.svelte'
+  import { authState } from '@/oauth2/auth.state.svelte'
   import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import type { PlaybackState } from 'MusicPlayer'
   import AuthButton from '@/components/AuthButton.svelte'
@@ -27,8 +28,15 @@
 
     await controller.initialize()
     hasTabLock = true
-    if (spotifyState.isAuthenticated) {
+    if (authState.providers.spotify.isAuthenticated) {
       controller.syncState()
+    }
+  })
+
+  $effect(() => {
+    const isAuthenticated = authState.providers.spotify.isAuthenticated
+    if (controller) {
+      controller.handleAuthChange(isAuthenticated)
     }
   })
 
@@ -60,7 +68,7 @@
       </p>
     </div>
   {:else}
-    {#if !spotifyState.isAuthenticated}
+    {#if !authState.providers.spotify.isAuthenticated}
       <div class="flex flex-col gap-4 items-center justify-center h-full">
         <p class="text-center text-lg">
           You are not authenticated with Spotify

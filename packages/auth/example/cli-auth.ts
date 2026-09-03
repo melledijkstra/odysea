@@ -4,14 +4,17 @@ import { FileStorage } from '@melledijkstra/storage'
 import {
   AuthClient,
   CliAuthFlowHandler,
-  AuthConfig,
-  OauthProvider,
+  GoogleAuthClient,
+  GithubAuthClient,
+  SpotifyAuthClient,
 } from '../src'
-import {
-  createSpotifyAuthConfig,
-  createGithubAuthConfig,
-  createGoogleAuthConfig,
-} from '../src/providers'
+
+const AUTH_PROVIDERS = ['google', 'github', 'spotify'] as const
+
+type OAuthProvider = (typeof AUTH_PROVIDERS)[number]
+
+const isSupportedAuthProvider = (provider: string): provider is OAuthProvider =>
+  AUTH_PROVIDERS.includes(provider as OAuthProvider)
 
 const rl = readline.createInterface({ input, output })
 
@@ -19,10 +22,15 @@ try {
   console.log('--- CLI OAuth Authentication Test ---\n')
 
   const providerNameInput = await rl.question(
-    'Enter Provider (google | github | spotify) [default: github]: '
+    `Enter Provider (${AUTH_PROVIDERS.join(' | ')}): `
   )
-  const providerName = (providerNameInput.trim().toLowerCase() ||
-    'github') as OauthProvider
+
+  const providerName = providerNameInput.trim().toLowerCase()
+
+  if (!isSupportedAuthProvider(providerName)) {
+    console.error(`Error: Unsupported provider '${providerName}'`)
+    process.exit(1)
+  }
 
   const redirectUrlInput = await rl.question(
     'Enter Redirect URL [default: http://localhost:3000/callback]: '
@@ -30,17 +38,42 @@ try {
   const redirectUrl =
     redirectUrlInput.trim() || 'http://localhost:3000/callback'
 
-  let config: AuthConfig
+  const storage = new FileStorage()
+  const handler = new CliAuthFlowHandler()
+  const options = { storage, handler, redirectUrl }
+
+  let authClient: AuthClient
 
   switch (providerName) {
     case 'google':
-      config = createGoogleAuthConfig()
+      authClient = new GoogleAuthClient(
+        {
+          clientId: process.env['GOOGLE_CLIENT_ID'] ?? '',
+          clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
+          initialScope: ['openid', 'profile'],
+        },
+        options
+      )
       break
     case 'github':
-      config = createGithubAuthConfig()
+      authClient = new GithubAuthClient(
+        {
+          clientId: process.env['GITHUB_CLIENT_ID'] ?? '',
+          clientSecret: process.env['GITHUB_CLIENT_SECRET'],
+          initialScope: ['user'],
+        },
+        options
+      )
       break
     case 'spotify':
-      config = createSpotifyAuthConfig()
+      authClient = new SpotifyAuthClient(
+        {
+          clientId: process.env['SPOTIFY_CLIENT_ID'] ?? '',
+          clientSecret: process.env['SPOTIFY_CLIENT_SECRET'],
+          initialScope: ['user'],
+        },
+        options
+      )
       break
     default:
       console.error(`Error: Unsupported provider '${providerName}'`)
@@ -50,13 +83,6 @@ try {
   console.log(
     '\nInitializing AuthClient with FileStorage and CliAuthFlowHandler...'
   )
-
-  const storage = new FileStorage()
-  const handler = new CliAuthFlowHandler()
-  const authClient = new AuthClient(config, redirectUrl, {
-    storage,
-    handler,
-  })
 
   console.log('Executing interactive authentication flow...')
   const token = await authClient.getAuthToken(true)

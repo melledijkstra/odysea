@@ -1,14 +1,17 @@
 import { createServer } from 'node:http'
-import { AuthClient, createGoogleAuthConfig } from '../src'
-
-// const clientId = process.env.GITHUB_CLIENT_ID
-// const clientSecret = process.env.GITHUB_CLIENT_SECRET
-// const scopes = ['user']
+import { GoogleAuthClient } from '../src'
 
 const PORT = 8000
 const redirectUrl = `http://localhost:${PORT}/oauth/callback`
 
-const authClient = new AuthClient(createGoogleAuthConfig(), redirectUrl)
+const authClient = new GoogleAuthClient(
+  {
+    clientId: process.env['GOOGLE_CLIENT_ID'] ?? '',
+    clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
+    initialScope: ['openid', 'profile'],
+  },
+  { redirectUrl }
+)
 
 console.log('Trying to authenticate...')
 
@@ -36,17 +39,17 @@ const server = createServer(async (req, res) => {
     }
 
     try {
-      // 5. Exchange Code for Tokens
+      // Exchange Code for Tokens
       const tokens = await authClient.validate(code, state)
 
       console.log('\nSUCCESS! Save these credentials safely:')
       console.log('-----------------------------------------')
-      console.log(`ACCESS_TOKEN: ${tokens.accessToken()}`)
+      console.log(`ACCESS_TOKEN: ${tokens.accessToken}`)
       console.log(
-        `REFRESH_TOKEN: ${tokens.hasRefreshToken() ? tokens.refreshToken() : 'N/A'}`
+        `REFRESH_TOKEN: ${tokens.refreshToken ? tokens.refreshToken : 'N/A'}`
       )
       console.log('-----------------------------------------')
-      console.log('data: ', tokens.data)
+      console.log('data: ', tokens)
 
       res.end('Authentication successful! You can close this tab.')
     } catch (e) {

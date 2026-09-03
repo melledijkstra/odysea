@@ -2,7 +2,7 @@
   import Clock from '@/components/Clock.svelte'
   import Welcome from '@/components/Welcome.svelte'
   import { settingsStore } from '@/settings/index.svelte'
-  import { getAuthContext } from '@/oauth2/auth.state.svelte'
+  import { authState } from '@/oauth2/auth.state.svelte'
   import { useTasksQuery, useTasksListQuery } from '@/queries/tasks'
   import { useAccountQuery } from '@/queries/account'
   import { GoogleTasksController } from '@/controllers/GoogleTasksController'
@@ -10,7 +10,6 @@
 
   const controller = new GoogleTasksController()
 
-  const authState = getAuthContext()
   const accountQuery = useAccountQuery()
 
   const isTasksEnabled = $derived(

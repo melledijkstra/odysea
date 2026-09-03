@@ -1,18 +1,11 @@
 <script lang="ts">
   import { settingsStore, settings } from '@/settings/index.svelte'
   import AuthButton from '@/components/AuthButton.svelte'
-  import { type OauthProvider } from '@/oauth2/providers'
-  import {
-    googleAuthClient,
-    spotifyAuthClient,
-    githubAuthClient,
-    googleHealthAuthClient,
-  } from '@/oauth2/clients'
   import Input from '@melledijkstra/ui/svelte/Input.svelte'
   import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
   import { Logger } from '@/logger'
-  import type { AuthClient } from '@melledijkstra/extension'
-  import { getAuthContext } from '@/oauth2/auth.state.svelte'
+  import type { AuthClient } from '@melledijkstra/auth'
+  import { authState, type OAuthProvider } from '@/oauth2/auth.state.svelte'
   import Card from '@melledijkstra/ui/svelte/Card.svelte'
   import { scopeRegistry } from '@/oauth2/scope-registry'
   import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
@@ -24,42 +17,30 @@
 
   const logger = new Logger('AuthenticationTab')
 
-  const clients: Record<OauthProvider, AuthClient> = {
-    google: googleAuthClient,
-    spotify: spotifyAuthClient,
-    github: githubAuthClient,
-    'google-health': googleHealthAuthClient,
-  } as const
-
-  const authState = getAuthContext()
+  const clients: Record<OAuthProvider, AuthClient> = authState.clients
 
   const loadAuthState = authState.initialize()
 
-  async function authenticate(provider: OauthProvider) {
+  async function authenticate(provider: OAuthProvider) {
     logger.log('Authenticating with', provider)
     isAuthenticating = true
     try {
       const authToken = await clients[provider].getAuthToken(true)
       const scopes = await clients[provider].getGrantedScopes()
       logger.log(
-        'Authenticated with',
-        provider,
-        'token:',
-        authToken,
-        'scopes:',
-        scopes
+        `Authenticated with ${provider}, token: ${authToken}, scopes: ${scopes}`
       )
       authState.update(provider, !!authToken, scopes)
     } catch (e) {
-      logger.error('Failed to authenticate with', provider, e)
+      logger.error(`Failed to authenticate with ${provider}`, e)
     } finally {
       isAuthenticating = false
     }
   }
 
-  async function deauthenticate(provider: OauthProvider) {
+  async function deauthenticate(provider: OAuthProvider) {
     logger.log('Deauthenticating from', provider)
-    await clients[provider].deauthenticate(true)
+    await clients[provider].revokeToken()
     authState.deauthenticated(provider)
     if (provider === 'google') {
       await clearAccountCache()
@@ -71,9 +52,9 @@
     isAuthenticating = true
     authenticatingScope = scopeKey
     try {
-      const success = await googleAuthClient.authenticate(scopes)
+      const success = await authState.clients.google.getAuthToken(true, scopes)
       if (success) {
-        const grantedScopes = await googleAuthClient.getGrantedScopes()
+        const grantedScopes = await authState.clients.google.getGrantedScopes()
         authState.update('google', true, grantedScopes)
       }
     } catch (e) {
@@ -127,7 +108,7 @@
   </div>
 {:then}
   {#each Object.keys(clients) as key (key)}
-    {@const provider = key as OauthProvider}
+    {@const provider = key as OAuthProvider}
     {@const providerState = authState.providers[provider]}
 
     {#if provider === 'google'}

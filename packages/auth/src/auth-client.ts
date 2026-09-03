@@ -1,148 +1,73 @@
 import { IStorage, MemoryCache } from '@melledijkstra/storage'
 import { Logger } from '@melledijkstra/toolbox'
 import {
-  ArcticFetchError,
-  CodeChallengeMethod,
-  generateCodeVerifier,
-  generateState,
-  GitHub,
-  Google,
   OAuth2Client,
-  OAuth2RequestError,
-  OAuth2Tokens,
-  Spotify,
-  UnexpectedErrorResponseBodyError,
-} from 'arctic'
-import type { ArcticClient, AuthConfig } from './providers'
-export type { OauthProvider } from './providers'
+  OAuth2Error,
+  OAuth2Token,
+  generateCodeVerifier,
+} from '@badgateway/oauth2-client'
+import type { AuthConfig } from './config'
+import type { AuthFlowHandler } from './flows/flow.interface'
 
 const OAUTH2_STORAGE_KEY = 'oauth2'
 
-type TokenStore = {
-  access_token: string
-  expires_at: number
-  refresh_token?: string
-  scopes?: string[]
-}
-
-export interface AuthFlowHandler {
-  /**
-   * Opens the authentication URL and returns the redirect URL with the code.
-   * @param url The authorization URL to open
-   */
-  open(url: URL): Promise<URL>
+export interface AuthEnvironmentOptions {
+  redirectUrl?: string
+  storage?: IStorage
+  handler?: AuthFlowHandler
 }
 
 export class AuthClient {
-  protected _storage: IStorage
-  protected _redirectUrl: string
-  protected _state: string | undefined
-  protected _codeVerifier: string | undefined
-  protected _logger: Logger
-  protected _handler: AuthFlowHandler | undefined
-  protected _tokenPromise: Promise<string | undefined> | null = null
-  provider: AuthConfig
+  public readonly name: string
+  public readonly config: AuthConfig
+  protected readonly _redirectUrl: string
+  protected readonly _storage: IStorage
+  // TODO: make handler required, we need a way to handle the case when no handler is provided
+  // perhaps set a default calculated based on available environment
+  // or force the consumer to always provide one.
+  protected readonly _handler?: AuthFlowHandler
+  protected readonly _logger: Logger
+  protected _tokenPromise: Promise<OAuth2Token | undefined> | null = null
+  protected _oauth2Client: OAuth2Client
 
   constructor(
-    provider: AuthConfig,
-    redirectUrl: string,
-    {
-      storage = new MemoryCache(),
-      handler,
-    }: {
-      storage?: IStorage
-      handler?: AuthFlowHandler
-    } = {}
+    name: string,
+    config: AuthConfig,
+    options: AuthEnvironmentOptions = {}
   ) {
-    this._logger = new Logger(`auth:${provider.name}`)
-    this.provider = provider
-    this._redirectUrl = redirectUrl
-    this._storage = storage
-    this._handler = handler
+    this.name = name
+    this.config = config
+    this._redirectUrl = options.redirectUrl ?? ''
+    this._storage = options.storage ?? new MemoryCache()
+    this._handler = options.handler
+    this._logger = new Logger(`auth:${name}`)
+
+    this._oauth2Client = new OAuth2Client({
+      ...this.config,
+    })
   }
 
-  /**
-   * Intentionally instantiates a new ArcticClient on every call rather than caching.
-   * This ensures that if the underlying credentials (like settingsStore API keys)
-   * change dynamically at runtime, the latest credentials are always used.
-   * Instantiating these classes is virtually zero cost.
-   */
-  protected get _arcticClient(): ArcticClient {
-    switch (this.provider.name) {
-      case 'google':
-      case 'google-health':
-        return new Google(
-          this.provider.clientId,
-          this.provider.clientSecret || (null as unknown as string),
-          this._redirectUrl
-        )
-      case 'spotify':
-        return new Spotify(
-          this.provider.clientId,
-          this.provider.clientSecret || null,
-          this._redirectUrl
-        )
-      case 'github':
-        return new GitHub(
-          this.provider.clientId,
-          this.provider.clientSecret ?? '',
-          this._redirectUrl
-        )
-      default:
-        return new OAuth2Client(
-          this.provider.clientId,
-          this.provider.clientSecret || null,
-          this._redirectUrl
-        )
+  get extraParams(): Record<string, string> {
+    return {
+      ...this.config.extraParams,
     }
   }
 
-  get storageKey() {
-    return `${OAUTH2_STORAGE_KEY}.${this.provider.name}`
+  get initialScope(): string[] {
+    return this.config.initialScope ?? []
+  }
+
+  get storageKey(): string {
+    return `${OAUTH2_STORAGE_KEY}.${this.name}`
+  }
+
+  get authStateKey(): string {
+    return `${OAUTH2_STORAGE_KEY}.state.${this.name}`
   }
 
   async isAuthenticated(): Promise<boolean> {
-    try {
-      const token = await this.getAuthToken()
-      this._logger.debug('isAuthenticated?', !!token)
-      return !!token
-    } catch {
-      return false
-    }
-  }
-
-  static isExpired(token?: TokenStore) {
-    return !token || Date.now() > token.expires_at - 60_000
-  }
-
-  async authenticate(
-    requestedScopes?: string[],
-    loginHint?: string
-  ): Promise<boolean> {
-    const token = await this.getAuthToken(true, requestedScopes, loginHint)
-    return !!token
-  }
-
-  async deauthenticate(serverRevoke: boolean = false): Promise<boolean> {
-    this._logger.log('deauthenticating')
     const token = await this.getAuthTokenFromStorage()
-    // force revoke the token if serverRevoke is true
-    // or if the provider does not skip server revocation
-    if (token && (serverRevoke || !this.provider.skipServerRevoke)) {
-      await this.revokeAuthToken(token.access_token)
-    }
-    await this.removeAuthTokenFromStorage()
-    return true
-  }
-
-  async getAuthTokenFromStorage(): Promise<TokenStore | undefined> {
-    const storeToken = this._storage.get<TokenStore>(this.storageKey)
-    return storeToken
-  }
-
-  async getGrantedScopes(): Promise<string[]> {
-    const storeToken = await this.getAuthTokenFromStorage()
-    return storeToken?.scopes ?? []
+    return !!token
   }
 
   async hasGrantedScopes(scopes: string[]): Promise<boolean> {
@@ -150,109 +75,101 @@ export class AuthClient {
     return scopes.every((scope) => grantedScopes.includes(scope))
   }
 
-  async revokeAuthToken(token: string) {
+  protected generateState(): string {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID()
+    }
+
+    const bytes = new Uint8Array(16)
+    crypto.getRandomValues(bytes)
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+  }
+
+  static isExpired(token: OAuth2Token): boolean {
+    if (!token.expiresAt) return false
+    // Subtract 1 minute to avoid edge-case expiry during flight
+    return Date.now() >= token.expiresAt - 60000
+  }
+
+  async getAuthTokenFromStorage(): Promise<OAuth2Token | undefined> {
+    return this._storage.get<OAuth2Token>(this.storageKey)
+  }
+
+  async getGrantedScopes(): Promise<string[]> {
+    const token = await this.getAuthTokenFromStorage()
+    return token?.scope || []
+  }
+
+  async revokeToken(): Promise<void> {
+    const tokenStore = await this.getAuthTokenFromStorage()
+
+    if (!tokenStore) {
+      this._logger.warn('Could not revoke token: not authenticated')
+      return
+    }
+
+    this._logger.debug('revoke token starting')
+
+    await this.removeAuthTokenFromStorage()
+
+    const skipServerRevoke = this.config.skipServerRevoke ?? false
+
+    if (skipServerRevoke) {
+      this._logger.debug('skipping server revoke for this provider')
+      return
+    }
+
     try {
-      if (this._arcticClient instanceof Google) {
-        await this._arcticClient.revokeToken(token)
-      } else {
-        this._logger.warn(
-          `Token revocation not implemented or supported for provider: ${this.provider.name}`
-        )
-      }
+      await this._oauth2Client.revoke(tokenStore)
+      this._logger.log('Server side revoke completed')
     } catch (e) {
-      if (e instanceof OAuth2RequestError) {
-        // Invalid tokens, credentials, or redirect URI
-        const code = e.code
-        this._logger.warn('Could not revoke token', {
-          code,
-          token,
-        })
-      } else if (e instanceof ArcticFetchError) {
-        // Failed to call `fetch()`
-        this._logger.error('Failed to revoke token', {
-          e,
-          token,
-        })
-      } else {
-        this._logger.error('Unknown error while revoking token', {
-          e,
-          token,
-        })
-      }
+      this._logger.error('Unknown error while revoking token on server', { e })
     }
   }
 
-  async removeAuthTokenFromStorage() {
+  async removeAuthTokenFromStorage(): Promise<void> {
     await this._storage.delete(this.storageKey)
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<OAuth2Tokens | null> {
-    if (!this.provider.clientId) {
-      this._logger.warn('Cannot refresh token: client ID is not configured')
-      return null
+  async refreshAccessToken(tokenStore: OAuth2Token): Promise<OAuth2Token> {
+    if (!this.config.clientId) {
+      throw new Error('Cannot refresh token: client ID is not configured')
     }
-    if (
-      this._arcticClient instanceof Google ||
-      this._arcticClient instanceof GitHub ||
-      this._arcticClient instanceof Spotify
-    ) {
-      return this._arcticClient.refreshAccessToken(refreshToken)
-    }
-    return this._arcticClient.refreshAccessToken(
-      this.provider.tokenEndpoint ?? '',
-      refreshToken,
-      this.provider.scopes
-    )
+
+    return await this._oauth2Client.refreshToken(tokenStore)
   }
 
   protected isInvalidTokenError(error: unknown): boolean {
-    if (error instanceof OAuth2RequestError && error.code === 'invalid_grant') {
-      return true
+    if (error instanceof OAuth2Error) {
+      return error.oauth2Code === 'invalid_grant'
     }
-    if (error instanceof UnexpectedErrorResponseBodyError) {
-      const errors = (error.data as Record<string, unknown>)?.errors
-      if (
-        Array.isArray(errors) &&
-        errors.some(
-          (e: Record<string, unknown>) => e?.errorType === 'invalid_grant'
-        )
-      ) {
-        return true
-      }
-    }
-    return false
+    return String(error).includes('invalid_grant')
   }
 
   private async tryRefreshToken(
-    refresh_token: string
-  ): Promise<string | undefined> {
-    if (!this.provider.clientId) {
+    tokenStore: OAuth2Token
+  ): Promise<OAuth2Token | undefined> {
+    if (!this.config.clientId) {
       this._logger.warn('Cannot refresh token: client ID is not configured')
       return undefined
     }
     this._logger.log('token expired, trying to refresh it')
     try {
-      const newTokens = await this.refreshAccessToken(refresh_token)
-      if (!newTokens) {
-        throw new Error('Failed to refresh token - user must re-authenticate.')
-      }
-
-      const newAccessToken = newTokens.accessToken()
+      const newTokens = await this.refreshAccessToken(tokenStore)
       this._logger.log('refreshed new access token, storing it and continue')
 
-      const storeToken = await this.getAuthTokenFromStorage()
-
       await this.cacheAuthToken(
-        newAccessToken,
-        newTokens.hasRefreshToken() ? newTokens.refreshToken() : refresh_token,
-        newTokens.accessTokenExpiresInSeconds(),
-        newTokens.hasScopes() ? newTokens.scopes() : storeToken?.scopes
+        newTokens.accessToken,
+        newTokens.refreshToken ?? tokenStore.refreshToken,
+        newTokens.expiresAt,
+        newTokens.scope ?? tokenStore.scope
       )
-      return newAccessToken
+
+      return newTokens
     } catch (error) {
       if (this.isInvalidTokenError(error)) {
         this._logger.warn('Refresh token is invalid, clearing storage')
-        await this._storage.delete(this.storageKey)
+        await this.removeAuthTokenFromStorage()
       } else {
         this._logger.error('Failed to refresh access token', { error })
       }
@@ -260,9 +177,9 @@ export class AuthClient {
     }
   }
 
-  async getTokenFromStoreOrRefreshToken(): Promise<string | undefined> {
+  async getTokenFromStoreOrRefreshToken(): Promise<OAuth2Token | undefined> {
     if (this._tokenPromise) {
-      this._logger.log(
+      this._logger.debug(
         'token retrieval already in progress, returning pending promise'
       )
       return this._tokenPromise
@@ -270,17 +187,17 @@ export class AuthClient {
 
     this._tokenPromise = (async () => {
       try {
-        const storeToken = await this.getAuthTokenFromStorage()
-        this._logger.debug('token in storage?', !!storeToken)
+        const tokenStore = await this.getAuthTokenFromStorage()
+        this._logger.debug('token in storage?', !!tokenStore)
 
-        if (!storeToken) return undefined
+        if (!tokenStore) return undefined
 
-        if (!AuthClient.isExpired(storeToken)) {
-          return storeToken.access_token
+        if (!AuthClient.isExpired(tokenStore)) {
+          return tokenStore
         }
 
-        if (storeToken.refresh_token) {
-          return await this.tryRefreshToken(storeToken.refresh_token)
+        if (tokenStore.refreshToken) {
+          return await this.tryRefreshToken(tokenStore)
         }
 
         return undefined
@@ -293,84 +210,69 @@ export class AuthClient {
   }
 
   async cacheAuthToken(
-    access_token: string,
-    refresh_token: string | undefined,
-    expires_in_seconds: number,
-    scopes?: string[]
-  ) {
-    const tokenStore: TokenStore = {
-      access_token,
-      refresh_token,
-      expires_at: Date.now() + expires_in_seconds * 1000,
-      scopes,
+    accessToken: string,
+    refreshToken: string | null,
+    expiresAt: number | null,
+    scope?: string[]
+  ): Promise<void> {
+    const tokenStore: OAuth2Token = {
+      accessToken,
+      refreshToken,
+      expiresAt,
+      scope,
     }
 
-    this._storage.set(this.storageKey, tokenStore)
-  }
-
-  get authStateKey() {
-    return `${OAUTH2_STORAGE_KEY}.state.${this.provider.name}`
+    await this._storage.set(this.storageKey, tokenStore)
   }
 
   async createAuthUrl(
     requestedScopes: string[] = [],
     loginHint?: string
   ): Promise<URL | undefined> {
-    this._state = generateState()
-    this._codeVerifier = generateCodeVerifier()
+    if (!this._redirectUrl) {
+      throw new Error('Redirect URL is required to create auth URL')
+    }
+
+    const state = this.generateState()
+    const codeVerifier = await generateCodeVerifier()
 
     const previousScopes = await this.getGrantedScopes()
     const allScopes = Array.from(
-      new Set([...this.provider.scopes, ...previousScopes, ...requestedScopes])
+      new Set([...this.initialScope, ...previousScopes, ...requestedScopes])
     )
 
     await this._storage.set(this.authStateKey, {
-      state: this._state,
-      codeVerifier: this._codeVerifier,
+      state,
+      codeVerifier,
     })
 
-    let url: URL
-    if (this._arcticClient instanceof OAuth2Client) {
-      url = this._arcticClient.createAuthorizationURLWithPKCE(
-        this.provider.authEndpoint ?? '',
-        this._state,
-        CodeChallengeMethod.S256,
-        this._codeVerifier,
-        allScopes
-      )
-    } else if (
-      this._arcticClient instanceof Google ||
-      this._arcticClient instanceof Spotify
-    ) {
-      url = this._arcticClient.createAuthorizationURL(
-        this._state,
-        this._codeVerifier,
-        allScopes
-      )
-      // add login_hint if provided, to pre-fill the email field in the Google login form
-      if (loginHint) {
-        url.searchParams.set('login_hint', loginHint ?? '')
-      }
-    } else if (this._arcticClient instanceof GitHub) {
-      url = this._arcticClient.createAuthorizationURL(this._state, allScopes)
-    } else {
-      return undefined
+    const url = await this._oauth2Client.authorizationCode.getAuthorizeUri({
+      redirectUri: this._redirectUrl,
+      state,
+      codeVerifier,
+      scope: allScopes,
+      extraParams: this.extraParams,
+    })
+
+    const finalUrl = new URL(url)
+
+    if (loginHint) {
+      finalUrl.searchParams.set('login_hint', loginHint)
     }
 
-    if (this.provider.extraParams) {
-      for (const [key, value] of Object.entries(this.provider.extraParams)) {
-        url.searchParams.set(key, value)
-      }
-    }
-
-    return url
+    return finalUrl
   }
 
-  async validate(code: string, state: string): Promise<OAuth2Tokens> {
+  async validate(code: string, state: string): Promise<OAuth2Token> {
+    if (!this._redirectUrl) {
+      throw new Error('Redirect URL is required to validate OAuth token')
+    }
+
     const storedState = await this._storage.get<{
       state: string
       codeVerifier: string
     }>(this.authStateKey)
+
     const { state: savedState, codeVerifier: savedCodeVerifier } =
       storedState ?? {}
 
@@ -383,31 +285,16 @@ export class AuthClient {
       savedCode: savedCodeVerifier,
     })
 
-    let tokens: OAuth2Tokens
-    if (this._arcticClient instanceof OAuth2Client) {
-      tokens = await this._arcticClient.validateAuthorizationCode(
-        this.provider.tokenEndpoint ?? '',
-        code,
-        savedCodeVerifier
-      )
-    } else {
-      tokens = await this._arcticClient.validateAuthorizationCode(
-        code,
-        savedCodeVerifier
-      )
-    }
+    const tokens = await this._oauth2Client.authorizationCode.getToken({
+      code,
+      redirectUri: this._redirectUrl,
+      state,
+      codeVerifier: savedCodeVerifier,
+    })
 
-    // Clean up auth state
     await this._storage.delete(this.authStateKey)
 
     return tokens
-  }
-
-  getContext() {
-    return {
-      state: this._state,
-      codeVerifier: this._codeVerifier,
-    }
   }
 
   async getAuthToken(
@@ -418,14 +305,13 @@ export class AuthClient {
     const storedToken = await this.getTokenFromStoreOrRefreshToken()
     const grantedScopes = await this.getGrantedScopes()
 
-    // Check if we need to request new scopes
     const hasAllRequestedScopes = requestedScopes
       ? requestedScopes.every((scope) => grantedScopes.includes(scope))
       : true
 
     if (storedToken && hasAllRequestedScopes) {
       this._logger.log('using stored token with all necessary scopes')
-      return storedToken
+      return storedToken.accessToken
     } else if (!interactive && !hasAllRequestedScopes) {
       this._logger.log(
         'missing requested scopes but not interactive, returning nothing'
@@ -435,7 +321,7 @@ export class AuthClient {
       this._logger.log(
         'no token retrieved, but not interactive, so returning nothing'
       )
-      return
+      return undefined
     }
 
     this._logger.log(
@@ -446,24 +332,33 @@ export class AuthClient {
 
     if (!url) {
       this._logger.error('Failed to create auth URL')
-      return
+      return undefined
     }
 
     this._logger.debug('Generated Auth URL:', url.href, {
-      provider: this.provider.name,
+      provider: this.name,
       scopes: requestedScopes,
-      clientId: this.provider.clientId,
-      clientSecret: this.provider.clientSecret ? '***' : undefined,
+      clientId: this.config.clientId,
+      clientSecret: this.config.clientSecret ? '***' : undefined,
     })
 
     if (this._handler) {
-      return this.handleRedirectFlow(url)
+      return this.handleRedirectFlow(url, requestedScopes)
     }
   }
 
-  private async handleRedirectFlow(url: URL): Promise<string | undefined> {
+  private async handleRedirectFlow(
+    url: URL,
+    requestedScopes: string[] = []
+  ): Promise<string | undefined> {
+    if (!this._handler) {
+      const msg = 'No auth flow handler configured!'
+      this._logger.error(msg)
+      throw new Error(msg)
+    }
+
     try {
-      const redirectUrl = await this._handler!.open(url)
+      const redirectUrl = await this._handler.open(url)
       const code = redirectUrl.searchParams.get('code')
       const state = redirectUrl.searchParams.get('state')
 
@@ -476,37 +371,26 @@ export class AuthClient {
 
       const tokens = await this.validate(code, state)
 
-      const refreshToken = tokens.hasRefreshToken()
-        ? tokens.refreshToken()
-        : undefined
-      let expiresIn = 31536000 // 1 year default for non-expiring tokens
+      const refreshToken = tokens.refreshToken ?? null
 
-      try {
-        expiresIn = tokens.accessTokenExpiresInSeconds()
-      } catch {
-        this._logger.debug(
-          'No expiry found for access token, using default 1 year expiry'
-        )
-      }
-
-      let scopesToSave: string[] | undefined = undefined
-      if (tokens.hasScopes()) {
-        scopesToSave = tokens.scopes()
-      } else {
-        // If the provider doesn't return scopes, keep the ones we requested/know about
-        scopesToSave = await this.getGrantedScopes()
-      }
+      // If token response returned scopes, use them; otherwise union granted + requested
+      const scopesToSave =
+        tokens.scope && tokens.scope.length > 0
+          ? tokens.scope
+          : Array.from(
+              new Set([...(await this.getGrantedScopes()), ...requestedScopes])
+            )
 
       await this.cacheAuthToken(
-        tokens.accessToken(),
+        tokens.accessToken,
         refreshToken,
-        expiresIn,
+        tokens.expiresAt,
         scopesToSave
       )
-      return tokens.accessToken()
+      return tokens.accessToken
     } catch (error) {
       this._logger.error('Auth flow failed', { error })
-      return undefined
+      throw error
     }
   }
 }

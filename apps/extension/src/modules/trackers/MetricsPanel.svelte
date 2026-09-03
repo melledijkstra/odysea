@@ -20,7 +20,7 @@
   import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import IconButton from '@melledijkstra/ui/svelte/IconButton.svelte'
   import { dndzone, type DndEvent } from 'svelte-dnd-action'
-  import { untrack, type Snippet } from 'svelte'
+  import { onMount, untrack, type Snippet } from 'svelte'
 
   type FormType = 'countdown' | 'worldclock' | 'counter'
 
@@ -79,6 +79,10 @@
     items = dragEvent.detail.items
     trackers.setMetrics(items)
   }
+
+  onMount(() => {
+    trackers.initialize()
+  })
 </script>
 
 <Popover.Root bind:open={isOpen}>

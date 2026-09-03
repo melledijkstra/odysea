@@ -1,24 +1,24 @@
 import { Logger } from '@/logger'
 import { spotifyState } from '@/modules/spotify/spotify.state.svelte'
-import { AuthClient } from '@melledijkstra/extension'
-import { spotifyAuthClient } from '@/oauth2/clients'
+import type { AuthClient } from '@melledijkstra/auth'
+import { authState } from '@/oauth2/auth.state.svelte'
 import type { Album, PlaybackState, Playlist, Track } from 'MusicPlayer'
 import type { ILogger } from '@/interfaces/logger.interface'
 import { convertPlayerState } from '@/transforms/spotify'
 import { BaseMusicController } from './BaseMusicController'
-import browser from 'webextension-polyfill'
 import { SpotifyPlayerService } from '@/services/SpotifyPlayerService'
 import { SpotifyApiService } from '@/services/SpotifyApiService'
 
 export class SpotifyController extends BaseMusicController implements ILogger {
   logger: Logger = new Logger('SpotifyController')
 
-  protected authClient: AuthClient = spotifyAuthClient
+  protected authClient: AuthClient = authState.clients.spotify
   protected playerService: SpotifyPlayerService
   protected apiService: SpotifyApiService
 
   private initialized: boolean = false
   public isPlayerActive: boolean = false
+  private currentAuthState: boolean = false
 
   constructor(state: { playback: PlaybackState }) {
     super(state)
@@ -59,50 +59,40 @@ export class SpotifyController extends BaseMusicController implements ILogger {
     }
 
     this.initialized = true
+    this.currentAuthState = await this.authClient.isAuthenticated()
 
-    spotifyState.isAuthenticated = await this.authClient.isAuthenticated()
-    browser.storage.local.onChanged.addListener(this.handleStorageChange)
-
-    if (spotifyState.isAuthenticated) {
+    if (this.currentAuthState) {
       await this.playerService.initialize()
+    }
+  }
+
+  async handleAuthChange(isAuthenticated: boolean) {
+    if (!this.initialized || this.currentAuthState === isAuthenticated) return
+    this.currentAuthState = isAuthenticated
+
+    this.logger.log('Spotify auth state changed reactively:', isAuthenticated)
+    if (isAuthenticated) {
+      if (!this.playerService.hasPlayer()) {
+        try {
+          await this.playerService.initialize()
+        } catch (err) {
+          this.logger.error(
+            'Failed to initialize Spotify player after re-auth:',
+            err
+          )
+        }
+      }
+    } else {
+      this.isPlayerActive = false
+      this.playerService.disconnect()
+      delete spotifyState.deviceId
+      spotifyState.devices = []
     }
   }
 
   destroy() {
     super.destroy()
-    browser.storage.local.onChanged.removeListener(this.handleStorageChange)
     this.playerService.disconnect()
-  }
-
-  private readonly handleStorageChange = async (
-    changes: Record<string, browser.Storage.StorageChange>
-  ) => {
-    const key = this.authClient.storageKey
-    if (changes[key]) {
-      const isAuthenticated = changes[key].newValue
-      spotifyState.isAuthenticated = !!isAuthenticated
-      this.logger.log(
-        'Spotify auth state changed reactively:',
-        spotifyState.isAuthenticated
-      )
-      if (isAuthenticated) {
-        if (!this.playerService.hasPlayer()) {
-          try {
-            await this.playerService.initialize()
-          } catch (err) {
-            this.logger.error(
-              'Failed to initialize Spotify player after re-auth:',
-              err
-            )
-          }
-        }
-      } else {
-        this.isPlayerActive = false
-        this.playerService.disconnect()
-        delete spotifyState.deviceId
-        spotifyState.devices = []
-      }
-    }
   }
 
   private async retrieveDevices(): Promise<void> {

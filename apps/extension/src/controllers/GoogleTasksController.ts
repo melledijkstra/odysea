@@ -1,8 +1,8 @@
 import { GoogleTasksApiClient } from '@melledijkstra/api'
 import type { ILogger } from '@/interfaces/logger.interface'
 import { Logger } from '@/logger'
-import { AuthClient } from '@melledijkstra/extension'
-import { googleAuthClient } from '@/oauth2/clients'
+import type { AuthClient } from '@melledijkstra/auth'
+import { authState } from '@/oauth2/auth.state.svelte'
 import { addNotification } from '@/stores/notifications.svelte'
 import type { Task, TaskList } from '@/modules/tasks/types'
 import { scopeRegistry, TASKS_SCOPE } from '@/oauth2/scope-registry'
@@ -17,7 +17,7 @@ export class GoogleTasksController implements TaskControllerInterface, ILogger {
 
   constructor() {
     this.logger = new Logger('GoogleTasksController')
-    this.auth = googleAuthClient
+    this.auth = authState.clients.google
     this.api = new GoogleTasksApiClient(this.auth)
   }
 
@@ -27,7 +27,7 @@ export class GoogleTasksController implements TaskControllerInterface, ILogger {
   }
 
   async authenticate(): Promise<boolean> {
-    return await this.auth.authenticate([TASKS_SCOPE])
+    return !!(await this.auth.getAuthToken(true, [TASKS_SCOPE]))
   }
 
   async isAuthenticated(): Promise<boolean> {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { OauthProvider } from '@/oauth2/providers'
+  import type { OAuthProvider } from '@/oauth2/auth.state.svelte'
   import Button from '@melledijkstra/ui/svelte/Button.svelte'
   import type { HTMLButtonAttributes } from 'svelte/elements'
   import IconGoogle from '@/icons/IconGoogle.svelte'
@@ -10,7 +10,7 @@
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
 
-  const classes: Record<OauthProvider, string | string[]> = {
+  const classes: Record<OAuthProvider, string | string[]> = {
     google: [
       'bg-google hover:bg-google/80 focus:ring-4 focus:outline-hidden focus:ring-google/50 dark:focus:ring-google/55',
     ],
@@ -32,7 +32,7 @@
     children,
     ...props
   }: {
-    provider: OauthProvider
+    provider: OAuthProvider
     authenticated?: boolean
     isLoading?: boolean
   } & HTMLButtonAttributes = $props()

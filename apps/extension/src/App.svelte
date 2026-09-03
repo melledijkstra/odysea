@@ -10,11 +10,7 @@
   import DefaultModeContent from './components/DefaultModeContent.svelte'
   import { QueryClientProvider } from '@tanstack/svelte-query'
   import { queryClient } from '@/queryClient'
-  import { AuthState, setAuthContext } from './oauth2/auth.state.svelte'
-
-  const authState = new AuthState()
-
-  setAuthContext(authState)
+  import { authState } from './oauth2/auth.state.svelte'
 
   const initPromise = (async () => {
     await settings.initialize()

@@ -5,7 +5,7 @@
   import PopPanel from '@melledijkstra/ui/svelte/PopPanel.svelte'
   import TasksPanelContent from './TasksPanelContent.svelte'
   import { addNotification } from '@/stores/notifications.svelte'
-  import { getAuthContext } from '@/oauth2/auth.state.svelte'
+  import { authState } from '@/oauth2/auth.state.svelte'
   import { TASKS_SCOPE } from '@/oauth2/scope-registry'
 
   type Provider = 'google' | 'github'
@@ -16,10 +16,9 @@
     (localStorage.getItem(STORAGE_KEY) as Provider) ?? 'google'
   )
 
-  const authState = getAuthContext()
-
-  const providerState = $derived(authState.providers[activeProvider])
-  const requiredScopes = $derived(
+  let providerState = $derived(authState.providers[activeProvider])
+  let isAuthenticating = $state(false)
+  let requiredScopes = $derived(
     activeProvider === 'google' ? [TASKS_SCOPE] : ['repo']
   )
 
@@ -31,14 +30,11 @@
   )
 
   let isInitializing = $state(true)
-  let isAuthenticating = $state(false)
 
   async function triggerAuthFlow() {
     isAuthenticating = true
     try {
-      const isAuthenticated = await activeController.authenticate()
-      const grantedScopes = await activeController.auth.getGrantedScopes()
-      authState.update(activeProvider, isAuthenticated, grantedScopes)
+      await activeController.authenticate()
     } catch (e: unknown) {
       console.error('Authentication error:', e)
       const errorMessage = e instanceof Error ? e.message : 'Unknown error'

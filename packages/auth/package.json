@@ -24,9 +24,9 @@
     "example": "cd example && tsx --env-file=.env"
   },
   "dependencies": {
+    "@badgateway/oauth2-client": "^3.3.1",
     "@melledijkstra/storage": "workspace:*",
-    "@melledijkstra/toolbox": "workspace:*",
-    "arctic": "^3.7.0"
+    "@melledijkstra/toolbox": "workspace:*"
   },
   "devDependencies": {
     "@melledijkstra/config": "workspace:*",

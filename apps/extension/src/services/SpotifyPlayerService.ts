@@ -1,6 +1,6 @@
 import { Logger } from '@/logger'
 import { initializeSpotifyPlayer as initSDKPlayer } from '@/modules/spotify/spotify-sdk'
-import type { AuthClient } from '@melledijkstra/extension'
+import type { AuthClient } from '@melledijkstra/auth'
 
 export class SpotifyPlayerService {
   private logger = new Logger('SpotifyPlayerService')

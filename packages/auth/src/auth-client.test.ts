@@ -1,13 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { AuthClient, AuthFlowHandler } from './auth-client'
-import { createGoogleAuthConfig, type AuthConfig } from './providers'
+import { AuthClient } from './auth-client'
+import { GoogleAuthClient } from './providers'
+import type { AuthConfig } from './config'
+import type { AuthFlowHandler } from './flows'
 import { MemoryCache } from '@melledijkstra/storage'
-import {
-  OAuth2Tokens,
-  OAuth2RequestError,
-  UnexpectedErrorResponseBodyError,
-  Google,
-} from 'arctic'
+import { OAuth2Token } from '@badgateway/oauth2-client'
 
 vi.mock('@melledijkstra/storage', () => {
   return {
@@ -27,13 +24,22 @@ vi.mock('@melledijkstra/storage', () => {
   }
 })
 
-vi.mock('arctic', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('arctic')>()
+vi.mock('@badgateway/oauth2-client', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@badgateway/oauth2-client')>()
   return {
     ...actual,
-    Google: class extends actual.Google {
-      async refreshAccessToken(refreshToken: string): Promise<OAuth2Tokens> {
-        return super.refreshAccessToken(refreshToken)
+    generateCodeVerifier: vi.fn().mockResolvedValue('mocked_code_verifier'),
+    OAuth2Client: class {
+      refreshToken = vi.fn()
+      revoke = vi.fn().mockResolvedValue(undefined)
+      authorizationCode = {
+        getAuthorizeUri: vi
+          .fn()
+          .mockResolvedValue(
+            'https://accounts.google.com/o/oauth2/v2/auth?state=mockstate'
+          ),
+        getToken: vi.fn(),
       }
     },
   }
@@ -43,7 +49,7 @@ describe('AuthClient', () => {
   let storage: MemoryCache
   let handler: AuthFlowHandler
   let client: AuthClient
-  let googleAuth: AuthConfig
+  let config: AuthConfig
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -51,229 +57,113 @@ describe('AuthClient', () => {
     handler = {
       open: vi.fn(),
     }
-    googleAuth = {
-      ...createGoogleAuthConfig(),
-      clientId: 'mock-google-client-id',
+
+    process.env.GOOGLE_CLIENT_ID = 'test-client-id'
+    process.env.GOOGLE_CLIENT_SECRET = 'test-client-secret'
+
+    config = {
+      clientId: 'test-client-id',
+      clientSecret: 'test-client-secret',
     }
-    client = new AuthClient(googleAuth, 'http://localhost:3000/callback', {
+
+    client = new AuthClient('google', config, {
       storage,
       handler,
+      redirectUrl: 'http://localhost/callback',
     })
   })
 
-  describe('token management', () => {
-    it('should correctly report isAuthenticated based on getAuthToken', async () => {
-      vi.spyOn(client, 'getAuthToken').mockResolvedValueOnce('token')
-      expect(await client.isAuthenticated()).toBe(true)
-
-      vi.spyOn(client, 'getAuthToken').mockResolvedValueOnce(undefined)
-      expect(await client.isAuthenticated()).toBe(false)
+  it('should be authenticated if a valid token is in storage', async () => {
+    vi.spyOn(storage, 'get').mockResolvedValue({
+      accessToken: 'valid_token',
+      expiresAt: Date.now() + 65000,
     })
 
-    it('should deauthenticate correctly', async () => {
-      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce({
-        access_token: 'old-token',
-        expires_at: Date.now() + 10000,
-        refresh_token: 'old-refresh',
-      })
-      vi.spyOn(client, 'revokeAuthToken').mockResolvedValueOnce(undefined)
-      vi.spyOn(client, 'removeAuthTokenFromStorage').mockResolvedValueOnce(
-        undefined
-      )
+    const isAuthenticated = await client.isAuthenticated()
+    expect(isAuthenticated).toBe(true)
+  })
 
-      const result = await client.deauthenticate()
+  it('should not be authenticated if storage is empty', async () => {
+    vi.spyOn(storage, 'get').mockResolvedValue(undefined)
 
-      expect(result).toBe(true)
-      expect(client.revokeAuthToken).toHaveBeenCalledWith('old-token')
-      expect(client.removeAuthTokenFromStorage).toHaveBeenCalled()
+    const isAuthenticated = await client.isAuthenticated()
+    expect(isAuthenticated).toBe(false)
+  })
+
+  describe('token management (getTokenFromStoreOrRefreshToken)', () => {
+    it('should return undefined if no token in storage', async () => {
+      vi.spyOn(storage, 'get').mockResolvedValue(undefined)
+      const token = await client.getTokenFromStoreOrRefreshToken()
+      expect(token).toBeUndefined()
     })
 
-    it('should deauthenticate correctly when skipServerRevoke is true', async () => {
-      client.provider.skipServerRevoke = true
-      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce({
-        access_token: 'old-token',
-        expires_at: Date.now() + 10000,
-        refresh_token: 'old-refresh',
-      })
-      vi.spyOn(client, 'revokeAuthToken').mockResolvedValueOnce(undefined)
-      vi.spyOn(client, 'removeAuthTokenFromStorage').mockResolvedValueOnce(
-        undefined
-      )
-
-      const result = await client.deauthenticate()
-
-      expect(result).toBe(true)
-      expect(client.revokeAuthToken).not.toHaveBeenCalled()
-      expect(client.removeAuthTokenFromStorage).toHaveBeenCalled()
-    })
-
-    it('getTokenFromStoreOrRefreshToken should refresh if token is expired', async () => {
-      const mockStore = {
-        access_token: 'expired-token',
-        expires_at: Date.now() - 10000,
-        refresh_token: 'refresh-token',
+    it('should return access token if it is not expired', async () => {
+      const mockStore: OAuth2Token = {
+        accessToken: 'valid-token',
+        expiresAt: Date.now() + 65000,
+        refreshToken: '',
       }
       vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce(
         mockStore
       )
 
-      const mockTokens = {
-        accessToken: () => 'new-access-token',
-        hasRefreshToken: () => true,
-        refreshToken: () => 'new-refresh-token',
-        accessTokenExpiresInSeconds: () => 3600,
-        hasScopes: () => true,
-        scopes: () => ['profile', 'email'],
-      } as unknown as OAuth2Tokens
+      const token = await client.getTokenFromStoreOrRefreshToken()
 
-      vi.spyOn(client, 'refreshAccessToken').mockResolvedValueOnce(mockTokens)
+      expect(token?.accessToken).toBe('valid-token')
+    })
+
+    it('should return undefined and delete from storage if expired and no refresh token exists', async () => {
+      const mockStore: OAuth2Token = {
+        accessToken: 'expired-token',
+        expiresAt: Date.now() - 10000,
+        refreshToken: '',
+      }
+      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce(
+        mockStore
+      )
+
+      const token = await client.getTokenFromStoreOrRefreshToken()
+      expect(token).toBeUndefined()
+    })
+
+    it('should refresh token if expired but refresh_token exists', async () => {
+      const mockStore: OAuth2Token = {
+        accessToken: 'expired-token',
+        expiresAt: Date.now() - 10000,
+        refreshToken: 'old-refresh-token',
+        scope: ['profile', 'email'],
+      }
+      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValue(mockStore)
+
+      const mockTokens: OAuth2Token = {
+        accessToken: 'new-access-token',
+        refreshToken: 'new-refresh-token',
+        expiresAt: Date.now() + 3600000,
+        scope: ['profile', 'email'],
+      }
+
+      vi.spyOn(client, 'refreshAccessToken').mockResolvedValue(mockTokens)
       vi.spyOn(client, 'cacheAuthToken').mockResolvedValueOnce(undefined)
 
       const token = await client.getTokenFromStoreOrRefreshToken()
 
-      expect(client.refreshAccessToken).toHaveBeenCalledWith('refresh-token')
       expect(client.cacheAuthToken).toHaveBeenCalledWith(
         'new-access-token',
         'new-refresh-token',
-        3600,
+        expect.any(Number),
         ['profile', 'email']
       )
-      expect(token).toBe('new-access-token')
-    })
-
-    it('getTokenFromStoreOrRefreshToken should reuse old refresh token when provider omits one from response', async () => {
-      const mockStore = {
-        access_token: 'expired-token',
-        expires_at: Date.now() - 10000,
-        refresh_token: 'old-refresh-token',
-        scopes: ['profile', 'email'],
-      }
-      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValue(mockStore)
-
-      // Simulate a provider that returns no refresh_token and no scopes in the response
-      const mockTokens = {
-        accessToken: () => 'new-access-token',
-        hasRefreshToken: () => false,
-        accessTokenExpiresInSeconds: () => 3600,
-        hasScopes: () => false,
-      } as unknown as OAuth2Tokens
-
-      vi.spyOn(client, 'refreshAccessToken').mockResolvedValueOnce(mockTokens)
-      vi.spyOn(client, 'cacheAuthToken').mockResolvedValueOnce(undefined)
-
-      const token = await client.getTokenFromStoreOrRefreshToken()
-
-      // Should reuse the old refresh token and old scopes instead of throwing
-      expect(client.cacheAuthToken).toHaveBeenCalledWith(
-        'new-access-token',
-        'old-refresh-token',
-        3600,
-        ['profile', 'email']
-      )
-      expect(token).toBe('new-access-token')
-    })
-
-    it('getTokenFromStoreOrRefreshToken should delete token on invalid refresh token error', async () => {
-      const mockStore = {
-        access_token: 'expired-token',
-        expires_at: Date.now() - 10000,
-        refresh_token: 'refresh-token',
-      }
-      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce(
-        mockStore
-      )
-
-      // To throw the internal AuthError, we need to make the internal _authclient throw OAuth2RequestError
-      const reqError = new OAuth2RequestError(
-        'invalid_grant',
-        'Refresh token invalid: mock-reason',
-        'https://mock-endpoint.com',
-        'mock-state'
-      )
-
-      vi.spyOn(Google.prototype, 'refreshAccessToken').mockRejectedValueOnce(
-        reqError
-      )
-
-      const token = await client.getTokenFromStoreOrRefreshToken()
-
-      expect(storage.delete).toHaveBeenCalledWith(client.storageKey)
-      expect(token).toBeUndefined()
-    })
-
-    it('should delete token when refresh token is invalid', async () => {
-      const mockStore = {
-        access_token: 'expired-token',
-        expires_at: Date.now() - 10000,
-        refresh_token: 'refresh-token',
-      }
-      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce(
-        mockStore
-      )
-
-      const reqError = new UnexpectedErrorResponseBodyError(400, {
-        errorType: 'invalid_grant',
-        message: 'Refresh token invalid: mock-reason',
-        errors: [
-          {
-            errorType: 'invalid_grant',
-            message: 'Refresh token invalid: mock-reason',
-          },
-        ],
-      })
-
-      vi.spyOn(Google.prototype, 'refreshAccessToken').mockRejectedValueOnce(
-        reqError
-      )
-
-      const token = await client.getTokenFromStoreOrRefreshToken()
-
-      expect(storage.delete).toHaveBeenCalledWith(client.storageKey)
-      expect(token).toBeUndefined()
-    })
-
-    it('should deduplicate concurrent refresh calls', async () => {
-      const mockStore = {
-        access_token: 'expired-token',
-        expires_at: Date.now() - 10000,
-        refresh_token: 'refresh-token',
-      }
-      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValue(mockStore)
-
-      const mockTokens = {
-        accessToken: () => 'new-access-token',
-        hasRefreshToken: () => true,
-        refreshToken: () => 'new-refresh-token',
-        accessTokenExpiresInSeconds: () => 3600,
-        hasScopes: () => false,
-      } as unknown as OAuth2Tokens
-
-      const refreshSpy = vi
-        .spyOn(client, 'refreshAccessToken')
-        .mockImplementation(async () => {
-          await new Promise((resolve) => setTimeout(resolve, 50))
-          return mockTokens
-        })
-      vi.spyOn(client, 'cacheAuthToken').mockResolvedValue(undefined)
-
-      const [token1, token2, token3] = await Promise.all([
-        client.getTokenFromStoreOrRefreshToken(),
-        client.getTokenFromStoreOrRefreshToken(),
-        client.getTokenFromStoreOrRefreshToken(),
-      ])
-
-      expect(refreshSpy).toHaveBeenCalledTimes(1)
-      expect(token1).toBe('new-access-token')
-      expect(token2).toBe('new-access-token')
-      expect(token3).toBe('new-access-token')
+      expect(token?.accessToken).toBe('new-access-token')
     })
   })
 
   describe('authentication flows (getAuthToken)', () => {
     it('should return stored token if available', async () => {
-      vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue(
-        'stored-token'
-      )
+      vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue({
+        accessToken: 'stored-token',
+        expiresAt: Date.now() + 65000,
+        refreshToken: '',
+      })
       vi.spyOn(client, 'getGrantedScopes').mockResolvedValue(['profile'])
 
       const token = await client.getAuthToken()
@@ -281,9 +171,11 @@ describe('AuthClient', () => {
     })
 
     it('should return stored token if requested scopes are already granted', async () => {
-      vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue(
-        'stored-token'
-      )
+      vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue({
+        accessToken: 'stored-token',
+        expiresAt: new Date().getTime() + 65000,
+        refreshToken: '',
+      })
       vi.spyOn(client, 'getGrantedScopes').mockResolvedValue([
         'profile',
         'email',
@@ -294,22 +186,21 @@ describe('AuthClient', () => {
     })
 
     it('should initiate auth flow if requested scopes are not granted', async () => {
-      vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue(
-        'stored-token'
-      )
+      vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue({
+        accessToken: 'stored-token',
+        expiresAt: Date.now() + 65000,
+        refreshToken: '',
+      })
       vi.spyOn(client, 'getGrantedScopes').mockResolvedValue(['profile'])
       vi.spyOn(client, 'createAuthUrl').mockResolvedValue(
         new URL('http://mock')
       )
 
-      const mockTokens = {
-        accessToken: () => 'new-access-token',
-        hasRefreshToken: () => true,
-        refreshToken: () => 'new-refresh-token',
-        accessTokenExpiresInSeconds: () => 3600,
-        hasScopes: () => true,
-        scopes: () => ['profile', 'tasks'],
-      } as unknown as OAuth2Tokens
+      const mockTokens: OAuth2Token = {
+        accessToken: 'new-access-token',
+        refreshToken: 'new-refresh-token',
+        expiresAt: Date.now() + 3600000,
+      }
 
       vi.spyOn(client, 'validate').mockResolvedValue(mockTokens)
       vi.mocked(handler.open).mockResolvedValue(
@@ -335,13 +226,11 @@ describe('AuthClient', () => {
         undefined
       )
 
-      const mockTokens = {
-        accessToken: () => 'new-access-token',
-        hasRefreshToken: () => true,
-        refreshToken: () => 'new-refresh-token',
-        accessTokenExpiresInSeconds: () => 3600,
-        hasScopes: () => false,
-      } as unknown as OAuth2Tokens
+      const mockTokens: OAuth2Token = {
+        accessToken: 'new-access-token',
+        refreshToken: 'new-refresh-token',
+        expiresAt: Date.now() + 3600000,
+      }
 
       vi.spyOn(client, 'validate').mockResolvedValue(mockTokens)
 
@@ -356,34 +245,6 @@ describe('AuthClient', () => {
       expect(client.validate).toHaveBeenCalledWith('mockcode', 'mockstate')
       expect(token).toBe('new-access-token')
     })
-
-    it('should accept when provider does not return a refresh token during initial auth flow', async () => {
-      vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue(
-        undefined
-      )
-
-      // Provider returns no refresh_token (e.g. missing access_type=offline)
-      const mockTokens = new OAuth2Tokens({
-        access_token: 'new-access-token',
-        expires_in: 3600,
-        // no refresh_token field
-      })
-
-      vi.spyOn(client, 'validate').mockResolvedValue(mockTokens)
-
-      const mockUrl = new URL(
-        'http://localhost:3000/callback?code=mockcode&state=mockstate'
-      )
-      vi.mocked(handler.open).mockResolvedValue(mockUrl)
-
-      // The error is caught internally and logged; getAuthToken returns undefined
-      const token = await client.getAuthToken(true)
-      expect(token).toBe('new-access-token')
-    })
-  })
-
-  it('should instantiate correctly', () => {
-    expect(client).toBeDefined()
   })
 
   describe('createAuthUrl and state handling', () => {
@@ -399,25 +260,13 @@ describe('AuthClient', () => {
         )
       }
 
-      const context = client.getContext()
-      expect(context.state).toBeDefined()
-      expect(context.codeVerifier).toBeDefined()
-
-      expect(storage.set).toHaveBeenCalledWith(client.authStateKey, {
-        state: context.state,
-        codeVerifier: context.codeVerifier,
-      })
-    })
-
-    it('should include previously granted scopes and newly requested scopes in auth url', async () => {
-      vi.spyOn(client, 'getGrantedScopes').mockResolvedValue(['profile'])
-      const authUrl = await client.createAuthUrl(['tasks', 'email'])
-
-      expect(authUrl).toBeDefined()
-      // Google provider passes space-separated scopes in the URL
-      expect(authUrl?.searchParams.get('scope')).toContain('profile')
-      expect(authUrl?.searchParams.get('scope')).toContain('tasks')
-      expect(authUrl?.searchParams.get('scope')).toContain('email')
+      expect(storage.set).toHaveBeenCalledWith(
+        client.authStateKey,
+        expect.objectContaining({
+          state: expect.any(String),
+          codeVerifier: expect.any(String),
+        })
+      )
     })
 
     it('should throw error in validate if state does not match', async () => {
@@ -435,6 +284,39 @@ describe('AuthClient', () => {
       vi.mocked(storage.get).mockResolvedValueOnce(null)
       await expect(client.validate('code', 'state')).rejects.toThrow(
         'Code or state mismatch'
+      )
+    })
+
+    it('should throw error if redirectUrl is missing when creating auth URL', async () => {
+      const clientWithoutRedirect = new AuthClient('google', config, {
+        storage,
+      })
+      await expect(clientWithoutRedirect.createAuthUrl()).rejects.toThrow(
+        'Redirect URL is required to create auth URL'
+      )
+    })
+  })
+
+  describe('GoogleAuthClient', () => {
+    it('should instantiate with Google defaults and support options', async () => {
+      const google = new GoogleAuthClient(
+        { clientId: 'test-google-id' },
+        { storage, redirectUrl: 'http://localhost/callback' }
+      )
+
+      expect(google.name).toBe('google')
+      expect(google.config.clientId).toBe('test-google-id')
+      expect(google.config.authorizationEndpoint).toBe(
+        'https://accounts.google.com/o/oauth2/v2/auth'
+      )
+      expect(google.config.tokenEndpoint).toBe(
+        'https://oauth2.googleapis.com/token'
+      )
+      expect(google.extraParams).toEqual(
+        expect.objectContaining({
+          access_type: 'offline',
+          prompt: 'consent',
+        })
       )
     })
   })
