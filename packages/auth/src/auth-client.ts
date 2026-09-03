@@ -6,77 +6,55 @@ import {
   OAuth2Token,
   generateCodeVerifier,
 } from '@badgateway/oauth2-client'
-import { AuthConfig, OAuthProvider, PROVIDER_DEFINITIONS } from './config'
+import type { AuthConfig } from './config'
 import type { AuthFlowHandler } from './flows/flow.interface'
 
 const OAUTH2_STORAGE_KEY = 'oauth2'
 
-export interface AuthClientOptions {
+export interface AuthEnvironmentOptions {
+  redirectUrl?: string
   storage?: IStorage
   handler?: AuthFlowHandler
 }
 
 export class AuthClient {
-  public readonly name: OAuthProvider
+  public readonly name: string
   public readonly config: AuthConfig
   protected readonly _redirectUrl: string
   protected readonly _storage: IStorage
+  // TODO: make handler required, we need a way to handle the case when no handler is provided
+  // perhaps set a default calculated based on available environment
+  // or force the consumer to always provide one.
   protected readonly _handler?: AuthFlowHandler
   protected readonly _logger: Logger
   protected _tokenPromise: Promise<OAuth2Token | undefined> | null = null
+  protected _oauth2Client: OAuth2Client
 
   constructor(
+    name: string,
     config: AuthConfig,
-    redirectUrl: string,
-    options: AuthClientOptions = {}
+    options: AuthEnvironmentOptions = {}
   ) {
-    this.name = config.name
+    this.name = name
     this.config = config
-    this._redirectUrl = redirectUrl
+    this._redirectUrl = options.redirectUrl ?? ''
     this._storage = options.storage ?? new MemoryCache()
     this._handler = options.handler
-    this._logger = new Logger(`auth:${config.name}`)
-  }
+    this._logger = new Logger(`auth:${name}`)
 
-  get clientId(): string {
-    return this.config.clientId
-  }
-
-  get clientSecret(): string | undefined {
-    return this.config.clientSecret
+    this._oauth2Client = new OAuth2Client({
+      ...this.config,
+    })
   }
 
   get extraParams(): Record<string, string> {
-    const defaults = PROVIDER_DEFINITIONS[this.name]?.extraParams
     return {
-      ...defaults,
       ...this.config.extraParams,
     }
   }
 
   get initialScope(): string[] {
     return this.config.initialScope ?? []
-  }
-
-  /**
-   * Instantiates an OAuth2Client using the provider defaults and custom config.
-   */
-  protected get _oauth2Client(): OAuth2Client {
-    const defaults = PROVIDER_DEFINITIONS[this.name]
-    const server =
-      this.config.server ?? defaults?.server ?? 'https://example.com'
-
-    return new OAuth2Client({
-      server,
-      clientId: this.clientId,
-      clientSecret: this.clientSecret,
-      authorizationEndpoint: this.config.authEndpoint ?? defaults?.authEndpoint,
-      tokenEndpoint: this.config.tokenEndpoint ?? defaults?.tokenEndpoint,
-      discoveryEndpoint:
-        this.config.discoveryEndpoint ?? defaults?.discoveryEndpoint,
-      revocationEndpoint:
-        this.config.revocationEndpoint ?? defaults?.revocationEndpoint,
-    })
   }
 
   get storageKey(): string {
@@ -134,10 +112,7 @@ export class AuthClient {
 
     await this.removeAuthTokenFromStorage()
 
-    const skipServerRevoke =
-      this.config.skipServerRevoke ??
-      PROVIDER_DEFINITIONS[this.name]?.skipServerRevoke ??
-      false
+    const skipServerRevoke = this.config.skipServerRevoke ?? false
 
     if (skipServerRevoke) {
       this._logger.debug('skipping server revoke for this provider')
@@ -157,7 +132,7 @@ export class AuthClient {
   }
 
   async refreshAccessToken(tokenStore: OAuth2Token): Promise<OAuth2Token> {
-    if (!this.clientId) {
+    if (!this.config.clientId) {
       throw new Error('Cannot refresh token: client ID is not configured')
     }
 
@@ -174,7 +149,7 @@ export class AuthClient {
   private async tryRefreshToken(
     tokenStore: OAuth2Token
   ): Promise<OAuth2Token | undefined> {
-    if (!this.clientId) {
+    if (!this.config.clientId) {
       this._logger.warn('Cannot refresh token: client ID is not configured')
       return undefined
     }
@@ -254,6 +229,10 @@ export class AuthClient {
     requestedScopes: string[] = [],
     loginHint?: string
   ): Promise<URL | undefined> {
+    if (!this._redirectUrl) {
+      throw new Error('Redirect URL is required to create auth URL')
+    }
+
     const state = this.generateState()
     const codeVerifier = await generateCodeVerifier()
 
@@ -285,6 +264,10 @@ export class AuthClient {
   }
 
   async validate(code: string, state: string): Promise<OAuth2Token> {
+    if (!this._redirectUrl) {
+      throw new Error('Redirect URL is required to validate OAuth token')
+    }
+
     const storedState = await this._storage.get<{
       state: string
       codeVerifier: string
@@ -355,8 +338,8 @@ export class AuthClient {
     this._logger.debug('Generated Auth URL:', url.href, {
       provider: this.name,
       scopes: requestedScopes,
-      clientId: this.clientId,
-      clientSecret: this.clientSecret ? '***' : undefined,
+      clientId: this.config.clientId,
+      clientSecret: this.config.clientSecret ? '***' : undefined,
     })
 
     if (this._handler) {
@@ -368,8 +351,14 @@ export class AuthClient {
     url: URL,
     requestedScopes: string[] = []
   ): Promise<string | undefined> {
+    if (!this._handler) {
+      const msg = 'No auth flow handler configured!'
+      this._logger.error(msg)
+      throw new Error(msg)
+    }
+
     try {
-      const redirectUrl = await this._handler!.open(url)
+      const redirectUrl = await this._handler.open(url)
       const code = redirectUrl.searchParams.get('code')
       const state = redirectUrl.searchParams.get('state')
 
@@ -401,7 +390,7 @@ export class AuthClient {
       return tokens.accessToken
     } catch (error) {
       this._logger.error('Auth flow failed', { error })
-      return undefined
+      throw error
     }
   }
 }

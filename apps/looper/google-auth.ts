@@ -1,4 +1,4 @@
-import { AuthClient, type AuthConfig } from '@melledijkstra/auth'
+import { GoogleAuthClient } from '@melledijkstra/auth'
 import { FileStorage } from '@melledijkstra/storage'
 import path from 'path'
 import dotenv from 'dotenv'
@@ -16,14 +16,14 @@ const initialScope = process.env['GOOGLE_SCOPES']
   ? process.env['GOOGLE_SCOPES'].split(' ')
   : ['openid', 'profile']
 
-const config: AuthConfig = {
-  name: 'google',
-  clientId: process.env['GOOGLE_CLIENT_ID'] ?? '',
-  clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
-  initialScope,
-  extraParams: { access_type: 'offline', prompt: 'consent' },
-}
-
-export const authClient = new AuthClient(config, redirectUri, {
-  storage,
-})
+export const authClient = new GoogleAuthClient(
+  {
+    clientId: process.env['GOOGLE_CLIENT_ID'] ?? '',
+    clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
+    initialScope,
+  },
+  {
+    storage,
+    redirectUrl: redirectUri,
+  }
+)

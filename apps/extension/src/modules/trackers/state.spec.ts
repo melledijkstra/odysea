@@ -25,6 +25,7 @@ describe('Trackers', () => {
     localStorage.setItem('metrics', JSON.stringify(mockMetrics))
 
     const trackers = new Trackers()
+    trackers.initialize()
     expect(trackers.metrics).toHaveLength(1)
     expect(trackers.metrics[0]).toBeInstanceOf(Counter)
     expect(trackers.metrics[0].formatValue()).toBe('10')

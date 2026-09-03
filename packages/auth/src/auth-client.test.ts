@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { AuthClient } from './auth-client'
+import { GoogleAuthClient } from './providers'
 import type { AuthConfig } from './config'
 import type { AuthFlowHandler } from './flows'
 import { MemoryCache } from '@melledijkstra/storage'
@@ -61,14 +62,14 @@ describe('AuthClient', () => {
     process.env.GOOGLE_CLIENT_SECRET = 'test-client-secret'
 
     config = {
-      name: 'google',
       clientId: 'test-client-id',
       clientSecret: 'test-client-secret',
     }
 
-    client = new AuthClient(config, 'http://localhost/callback', {
+    client = new AuthClient('google', config, {
       storage,
       handler,
+      redirectUrl: 'http://localhost/callback',
     })
   })
 
@@ -283,6 +284,39 @@ describe('AuthClient', () => {
       vi.mocked(storage.get).mockResolvedValueOnce(null)
       await expect(client.validate('code', 'state')).rejects.toThrow(
         'Code or state mismatch'
+      )
+    })
+
+    it('should throw error if redirectUrl is missing when creating auth URL', async () => {
+      const clientWithoutRedirect = new AuthClient('google', config, {
+        storage,
+      })
+      await expect(clientWithoutRedirect.createAuthUrl()).rejects.toThrow(
+        'Redirect URL is required to create auth URL'
+      )
+    })
+  })
+
+  describe('GoogleAuthClient', () => {
+    it('should instantiate with Google defaults and support options', async () => {
+      const google = new GoogleAuthClient(
+        { clientId: 'test-google-id' },
+        { storage, redirectUrl: 'http://localhost/callback' }
+      )
+
+      expect(google.name).toBe('google')
+      expect(google.config.clientId).toBe('test-google-id')
+      expect(google.config.authorizationEndpoint).toBe(
+        'https://accounts.google.com/o/oauth2/v2/auth'
+      )
+      expect(google.config.tokenEndpoint).toBe(
+        'https://oauth2.googleapis.com/token'
+      )
+      expect(google.extraParams).toEqual(
+        expect.objectContaining({
+          access_type: 'offline',
+          prompt: 'consent',
+        })
       )
     })
   })

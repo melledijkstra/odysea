@@ -16,8 +16,9 @@
     (localStorage.getItem(STORAGE_KEY) as Provider) ?? 'google'
   )
 
-  const providerState = $derived(authState.providers[activeProvider])
-  const requiredScopes = $derived(
+  let providerState = $derived(authState.providers[activeProvider])
+  let isAuthenticating = $state(false)
+  let requiredScopes = $derived(
     activeProvider === 'google' ? [TASKS_SCOPE] : ['repo']
   )
 
@@ -29,14 +30,11 @@
   )
 
   let isInitializing = $state(true)
-  let isAuthenticating = $state(false)
 
   async function triggerAuthFlow() {
     isAuthenticating = true
     try {
-      const isAuthenticated = await activeController.authenticate()
-      const grantedScopes = await activeController.auth.getGrantedScopes()
-      authState.update(activeProvider, isAuthenticated, grantedScopes)
+      await activeController.authenticate()
     } catch (e: unknown) {
       console.error('Authentication error:', e)
       const errorMessage = e instanceof Error ? e.message : 'Unknown error'

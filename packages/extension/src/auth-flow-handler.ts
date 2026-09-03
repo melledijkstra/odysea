@@ -2,10 +2,10 @@ import { AuthFlowHandler } from '@melledijkstra/auth'
 import * as browser from 'webextension-polyfill'
 
 export class ExtensionAuthFlowHandler implements AuthFlowHandler {
-  async open(url: URL): Promise<URL> {
+  async open(url: URL, interactive = true): Promise<URL> {
     const resultUrl = await browser.identity.launchWebAuthFlow({
       url: url.toString(),
-      interactive: true,
+      interactive,
     })
     return new URL(resultUrl)
   }

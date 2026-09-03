@@ -1,13 +1,11 @@
 <script lang="ts">
   import { settingsStore, settings } from '@/settings/index.svelte'
   import AuthButton from '@/components/AuthButton.svelte'
-  import type { OAuthProvider } from '@melledijkstra/auth'
-
   import Input from '@melledijkstra/ui/svelte/Input.svelte'
   import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
   import { Logger } from '@/logger'
   import type { AuthClient } from '@melledijkstra/auth'
-  import { authState } from '@/oauth2/auth.state.svelte'
+  import { authState, type OAuthProvider } from '@/oauth2/auth.state.svelte'
   import Card from '@melledijkstra/ui/svelte/Card.svelte'
   import { scopeRegistry } from '@/oauth2/scope-registry'
   import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
@@ -30,16 +28,11 @@
       const authToken = await clients[provider].getAuthToken(true)
       const scopes = await clients[provider].getGrantedScopes()
       logger.log(
-        'Authenticated with',
-        provider,
-        'token:',
-        authToken,
-        'scopes:',
-        scopes
+        `Authenticated with ${provider}, token: ${authToken}, scopes: ${scopes}`
       )
       authState.update(provider, !!authToken, scopes)
     } catch (e) {
-      logger.error('Failed to authenticate with', provider, e)
+      logger.error(`Failed to authenticate with ${provider}`, e)
     } finally {
       isAuthenticating = false
     }
