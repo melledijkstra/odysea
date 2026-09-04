@@ -63,6 +63,8 @@
 
 <button
   onclick={toggleMode}
+  title="Toggle clock format"
+  aria-label="Toggle clock format"
   class={[
     'font-sans',
     'clock empty:min-h-32 time text-white text-10xl antialiased drop-shadow-lg text-shadow-lg/30 cursor-pointer',

@@ -13,7 +13,11 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <button onclick={() => onSelectNote(null)} class="cursor-pointer">
+  <button
+    onclick={() => onSelectNote(null)}
+    class="cursor-pointer"
+    title="Create new note"
+  >
     <span class="sr-only">Create new note</span>
     <Icon path={mdiNote} size={24} />
   </button>

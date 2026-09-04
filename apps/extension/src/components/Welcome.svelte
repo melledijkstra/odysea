@@ -67,6 +67,8 @@
         <button
           class="text-shadow-lg/30 cursor-pointer hover:line-through"
           onclick={() => onClearUsername?.()}
+          title="Clear username"
+          aria-label="Clear username"
         >
           {name}
         </button>
