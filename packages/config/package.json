@@ -26,7 +26,7 @@
     "eslint-plugin-turbo": "catalog:",
     "globals": "^17.11.0",
     "prettier": "catalog:",
-    "rollup-plugin-visualizer": "^6.0.11",
+    "rollup-plugin-visualizer": "^7.1.1",
     "svelte-eslint-parser": "^1.8.1",
     "typescript": "catalog:",
     "typescript-eslint": "^8.68.0"
