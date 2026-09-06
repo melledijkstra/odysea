@@ -62,6 +62,8 @@
       class="p-1 rounded transition-colors hover:bg-gray-200/20"
       class:opacity-50={activeProvider !== 'google'}
       onclick={() => (activeProvider = 'google')}
+      title="Switch to Google Tasks"
+      aria-label="Switch to Google Tasks"
     >
       <img src="icons/google-tasks.svg" class="size-5" alt="Google Tasks" />
     </button>
@@ -69,6 +71,8 @@
       class="p-1 rounded transition-colors hover:bg-gray-200/20 text-black dark:text-white"
       class:opacity-50={activeProvider !== 'github'}
       onclick={() => (activeProvider = 'github')}
+      title="Switch to GitHub Issues"
+      aria-label="Switch to GitHub Issues"
     >
       <img
         src="icons/github.svg"
