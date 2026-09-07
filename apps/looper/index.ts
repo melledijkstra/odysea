@@ -6,6 +6,8 @@ import { WorkflowEngine } from './engine.js'
 import { getLastExecutedTimestamp } from './database.js'
 import { toHuman } from 'cron-translate'
 import path from 'node:path'
+import { CronTriggerManager } from './scheduler.js'
+import { ActiveTimeTriggerManager } from './active-time-trigger.js'
 
 const logger = new Logger('looper')
 
@@ -24,6 +26,8 @@ app.use(express.json())
 // ---------------------------------------------------------------------------
 const workflowsDir = path.resolve('workflows')
 const scheduler = new WorkflowScheduler(workflowsDir)
+scheduler.addTriggerManager(new CronTriggerManager())
+scheduler.addTriggerManager(new ActiveTimeTriggerManager())
 
 // ---------------------------------------------------------------------------
 // Auth routes
@@ -133,7 +137,7 @@ app.get('/status', async (_req, res) => {
 
   const workflowStatuses = scheduler.getWorkflows().map((workflow) => {
     const lastRun = getLastExecutedTimestamp(workflow.id)
-    const nextRunAt = scheduler.getCronManager().getNextRunTime(workflow)
+    const nextRunAt = scheduler.getNextRunTime(workflow)
 
     return {
       workflowId: workflow.id,

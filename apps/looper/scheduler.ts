@@ -11,7 +11,15 @@ import type { Workflow } from './types/workflow.js'
 
 const logger = new Logger('WorkflowScheduler')
 
-export class CronTriggerManager {
+export interface TriggerManager {
+  register(workflow: Workflow, onTick: (w: Workflow) => Promise<void>): void
+  unregister(workflowId: string): void
+  stopAll(): void
+  catchUpMissedExecutions?(workflows: Iterable<Workflow>): void
+  getNextRunTime?(workflow: Workflow): string | null
+}
+
+export class CronTriggerManager implements TriggerManager {
   private readonly cronHandles = new Map<string, CronTask>()
 
   register(workflow: Workflow, onTick: (w: Workflow) => Promise<void>): void {
@@ -119,7 +127,7 @@ export class CronTriggerManager {
 
 export class WorkflowScheduler {
   private readonly workflows = new Map<string, Workflow>()
-  private readonly cronManager = new CronTriggerManager()
+  private readonly triggerManagers: TriggerManager[] = []
   private watcher: chokidar.FSWatcher | null = null
   private lastCheckTime = Date.now()
   private clockDriftInterval: ReturnType<typeof setInterval> | null = null
@@ -127,6 +135,10 @@ export class WorkflowScheduler {
   private readonly DRIFT_THRESHOLD = 30_000 // 30 seconds
 
   constructor(private readonly workflowsDir: string) {}
+
+  addTriggerManager(manager: TriggerManager): void {
+    this.triggerManagers.push(manager)
+  }
 
   start(): void {
     logger.log(`Starting WorkflowScheduler, watching: ${this.workflowsDir}`)
@@ -156,7 +168,9 @@ export class WorkflowScheduler {
       this.watcher = null
     }
 
-    this.cronManager.stopAll()
+    for (const manager of this.triggerManagers) {
+      manager.stopAll()
+    }
 
     if (this.clockDriftInterval) {
       clearInterval(this.clockDriftInterval)
@@ -176,7 +190,9 @@ export class WorkflowScheduler {
             elapsed / 1000
           )}s exceeded threshold. Catching up missed workflows...`
         )
-        this.cronManager.catchUpMissedExecutions(this.workflows.values())
+        for (const manager of this.triggerManagers) {
+          manager.catchUpMissedExecutions?.(this.workflows.values())
+        }
       }
 
       this.lastCheckTime = now
@@ -222,14 +238,18 @@ export class WorkflowScheduler {
     this.workflows.set(workflow.id, workflow)
     logger.log(`Registered workflow: ${workflow.name} [${workflow.id}]`)
 
-    this.cronManager.register(workflow, async (w) => {
-      logger.log(`Cron tick for workflow "${w.name}" [${w.id}].`)
-      await WorkflowEngine.execute(w, 'Cron Scheduled Run')
-    })
+    for (const manager of this.triggerManagers) {
+      manager.register(workflow, async (w) => {
+        logger.log(`Trigger fired for workflow "${w.name}" [${w.id}].`)
+        await WorkflowEngine.execute(w, `${w.trigger.type} Scheduled Run`)
+      })
+    }
   }
 
   private unregisterWorkflow(workflowId: string): void {
-    this.cronManager.unregister(workflowId)
+    for (const manager of this.triggerManagers) {
+      manager.unregister(workflowId)
+    }
     this.workflows.delete(workflowId)
   }
 
@@ -243,7 +263,17 @@ export class WorkflowScheduler {
     return Array.from(this.workflows.values())
   }
 
-  getCronManager(): CronTriggerManager {
-    return this.cronManager
+  getTriggerManagers(): ReadonlyArray<TriggerManager> {
+    return this.triggerManagers
+  }
+
+  getNextRunTime(workflow: Workflow): string | null {
+    for (const manager of this.triggerManagers) {
+      if (manager.getNextRunTime) {
+        const nextRun = manager.getNextRunTime(workflow)
+        if (nextRun) return nextRun
+      }
+    }
+    return null
   }
 }

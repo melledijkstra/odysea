@@ -1,11 +1,11 @@
 id: simple-reminder
-name: Simple Hourly Reminder
+name: Simple Health Reminder
 trigger:
-  type: cron
-  expression: '0 * * * *' # Every hour
+  type: active_time
+  duration: 2700 # 45 minutes
 steps:
   - id: notifyStep
     action: system.notify
     args:
-      title: 'Hourly Check-in'
-      message: "It's time for your hourly check-in! Stay hydrated and take a quick stretch."
+      title: 'Health Check-in'
+      message: "It's time for your check-in! Stay hydrated and take a quick stretch."

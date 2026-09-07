@@ -9,7 +9,18 @@ export interface WorkflowTriggerWebhook {
   type: 'webhook'
 }
 
-export type WorkflowTrigger = WorkflowTriggerCron | WorkflowTriggerWebhook
+export interface WorkflowTriggerActiveTime {
+  type: 'active_time'
+  /** Total active time in seconds to trigger */
+  duration: number
+  /** Seconds of inactivity before pausing accumulation (default: 60) */
+  idleLimit?: number
+  /** Seconds of inactivity before resetting active time (default: 300) */
+  resetLimit?: number
+}
+
+export type WorkflowTrigger =
+  WorkflowTriggerCron | WorkflowTriggerWebhook | WorkflowTriggerActiveTime
 
 export interface WorkflowStep {
   id: string
