@@ -26,7 +26,8 @@ Domain documentation uses a single-context layout (`CONTEXT.md`). See `docs/agen
 
 ### Extension Inspection & Testing
 
-- **Interactive Playwright CLI**: For interactive debugging and inspection during development (without polluting or running the E2E test suite), use `pnpm inspect` (or `pnpm --filter @odysea/extension inspect <command>`). It launches and maintains a live Playwright Chromium session with `--load-extension` and exposes fast CLI commands:
+- **Built-in IDE Browser (Preferred)**: If the Antigravity IDE built-in browser is available, ALWAYS prioritize using it for interactive testing, debugging, and visual inspection of extension pages (e.g., `chrome-extension://...`) and web apps/Storybook. It is more reliable than the CLI script, natively renders extension and local pages, and keeps session state visible in the IDE.
+- **Interactive Playwright CLI (Fallback / Headless)**: If the IDE browser is not available, use `pnpm inspect` (or `pnpm --filter @odysea/extension inspect <command>`). It launches and maintains a live Playwright Chromium session with `--load-extension` and exposes fast CLI commands:
   - `pnpm inspect open [home|popup|options|debug|<url>]`: Open/navigate to an extension page.
   - `pnpm inspect snapshot`: Output visible text and DOM state from the active page.
   - `pnpm inspect network`: Print recent network requests (status, size, duration, headers).
