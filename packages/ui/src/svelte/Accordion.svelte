@@ -1,16 +1,18 @@
 <script lang="ts">
   import { Accordion } from 'bits-ui'
   import type { WithoutChildrenOrChild } from 'bits-ui'
+  import type { Component, Snippet } from 'svelte'
 
   export type AccordionItemData = {
     id: string
     title: string
-    content: string
+    content?: string | Component
     disabled?: boolean
   }
 
   export type AccordionProps = WithoutChildrenOrChild<Accordion.RootProps> & {
     items: AccordionItemData[]
+    content?: Snippet<[item: AccordionItemData]>
   }
 
   let {
@@ -18,6 +20,7 @@
     value = $bindable(),
     ref = $bindable(null),
     class: className,
+    content,
     ...props
   }: AccordionProps = $props()
 </script>
@@ -37,7 +40,7 @@
     >
       <Accordion.Header>
         <Accordion.Trigger
-          class="flex w-full flex-1 items-center justify-between py-4 text-left font-medium transition-all hover:underline cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 [&[data-state=open]>svg]:rotate-180"
+          class="flex w-full flex-1 items-center text-base justify-between py-4 text-left font-medium transition-all hover:underline cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 [&[data-state=open]>svg]:rotate-180"
         >
           {item.title}
           <svg
@@ -62,7 +65,14 @@
         ]}
       >
         <div class="pb-4 pt-0 text-gray-700 dark:text-gray-300">
-          {item.content}
+          {#if content}
+            {@render content(item)}
+          {:else if typeof item.content === 'function'}
+            {@const Content = item.content}
+            <Content />
+          {:else if item.content}
+            {item.content}
+          {/if}
         </div>
       </Accordion.Content>
     </Accordion.Item>

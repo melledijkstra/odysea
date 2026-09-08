@@ -1,6 +1,7 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { Accordion } from '../src/svelte'
+  import Spinner from '@/svelte/Spinner.svelte'
 
   const defaultItems = [
     {
@@ -33,6 +34,9 @@
           'Determines whether one or multiple items can be opened at the same time.',
       },
     },
+    globals: {
+      backgrounds: { value: 'light', grid: false },
+    },
     args: {
       type: 'single',
       items: defaultItems,
@@ -58,3 +62,36 @@
     ],
   }}
 />
+
+<Story name="With Component Content">
+  <Accordion
+    type="single"
+    items={[
+      ...defaultItems,
+      {
+        id: 'component-item',
+        title: 'Component Content (Spinner)',
+        content: Spinner,
+      },
+    ]}
+  />
+</Story>
+
+<Story name="With Content Snippet Prop">
+  {#snippet template()}
+    <Accordion
+      type="single"
+      items={[
+        { id: 'custom-1', title: 'Custom Item 1' },
+        { id: 'custom-2', title: 'Custom Item 2' },
+      ]}
+    >
+      {#snippet content(item)}
+        <div class="p-2 bg-blue-50 dark:bg-blue-950 rounded">
+          <strong>Snippet for {item.title}:</strong>
+          <p>ID: {item.id}</p>
+        </div>
+      {/snippet}
+    </Accordion>
+  {/snippet}
+</Story>
