@@ -152,6 +152,7 @@ app.get('/status', async (_req, res) => {
           human: toHuman(workflow.trigger.expression),
         }),
       },
+      triggerState: scheduler.getTriggerState(workflow.id),
       nextRunAt,
     }
   })

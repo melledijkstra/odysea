@@ -17,6 +17,7 @@ export interface TriggerManager {
   stopAll(): void
   catchUpMissedExecutions?(workflows: Iterable<Workflow>): void
   getNextRunTime?(workflow: Workflow): string | null
+  getTriggerState?(workflowId: string): Record<string, unknown> | null
 }
 
 export class CronTriggerManager implements TriggerManager {
@@ -272,6 +273,16 @@ export class WorkflowScheduler {
       if (manager.getNextRunTime) {
         const nextRun = manager.getNextRunTime(workflow)
         if (nextRun) return nextRun
+      }
+    }
+    return null
+  }
+
+  getTriggerState(workflowId: string): Record<string, unknown> | null {
+    for (const manager of this.triggerManagers) {
+      if (manager.getTriggerState) {
+        const state = manager.getTriggerState(workflowId)
+        if (state) return state
       }
     }
     return null

@@ -52,6 +52,20 @@ export class ActiveTimeTriggerManager implements TriggerManager {
     this.workflows.clear()
   }
 
+  getTriggerState(workflowId: string): Record<string, unknown> | null {
+    const state = this.workflows.get(workflowId)
+    if (!state) return null
+    if (state.workflow.trigger.type !== 'active_time') return null
+
+    return {
+      activeSeconds: state.activeSeconds,
+      duration: state.workflow.trigger.duration,
+      progressPercentage: Math.round(
+        (state.activeSeconds / state.workflow.trigger.duration) * 100
+      ),
+    }
+  }
+
   private startPollingIfNeeded(): void {
     if (this.intervalHandle) return
     if (process.platform !== 'darwin') {
