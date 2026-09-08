@@ -2,6 +2,8 @@
   import { loadModule } from '@/modules'
   import { onMount } from 'svelte'
   import { settings } from '@/settings/index.svelte'
+  import { Accordion } from '@melledijkstra/ui/svelte'
+  import Auth from './Auth.svelte'
 
   settings.initialize()
 
@@ -19,6 +21,11 @@
   {#await loadModule('habits') then Module}
     <Module.scene />
   {/await}
+
+  <Accordion
+    type="multiple"
+    items={[{ id: '1', title: 'Authentication', content: Auth }]}
+  />
 </main>
 
 <style>
