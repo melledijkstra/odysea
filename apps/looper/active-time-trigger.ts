@@ -87,8 +87,19 @@ export class ActiveTimeTriggerManager implements TriggerManager {
         { encoding: 'utf8' }
       )
       idleSec = parseInt(output.trim(), 10) || 0
+
+      // If physically idle, check if there's a software assertion keeping the display awake (e.g. video playback, video call)
+      if (idleSec >= 10) {
+        const pmsetOutput = execSync('pmset -g assertions', {
+          encoding: 'utf8',
+        })
+        if (/PreventUserIdleDisplaySleep\s+1/.test(pmsetOutput)) {
+          // Treat as fully active
+          idleSec = 0
+        }
+      }
     } catch (err) {
-      logger.error('Error fetching idle time from ioreg:', err)
+      logger.error('Error fetching idle time/assertions:', err)
       return
     }
 

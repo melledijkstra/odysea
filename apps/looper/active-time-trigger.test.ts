@@ -27,8 +27,16 @@ describe('ActiveTimeTriggerManager', () => {
     Object.defineProperty(process, 'platform', { value: originalPlatform })
   })
 
-  const mockExecSync = (idleSeconds: number) => {
-    vi.mocked(cp.execSync).mockReturnValue(`${idleSeconds}\n`)
+  const mockExecSync = (idleSeconds: number, hasAssertion = false) => {
+    vi.mocked(cp.execSync).mockImplementation((cmd) => {
+      const command = cmd.toString()
+      if (command.includes('ioreg')) return `${idleSeconds}\n`
+      if (command.includes('pmset'))
+        return hasAssertion
+          ? 'PreventUserIdleDisplaySleep    1\n'
+          : 'PreventUserIdleDisplaySleep    0\n'
+      return ''
+    })
   }
 
   const createWorkflow = (
@@ -129,6 +137,19 @@ describe('ActiveTimeTriggerManager', () => {
 
     vi.advanceTimersByTime(5000)
     // Now it triggers (15s after reset)
+    expect(onTick).toHaveBeenCalledTimes(1)
+  })
+
+  it('treats user as active when pmset PreventUserIdleDisplaySleep assertion is active', () => {
+    const onTick = vi.fn().mockResolvedValue(undefined)
+    manager.register(createWorkflow(15, 60, 300), onTick)
+
+    // User is physically idle for 100 seconds, but has an active media assertion
+    mockExecSync(100, true)
+
+    vi.advanceTimersByTime(15000) // 3 ticks of 5s
+
+    // Should trigger, because idleSec was overridden to 0 by the assertion!
     expect(onTick).toHaveBeenCalledTimes(1)
   })
 
