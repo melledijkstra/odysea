@@ -10,6 +10,7 @@ export interface Module {
   component: Component
   scene?: Component
   trigger?: Component
+  settings?: Component
   init?: () => void
 }
 

@@ -5,6 +5,15 @@ import type { ILogger } from '@/interfaces/logger.interface'
 
 let changeListenersSet = false
 
+export type BreathingSettings = {
+  durationMinutes: number
+  inhaleSeconds: number
+  holdSeconds: number
+  exhaleSeconds: number
+  holdOutSeconds: number
+  soundOn: boolean
+}
+
 export type SettingsState = {
   loaded?: boolean
   network: {
@@ -28,6 +37,7 @@ export type SettingsState = {
     github_client_id?: string
     github_client_secret?: string
   }
+  breathing: BreathingSettings
 }
 
 const SETTINGS_KEY = 'settings' as const
@@ -56,6 +66,14 @@ export const DEFAULT_SETTINGS: SettingsState = {
     showQuotes: true,
   },
   apiKeys: {},
+  breathing: {
+    durationMinutes: 5,
+    inhaleSeconds: 5,
+    holdSeconds: 0,
+    exhaleSeconds: 7,
+    holdOutSeconds: 0,
+    soundOn: true,
+  },
 }
 
 export const settingsStore = $state<SettingsState>(
@@ -107,6 +125,10 @@ export class Settings implements ILogger {
     const mergedSettings = {
       ...DEFAULT_SETTINGS,
       ...storageSettings,
+      breathing: {
+        ...DEFAULT_SETTINGS.breathing,
+        ...storageSettings?.breathing,
+      },
       loaded: true,
     }
 
@@ -127,7 +149,15 @@ export class Settings implements ILogger {
       SETTINGS_KEY
     )) as { settings: SettingsState }
 
-    return { ...DEFAULT_SETTINGS, ...storageSettings, loaded: true }
+    return {
+      ...DEFAULT_SETTINGS,
+      ...storageSettings,
+      breathing: {
+        ...DEFAULT_SETTINGS.breathing,
+        ...storageSettings?.breathing,
+      },
+      loaded: true,
+    }
   }
 
   saveSettingsToStorage = async () => {
