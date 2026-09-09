@@ -14,9 +14,9 @@
 
   async function refreshBackround() {
     try {
-      const url = await unsplashClient.refreshDailyImage()
-      if (url) {
-        await setBackgroundImage(url)
+      const result = await unsplashClient.refreshDailyImage()
+      if (result) {
+        await setBackgroundImage(result.imageData, result.info)
       } else {
         background.error = true
         background.url = undefined
@@ -27,9 +27,27 @@
     }
   }
 
+  let initialSettingsLoaded = false
+  let prevSettings: string | null = null
+
   $effect(() => {
-    // Clear the cache whenever the query parameters for Unsplash change
-    if (serverlessHost || dailyImageQuery || dailyImageCollections) {
+    // Only react after settings have finished loading from storage
+    if (!settingsStore.loaded) return
+
+    const currentSettingsKey = JSON.stringify({
+      host: serverlessHost,
+      query: dailyImageQuery,
+      collections: dailyImageCollections,
+    })
+
+    if (!initialSettingsLoaded) {
+      initialSettingsLoaded = true
+      prevSettings = currentSettingsKey
+      return
+    }
+
+    if (prevSettings !== currentSettingsKey) {
+      prevSettings = currentSettingsKey
       logger.log('Unsplash settings changed, clearing next image cache')
       unsplashClient.clearNextImage()
     }

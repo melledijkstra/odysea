@@ -5,8 +5,17 @@ import {
 import { SERVERLESS_HOST_URL } from '@/constants'
 import browser from 'webextension-polyfill'
 import { addDays, formatDate } from '@melledijkstra/toolbox'
-import { ImageCache, type ImageInfo } from '../cache/image-cache'
+import {
+  ImageCache,
+  type ImageConfig,
+  type ImageInfo,
+} from '../cache/image-cache'
 import { settingsStore } from '@/settings/index.svelte'
+
+export type DailyImageResult = {
+  imageData: string
+  info: ImageInfo
+}
 
 function getScreenDimensions(): { width: number; dpr: number } {
   return {
@@ -67,6 +76,17 @@ export class UnsplashClient extends BaseUnsplashClient {
     return headers
   }
 
+  isConfigMatch(cachedConfig?: ImageConfig): boolean {
+    if (!cachedConfig) return false
+    const current = this.getConfig()
+    if ((cachedConfig.host || '') !== (current.host || '')) return false
+    if ((cachedConfig.query || '') !== (current.query || '')) return false
+    const cachedCollections = cachedConfig.collections || []
+    const currentCollections = current.collections || []
+    if (cachedCollections.length !== currentCollections.length) return false
+    return cachedCollections.every((col, i) => col === currentCollections[i])
+  }
+
   scheduleRetrieveNextImage(delayMs = 3000): void {
     if (typeof window === 'undefined') return
 
@@ -92,12 +112,19 @@ export class UnsplashClient extends BaseUnsplashClient {
   }
 
   async retrieveNextImage(): Promise<ImageInfo> {
+    const config = this.getConfig()
     const response = await this.fetchUnsplashImage()
     const tomorrow = addDays(new Date(), 1)
     const next: ImageInfo = {
       id: response.id,
       url: getOptimizedImageUrl(response.urls),
       date: formatDate(tomorrow),
+      unsplashInfo: response,
+      config: {
+        host: config.host,
+        query: config.query,
+        collections: config.collections ? [...config.collections] : [],
+      },
     }
 
     await this.cache.setNextImageInfo(next)
@@ -140,52 +167,73 @@ export class UnsplashClient extends BaseUnsplashClient {
     return url
   }
 
-  async getDailyImage(): Promise<string | undefined> {
+  async getDailyImage(): Promise<DailyImageResult | undefined> {
     const today = formatDate(new Date())
     const cached = await this.cache.getDailyImageInfo()
 
-    let imageUrl: string
+    let dailyImageInfo: ImageInfo
 
     if (cached?.date === today) {
       this.logger.log('retrieved daily image from cache')
-      imageUrl = cached.url
+      dailyImageInfo = cached
 
-      // Ensure next image is pre-cached if not yet present
+      // Ensure next image is pre-cached if not yet present or config mismatched
       this.cache.getNextImageInfo().then((next) => {
-        if (!next || next.date !== formatDate(addDays(new Date(), 1))) {
+        if (
+          !next ||
+          next.date !== formatDate(addDays(new Date(), 1)) ||
+          !this.isConfigMatch(next.config)
+        ) {
           this.scheduleRetrieveNextImage()
         }
       })
     } else {
       const next = await this.cache.getNextImageInfo()
-      let dailyImageInfo: ImageInfo
 
-      if (next) {
-        this.logger.log('next image exists, use that one instead')
+      if (next && this.isConfigMatch(next.config)) {
+        this.logger.log(
+          'next image exists and config matches, use that one instead'
+        )
         dailyImageInfo = { ...next, date: today }
         await this.cache.clearNextImage()
       } else {
-        this.logger.log('no cached image found, fetching new one')
+        if (next) {
+          this.logger.log(
+            'next image exists but config mismatched, discarding and fetching new one'
+          )
+          await this.cache.clearNextImage()
+        } else {
+          this.logger.log('no cached image found, fetching new one')
+        }
         const data = await this.fetchUnsplashImage()
+        const config = this.getConfig()
         dailyImageInfo = {
           id: data.id,
           url: getOptimizedImageUrl(data.urls),
           date: today,
+          unsplashInfo: data,
+          config: {
+            host: config.host,
+            query: config.query,
+            collections: config.collections ? [...config.collections] : [],
+          },
         }
       }
 
       await this.cache.setDailyImageInfo(dailyImageInfo)
       this.scheduleRetrieveNextImage()
-      imageUrl = dailyImageInfo.url
     }
 
-    if (imageUrl) {
-      return this.getImageUrlFromCacheOrFetch(imageUrl)
+    if (dailyImageInfo.url) {
+      const imageData = await this.getImageUrlFromCacheOrFetch(
+        dailyImageInfo.url
+      )
+      return { imageData, info: dailyImageInfo }
     }
     return undefined
   }
 
-  async refreshDailyImage(): Promise<string | undefined> {
+  async refreshDailyImage(): Promise<DailyImageResult | undefined> {
     await this.cache.clearDailyImage()
     return this.getDailyImage()
   }

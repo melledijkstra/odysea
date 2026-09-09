@@ -2,11 +2,20 @@ import { DAILY_IMAGE_KEY, NEXT_IMAGE_KEY } from '@/constants'
 import { Logger } from '@/logger'
 import type { ILogger } from '@/interfaces/logger.interface'
 import { ExtensionStorage } from '@melledijkstra/extension'
+import type { UnsplashResponse } from '@melledijkstra/api'
+
+export type ImageConfig = {
+  host?: string
+  query?: string
+  collections?: string[]
+}
 
 export type ImageInfo = {
   id: string
   url: string
   date?: string
+  unsplashInfo: UnsplashResponse
+  config?: ImageConfig
 }
 
 export class ImageCache implements ILogger {

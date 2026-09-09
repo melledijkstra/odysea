@@ -1,4 +1,5 @@
 import { Logger } from '@/logger'
+import type { ImageInfo } from '../cache/image-cache'
 
 const logger = new Logger('background-store')
 
@@ -17,18 +18,22 @@ function fetchImage(src: string): Promise<string> {
 export const background = $state<{
   url: string | undefined
   error: boolean
+  info: ImageInfo | undefined
 }>({
   url: undefined,
   error: false,
+  info: undefined
 })
 
-export async function setBackgroundImage(url: string) {
+export async function setBackgroundImage(url: string, info?: ImageInfo) {
   try {
     const src = await fetchImage(url)
     background.url = src
+    background.info = info
     background.error = false
   } catch {
     background.url = undefined
+    background.info = undefined
     background.error = true
   }
 }

@@ -7,10 +7,10 @@
 
   onMount(async () => {
     try {
-      const url = await unsplashClient.getDailyImage()
+      const result = await unsplashClient.getDailyImage()
 
-      if (url) {
-        await setBackgroundImage(url)
+      if (result) {
+        await setBackgroundImage(result.imageData, result.info)
       } else {
         background.error = true
         background.url = undefined
