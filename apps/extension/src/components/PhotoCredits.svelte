@@ -17,78 +17,54 @@
   } from '@mdi/js'
 
   const logger = new Logger('PhotoCredits')
-
-  const serverlessHost = $derived(settingsStore.network.serverlessHost)
-  const dailyImageQuery = $derived(settingsStore.ui.dailyImageQuery)
-  const dailyImageCollections = $derived(settingsStore.ui.dailyImageCollections)
-
   let isRefreshing = $state(false)
 
-  function buildUnsplashUrl(url: string): string {
-    try {
-      const parsed = new URL(url)
-      parsed.searchParams.set('utm_source', 'odysea')
-      parsed.searchParams.set('utm_medium', 'referral')
-      return parsed.toString()
-    } catch {
-      return `${url}?utm_source=odysea&utm_medium=referral`
-    }
-  }
+  const withUtm = (url: string) =>
+    `${url}${url.includes('?') ? '&' : '?'}utm_source=odysea&utm_medium=referral`
 
-  const unsplashInfo = $derived(background.info?.unsplashInfo)
-  const locationName = $derived(unsplashInfo?.location?.name)
-  const locationSub = $derived(
-    [unsplashInfo?.location?.city, unsplashInfo?.location?.country]
-      .filter(Boolean)
-      .join(', ')
-  )
-  const photographerName = $derived(unsplashInfo?.user?.name)
-  const photographerProfileUrl = $derived(
-    unsplashInfo?.user?.links?.html
-      ? buildUnsplashUrl(unsplashInfo.user.links.html)
-      : undefined
-  )
-  const photoPageUrl = $derived(
-    unsplashInfo?.links?.html
-      ? buildUnsplashUrl(unsplashInfo.links.html)
-      : undefined
-  )
-  const unsplashHomeUrl = buildUnsplashUrl('https://unsplash.com')
-  const description = $derived(unsplashInfo?.description)
-
-  const camera = $derived(
-    [unsplashInfo?.exif?.make, unsplashInfo?.exif?.model]
-      .filter(Boolean)
-      .join(' ')
-  )
-
-  const exifSummary = $derived(
-    [
-      unsplashInfo?.exif?.aperture ? `ƒ/${unsplashInfo.exif.aperture}` : null,
-      unsplashInfo?.exif?.exposure_time
-        ? `${unsplashInfo.exif.exposure_time}s`
-        : null,
-      unsplashInfo?.exif?.focal_length
-        ? `${unsplashInfo.exif.focal_length}mm`
-        : null,
-      unsplashInfo?.exif?.iso ? `ISO ${unsplashInfo.exif.iso}` : null,
-    ]
-      .filter(Boolean)
-      .join(' · ')
-  )
-
-  const triggerTitle = $derived.by(() => {
-    if (locationName && photographerName) {
-      return `${locationName} by ${photographerName}`
+  const photo = $derived.by(() => {
+    const info = background.info?.unsplashInfo
+    if (!info) return null
+    const { location, user, exif, links, description } = info
+    return {
+      title: location?.name || description || 'Daily Wallpaper',
+      location: location?.name,
+      subLocation: [location?.city, location?.country]
+        .filter(Boolean)
+        .join(', '),
+      description,
+      photographer: user?.name,
+      photographerUrl: user?.links?.html ? withUtm(user.links.html) : undefined,
+      photoUrl: links?.html ? withUtm(links.html) : undefined,
+      camera: [exif?.make, exif?.model].filter(Boolean).join(' '),
+      exif: [
+        exif?.aperture && `ƒ/${exif.aperture}`,
+        exif?.exposure_time && `${exif.exposure_time}s`,
+        exif?.focal_length && `${exif.focal_length}mm`,
+        exif?.iso && `ISO ${exif.iso}`,
+      ]
+        .filter(Boolean)
+        .join(' · '),
     }
-    if (photographerName) {
-      return `Photo by ${photographerName}`
-    }
-    if (locationName) {
-      return locationName
-    }
-    return 'Daily photo on Unsplash'
   })
+
+  const unsplashHomeUrl = withUtm('https://unsplash.com')
+
+  const triggerTitle = $derived(
+    photo?.location && photo.photographer
+      ? `${photo.location} by ${photo.photographer}`
+      : photo?.photographer
+        ? `Photo by ${photo.photographer}`
+        : photo?.location || 'Daily photo on Unsplash'
+  )
+
+  const headerIcon = $derived(
+    photo?.location
+      ? mdiMapMarkerOutline
+      : photo?.description
+        ? mdiImageOutline
+        : null
+  )
 
   async function refreshBackground() {
     if (isRefreshing) return
@@ -109,33 +85,19 @@
       isRefreshing = false
     }
   }
-
-  let initialSettingsLoaded = false
-  let prevSettings: string | null = null
-
-  $effect(() => {
-    // Only react after settings have finished loading from storage
-    if (!settingsStore.loaded) return
-
-    const currentSettingsKey = JSON.stringify({
-      host: serverlessHost,
-      query: dailyImageQuery,
-      collections: dailyImageCollections,
-    })
-
-    if (!initialSettingsLoaded) {
-      initialSettingsLoaded = true
-      prevSettings = currentSettingsKey
-      return
-    }
-
-    if (prevSettings !== currentSettingsKey) {
-      prevSettings = currentSettingsKey
-      logger.log('Unsplash settings changed, clearing next image cache')
-      unsplashClient.clearNextImage()
-    }
-  })
 </script>
+
+{#snippet externalLink(href: string, text: string, className = '')}
+  <a
+    {href}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="hover:underline inline-flex items-center gap-0.5 {className}"
+  >
+    {text}
+    <Icon path={mdiOpenInNew} size={12} class="opacity-70" />
+  </a>
+{/snippet}
 
 <Popover.Root>
   <Popover.Trigger
@@ -148,7 +110,7 @@
     aria-label={triggerTitle}
   >
     <IconUnsplash size={16} class="shrink-0 text-white/80" />
-    {#if locationName}
+    {#if photo?.location}
       <span
         class="relative inline-grid [grid-template-areas:'stack'] text-left max-w-72"
       >
@@ -156,13 +118,13 @@
           class={[
             '[grid-area:stack] truncate font-medium text-white/90 group-hover:text-white',
             'transition-all duration-300 ease-in will-change-transform whitespace-nowrap',
-            photographerName &&
+            photo.photographer &&
               'translate-y-0 group-hover:-translate-y-1/2 group-focus-visible:-translate-y-1/2',
           ]}
         >
-          {locationName}
+          {photo.location}
         </span>
-        {#if photographerName}
+        {#if photo.photographer}
           <span
             class={[
               '[grid-area:stack] truncate text-[10px] text-white/60 pointer-events-none',
@@ -170,13 +132,13 @@
               'translate-y-0 opacity-0 group-hover:translate-y-1/2 group-hover:opacity-100 group-focus-visible:translate-y-1/2 group-focus-visible:opacity-100',
             ]}
           >
-            {photographerName}
+            {photo.photographer}
           </span>
         {/if}
       </span>
-    {:else if photographerName}
+    {:else if photo?.photographer}
       <span class="truncate max-w-72 text-left text-white/80">
-        Photo by {photographerName}
+        Photo by {photo.photographer}
       </span>
     {:else}
       <span class="text-white/70">Daily Photo</span>
@@ -192,38 +154,24 @@
       <!-- Header / Location / Title -->
       <div class="flex items-start gap-2.5">
         <div class="p-1.5 rounded-md bg-white/10 text-white shrink-0 mt-0.5">
-          {#if locationName}
-            <Icon path={mdiMapMarkerOutline} size={18} />
-          {:else if description}
-            <Icon path={mdiImageOutline} size={18} />
+          {#if headerIcon}
+            <Icon path={headerIcon} size={18} />
           {:else}
             <IconUnsplash size={18} />
           {/if}
         </div>
         <div class="flex flex-col min-w-0">
-          {#if locationName}
-            <h3
-              class="font-semibold text-sm text-white leading-snug wrap-break-word"
+          <h3
+            class="font-semibold text-sm text-white leading-snug wrap-break-word line-clamp-2"
+          >
+            {photo?.title ?? 'Daily Wallpaper'}
+          </h3>
+          {#if photo?.subLocation && photo.subLocation !== photo.location}
+            <p
+              class="text-xs text-white/60 leading-tight mt-0.5 wrap-break-word"
             >
-              {locationName}
-            </h3>
-            {#if locationSub && locationSub !== locationName}
-              <p
-                class="text-xs text-white/60 leading-tight mt-0.5 wrap-break-word"
-              >
-                {locationSub}
-              </p>
-            {/if}
-          {:else if description}
-            <h3
-              class="font-semibold text-sm text-white leading-snug line-clamp-2"
-            >
-              {description}
-            </h3>
-          {:else}
-            <h3 class="font-semibold text-sm text-white leading-snug">
-              Daily Wallpaper
-            </h3>
+              {photo.subLocation}
+            </p>
           {/if}
         </div>
       </div>
@@ -234,48 +182,36 @@
       >
         <div class="flex items-center gap-1 flex-wrap">
           <span>Photo by</span>
-          {#if photographerProfileUrl && photographerName}
-            <a
-              href={photographerProfileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="font-medium text-white hover:underline inline-flex items-center gap-0.5"
-            >
-              {photographerName}
-              <Icon path={mdiOpenInNew} size={12} class="opacity-70" />
-            </a>
+          {#if photo?.photographerUrl && photo.photographer}
+            {@render externalLink(
+              photo.photographerUrl,
+              photo.photographer,
+              'font-medium text-white'
+            )}
           {:else}
             <span class="font-medium text-white"
-              >{photographerName || 'Unknown'}</span
+              >{photo?.photographer || 'Unknown'}</span
             >
           {/if}
           <span>on</span>
-          <a
-            href={unsplashHomeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="font-medium text-white hover:underline inline-flex items-center gap-0.5"
-          >
-            Unsplash
-            <Icon path={mdiOpenInNew} size={12} class="opacity-70" />
-          </a>
+          {@render externalLink(
+            unsplashHomeUrl,
+            'Unsplash',
+            'font-medium text-white'
+          )}
         </div>
 
-        {#if photoPageUrl}
-          <a
-            href={photoPageUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-[11px] text-white/50 hover:text-white/80 inline-flex items-center gap-1 transition-colors w-fit mt-0.5"
-          >
-            View photo on Unsplash
-            <Icon path={mdiOpenInNew} size={11} />
-          </a>
+        {#if photo?.photoUrl}
+          {@render externalLink(
+            photo.photoUrl,
+            'View photo on Unsplash',
+            'text-[11px] text-white/50 hover:text-white/80 mt-0.5'
+          )}
         {/if}
       </div>
 
       <!-- Additional info: Camera EXIF & Details -->
-      {#if camera || exifSummary}
+      {#if photo?.camera || photo?.exif}
         <div
           class="flex items-start gap-2 bg-white/5 rounded-lg p-2.5 text-xs text-white/80 border border-white/10"
         >
@@ -285,21 +221,23 @@
             class="shrink-0 text-white/60 mt-0.5"
           />
           <div class="flex flex-col min-w-0">
-            {#if camera}
-              <span class="font-medium text-white/90 truncate">{camera}</span>
+            {#if photo.camera}
+              <span class="font-medium text-white/90 truncate"
+                >{photo.camera}</span
+              >
             {/if}
-            {#if exifSummary}
+            {#if photo.exif}
               <span class="text-white/60 text-[11px] font-mono tracking-tight"
-                >{exifSummary}</span
+                >{photo.exif}</span
               >
             {/if}
           </div>
         </div>
       {/if}
 
-      {#if locationName && description}
+      {#if photo?.location && photo?.description}
         <p class="text-xs text-white/60 italic line-clamp-2">
-          "{description}"
+          "{photo.description}"
         </p>
       {/if}
 
