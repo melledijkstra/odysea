@@ -16,7 +16,7 @@
     mdiImageOutline,
   } from '@mdi/js'
 
-  const logger = new Logger('ImageRefreshButton')
+  const logger = new Logger('PhotoCredits')
 
   const serverlessHost = $derived(settingsStore.network.serverlessHost)
   const dailyImageQuery = $derived(settingsStore.ui.dailyImageQuery)
@@ -140,27 +140,47 @@
 <Popover.Root>
   <Popover.Trigger
     class={[
-      'flex items-center gap-2 text-xs text-white/70 hover:text-white',
-      'rounded-lg px-2.5 py-1.5 transition-colors cursor-pointer select-none',
+      'group flex items-center gap-2 text-xs text-white/70 hover:text-white',
+      'rounded-lg px-2.5 py-2.5 transition-colors cursor-pointer select-none',
       'hover:bg-white/10 active:bg-white/15',
     ]}
     title={triggerTitle}
     aria-label={triggerTitle}
   >
     <IconUnsplash size={16} class="shrink-0 text-white/80" />
-    <span class="truncate max-w-72 text-left flex items-center gap-1.5">
-      {#if locationName}
-        <span class="font-medium text-white/90 truncate">{locationName}</span>
+    {#if locationName}
+      <span
+        class="relative inline-grid [grid-template-areas:'stack'] text-left max-w-72"
+      >
+        <span
+          class={[
+            '[grid-area:stack] truncate font-medium text-white/90 group-hover:text-white',
+            'transition-all duration-300 ease-in will-change-transform whitespace-nowrap',
+            photographerName &&
+              'translate-y-0 group-hover:-translate-y-1/2 group-focus-visible:-translate-y-1/2',
+          ]}
+        >
+          {locationName}
+        </span>
         {#if photographerName}
-          <span class="text-white/40 shrink-0">&bull;</span>
-          <span class="text-white/70 truncate">{photographerName}</span>
+          <span
+            class={[
+              '[grid-area:stack] truncate text-[10px] text-white/60 pointer-events-none',
+              'transition-all duration-300 ease-in will-change-transform whitespace-nowrap',
+              'translate-y-0 opacity-0 group-hover:translate-y-1/2 group-hover:opacity-100 group-focus-visible:translate-y-1/2 group-focus-visible:opacity-100',
+            ]}
+          >
+            {photographerName}
+          </span>
         {/if}
-      {:else if photographerName}
-        <span class="text-white/80 truncate">Photo by {photographerName}</span>
-      {:else}
-        <span class="text-white/70">Daily Photo</span>
-      {/if}
-    </span>
+      </span>
+    {:else if photographerName}
+      <span class="truncate max-w-72 text-left text-white/80">
+        Photo by {photographerName}
+      </span>
+    {:else}
+      <span class="text-white/70">Daily Photo</span>
+    {/if}
   </Popover.Trigger>
 
   <PopPanel
