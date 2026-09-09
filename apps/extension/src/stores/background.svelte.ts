@@ -22,7 +22,7 @@ export const background = $state<{
 }>({
   url: undefined,
   error: false,
-  info: undefined
+  info: undefined,
 })
 
 export async function setBackgroundImage(url: string, info?: ImageInfo) {

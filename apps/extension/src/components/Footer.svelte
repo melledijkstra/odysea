@@ -14,7 +14,7 @@
   ]}
 >
   <!-- BOTTOM LEFT -->
-  <div class="flex flex-row gap-3">
+  <div class="flex flex-row gap-3 items-center">
     <SettingsMenuItem />
     <ImageRefreshButton />
   </div>
