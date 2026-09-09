@@ -54,6 +54,7 @@
 
   onMount(() => {
     timer.on('tick', onTick)
+    timer.on('complete', stop)
   })
 
   onDestroy(() => {
