@@ -32,11 +32,11 @@
 
 <ContextMenu items={menuItems} {open}>
   <div
-    class="relative flex items-center gap-1 text-sm text-white hover:bg-gray-800 group/task rounded-md p-1"
+    class="relative flex items-center gap-1 text-sm text-white hover:bg-gray-800 focus-within:bg-gray-800 group/task rounded-md p-1"
   >
     <input
       type="checkbox"
-      class="mr-1 self-start translate-y-1"
+      class="mr-1 self-start translate-y-1 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm"
       title="Toggle task completion"
       aria-label={`Toggle task completion for ${task.title}`}
       onchange={(e) =>
@@ -62,7 +62,7 @@
       />
     {:else}
       <button
-        class="flex-1 text-left leading-[1em]"
+        class="flex-1 text-left leading-[1em] focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm"
         title="Double-click to edit"
         aria-label={`Edit task: ${task.title}`}
         ondblclick={() => (editMode = true)}
@@ -75,7 +75,7 @@
         href={task.webViewLink}
         target="_blank"
         rel="noopener noreferrer"
-        class="text-gray-400 hover:text-white ml-auto invisible group-hover/task:visible p-1"
+        class="text-gray-400 hover:text-white ml-auto opacity-0 group-hover/task:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm p-1 transition-opacity"
         title="Open link"
       >
         <Icon path={mdiOpenInNew} size={16} />
@@ -85,7 +85,7 @@
       items={menuItems}
       triggerProps={{
         class:
-          'text-gray-400 bg-gray-800 rounded-full ml-auto p-1 invisible group-hover/task:visible',
+          'text-gray-400 hover:text-white bg-gray-800 rounded-full ml-auto p-1 opacity-0 group-hover/task:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden transition-opacity',
         title: 'Task options',
         'aria-label': `Task options for ${task.title}`,
       }}
