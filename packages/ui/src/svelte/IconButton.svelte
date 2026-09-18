@@ -33,7 +33,7 @@
     !hasColor &&
       'dark:text-white/70 dark:hover:text-white text-zinc-500 hover:text-zinc-700',
     'disabled:opacity-50 disabled:cursor-not-allowed',
-    'block cursor-pointer transition-colors',
+    'block cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm',
   ]}
 >
   <Icon path={icon} {size} />
