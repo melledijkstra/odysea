@@ -1,8 +1,9 @@
-id: simple-reminder
-name: Simple Health Reminder
+id: health-reminder
+name: Health Reminder
 trigger:
   type: active_time
   duration: 2700 # 45 minutes
+  resetLimit: 600 # 10 minutes
 steps:
   - id: notifyStep
     action: system.notify
