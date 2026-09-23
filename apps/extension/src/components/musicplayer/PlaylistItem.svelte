@@ -18,6 +18,8 @@
   <button
     class="cursor-pointer hover:opacity-30 shrink-0"
     onclick={() => onPlaylistPlay(playlist)}
+    aria-label="Play {playlist.title}"
+    title="Play {playlist.title}"
   >
     <img
       class="size-10 aspect-square"
