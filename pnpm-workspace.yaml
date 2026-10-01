@@ -21,7 +21,7 @@ onlyBuiltDependencies:
 catalog:
   # Building & Bundling
   turbo: ^2.10.12
-  vite: ^8.2.2
+  vite: ^8.3.1
   tsx: ^4.23.12
   tsdown: ^0.22.14
   deno: ^2.9.6
@@ -47,8 +47,8 @@ catalog:
   eslint-plugin-turbo: ^2.10.12
 
   # Testing
-  vitest: ^4.1.11
-  '@vitest/coverage-v8': ^4.1.11
+  vitest: ^5.0.2
+  '@vitest/coverage-v8': ^5.0.2
   playwright: ^1.62.1
 
   # Extension
