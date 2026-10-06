@@ -37,6 +37,10 @@ export type SettingsState = {
     github_client_id?: string
     github_client_secret?: string
   }
+  supabase: {
+    url: string
+    anonKey: string
+  }
   breathing: BreathingSettings
 }
 
@@ -57,6 +61,10 @@ export const DEFAULT_SETTINGS: SettingsState = {
   network: {
     serverlessHost: '',
     databaseUri: '',
+  },
+  supabase: {
+    url: '',
+    anonKey: '',
   },
   modules: DEFAULT_MODULE_SETTINGS,
   ui: {
@@ -125,6 +133,10 @@ export class Settings implements ILogger {
     const mergedSettings = {
       ...DEFAULT_SETTINGS,
       ...storageSettings,
+      supabase: {
+        ...DEFAULT_SETTINGS.supabase,
+        ...storageSettings?.supabase,
+      },
       breathing: {
         ...DEFAULT_SETTINGS.breathing,
         ...storageSettings?.breathing,
@@ -152,6 +164,10 @@ export class Settings implements ILogger {
     return {
       ...DEFAULT_SETTINGS,
       ...storageSettings,
+      supabase: {
+        ...DEFAULT_SETTINGS.supabase,
+        ...storageSettings?.supabase,
+      },
       breathing: {
         ...DEFAULT_SETTINGS.breathing,
         ...storageSettings?.breathing,
