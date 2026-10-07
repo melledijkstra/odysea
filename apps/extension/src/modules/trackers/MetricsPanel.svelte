@@ -193,7 +193,7 @@
           >
             {#each items as item (item.id)}
               <div
-                class="flex flex-row items-center justify-between gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group/item"
+                class="flex flex-row items-center justify-between gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 focus-within:bg-white/10 transition-colors group/item"
               >
                 <div
                   class="cursor-grab active:cursor-grabbing text-white/40 hover:text-white"
@@ -213,7 +213,7 @@
                   </p>
                 </div>
                 <div
-                  class="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity"
+                  class="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 focus-within:opacity-100 transition-opacity"
                 >
                   <IconButton
                     icon={item.pinned ? mdiPin : mdiPinOff}

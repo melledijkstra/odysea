@@ -29,21 +29,21 @@
       await navigator.clipboard.writeText(copyText)
       addNotification('Copied to clipboard!', 'success')
     }}
-    class="cursor-pointer"
+    class="cursor-pointer focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm"
   >
     <em
       class={[
-        'inline-block text-lg text-white/50 group-hover:text-white',
+        'inline-block text-lg text-white/50 group-hover:text-white group-focus-within:text-white',
         'transition-all duration-300 ease-in will-change-transform whitespace-nowrap',
-        'translate-y-0 group-hover:-translate-y-1/2',
+        'translate-y-0 group-hover:-translate-y-1/2 group-focus-within:-translate-y-1/2',
       ]}>"{randomQuote.text}"</em
     >
     <p
       class={[
         'inline-block text-sm text-gray-200',
         'transition-all duration-300 ease-in will-change-transform whitespace-nowrap',
-        'translate-y-0 group-hover:translate-y-1/2',
-        'opacity-0 group-hover:opacity-100',
+        'translate-y-0 group-hover:translate-y-1/2 group-focus-within:translate-y-1/2',
+        'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100',
         'absolute left-0 right-0',
       ]}
     >
