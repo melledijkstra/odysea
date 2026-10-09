@@ -10,8 +10,10 @@
   <Popover.Trigger
     class={[
       'dark:text-white/70 dark:hover:text-white text-zinc-500 hover:text-zinc-700',
-      'block cursor-pointer transition-colors',
+      'block cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm',
     ]}
+    aria-label="Settings"
+    title="Settings"
   >
     <Icon path={mdiTuneVertical} size={25} />
   </Popover.Trigger>
