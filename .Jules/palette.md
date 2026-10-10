@@ -17,3 +17,7 @@
 
 **Learning:** Found an icon-only button inside `PlaylistItem.svelte` that lacked `aria-label` and `title` attributes, which are essential for screen reader access and visual tooltips.
 **Action:** When working on Svelte components containing icon-only `<button>`s, ensure that both `aria-label` and `title` attributes are set.
+
+## 2025-02-12 - Added Focus Styles and ARIA Labels to Menu Items
+**Learning:** When using `bits-ui` headless primitives like `Popover.Trigger` or `Tooltip` in this codebase, focus styles (e.g., `focus-visible:ring-2`) and ARIA labels/titles are not applied by default. Screen reader users and keyboard navigators miss critical context and visual feedback if these are omitted.
+**Action:** Always manually apply `focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm` and include `aria-label` and `title` attributes on custom `bits-ui` triggers, especially for icon-only buttons.
