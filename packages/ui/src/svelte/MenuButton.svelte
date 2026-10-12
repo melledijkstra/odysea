@@ -22,8 +22,10 @@
   triggerProps={{
     class: [
       'text-white/70 hover:text-white',
-      'block cursor-pointer transition-colors',
+      'block cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm',
     ],
+    'aria-label': tooltip,
+    title: tooltip,
     ...triggerProps,
   }}
 >

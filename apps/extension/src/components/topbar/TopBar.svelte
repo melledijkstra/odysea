@@ -58,8 +58,10 @@
               : 'opacity-0 dark:text-white/70 dark:hover:text-white hover:text-zinc-700 text-zinc-500',
             'group-hover:opacity-100 focus:opacity-100 transition-opacity duration-300 flex flex-col cursor-pointer',
             'text-center',
-            'cursor-pointer transition-colors',
+            'cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm',
           ]}
+          aria-label="Add Metric"
+          title="Add Metric"
         >
           <Icon path={mdiPlus} size={24} class="mx-auto" />
           <span class="text-xs">Add</span>
