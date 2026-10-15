@@ -20,7 +20,7 @@
   </div>
 
   <!-- MIDDLE -->
-  <div class="justify-self-center text-center px-4">
+  <div class="justify-self-center text-center px-4 min-w-0">
     {#if settingsStore.ui.showQuotes && appState.mode !== 'focus'}
       <Quotes />
     {/if}
