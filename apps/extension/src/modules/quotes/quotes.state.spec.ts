@@ -166,7 +166,7 @@ describe('QuotesState', () => {
 
       // Subsequent initialization loads from cache
       const state2 = new QuotesState()
-      await state2.init()
+      await state2.initialize()
       expect(state2.hasCustomQuotes).toBe(true)
       expect(state2.quotes).toEqual(dbQuotes)
       const initialQuote = state2.currentQuote

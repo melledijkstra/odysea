@@ -5,6 +5,7 @@
   import { mdiRefresh } from '@mdi/js'
 
   $effect(() => {
+    quotesState.initialize()
     quotesState.fetchQuotes()
   })
 

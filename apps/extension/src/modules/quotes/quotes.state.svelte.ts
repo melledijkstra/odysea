@@ -29,6 +29,7 @@ export const QUOTES_STORAGE_KEY = 'quotes::cache'
 export class QuotesState {
   private logger = new Logger('QuotesState')
   private cache = new WebLocalStorage()
+  private initPromise: Promise<void> | null = null
 
   quotes = $state<Quote[]>([...DEFAULT_QUOTES])
   currentQuote = $state<Quote>(DEFAULT_QUOTES[0])
@@ -39,25 +40,32 @@ export class QuotesState {
 
   constructor() {
     this.currentQuote = this.selectRandomQuote(this.quotes)
-    this.init()
   }
 
   /**
    * Initializes state by loading quotes from cache if available.
    */
-  async init(): Promise<void> {
-    try {
-      const cached = await this.cache.get<Quote[]>(QUOTES_STORAGE_KEY)
-      if (cached && cached.length > 0) {
-        this.quotes = cached
-        this.currentQuote = this.selectRandomQuote(cached)
-        this.hasCustomQuotes = true
+  async initialize(): Promise<void> {
+    if (this.hasLoaded) return
+    if (this.initPromise) return this.initPromise
+
+    this.initPromise = (async () => {
+      try {
+        const cached = await this.cache.get<Quote[]>(QUOTES_STORAGE_KEY)
+        if (cached && cached.length > 0) {
+          this.quotes = cached
+          this.currentQuote = this.selectRandomQuote(cached)
+          this.hasCustomQuotes = true
+        }
+      } catch (e) {
+        this.logger.error('Failed to load quotes from cache', e)
+      } finally {
+        this.hasLoaded = true
+        this.initPromise = null
       }
-    } catch (e) {
-      this.logger.error('Failed to load quotes from cache', e)
-    } finally {
-      this.hasLoaded = true
-    }
+    })()
+
+    return this.initPromise
   }
 
   /**
@@ -110,7 +118,7 @@ export class QuotesState {
    */
   async fetchQuotes(): Promise<void> {
     if (!this.hasLoaded) {
-      await this.init()
+      await this.initialize()
     }
 
     const client = getSupabaseClient()
