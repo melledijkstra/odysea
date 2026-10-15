@@ -1,5 +1,6 @@
 import { getSupabaseClient } from '@/db/supabase'
 import { Logger } from '@/logger'
+import { WebLocalStorage } from '@melledijkstra/storage'
 
 export type Quote = {
   id?: string | number
@@ -23,16 +24,50 @@ export const DEFAULT_QUOTES: Quote[] = [
   },
 ]
 
+export const QUOTES_STORAGE_KEY = 'quotes::cache'
+
 export class QuotesState {
   private logger = new Logger('QuotesState')
+  private cache = new WebLocalStorage()
 
   quotes = $state<Quote[]>([...DEFAULT_QUOTES])
   currentQuote = $state<Quote>(DEFAULT_QUOTES[0])
   loading = $state(false)
   error = $state<string | null>(null)
+  hasLoaded = $state(false)
+  hasCustomQuotes = $state(false)
 
   constructor() {
     this.currentQuote = this.selectRandomQuote(this.quotes)
+    this.init()
+  }
+
+  /**
+   * Initializes state by loading quotes from cache if available.
+   */
+  async init(): Promise<void> {
+    try {
+      const cached = await this.cache.get<Quote[]>(QUOTES_STORAGE_KEY)
+      if (cached && cached.length > 0) {
+        this.quotes = cached
+        this.currentQuote = this.selectRandomQuote(cached)
+        this.hasCustomQuotes = true
+      }
+    } catch (e) {
+      this.logger.error('Failed to load quotes from cache', e)
+    } finally {
+      this.hasLoaded = true
+    }
+  }
+
+  /**
+   * Helper to check if a quote matches any of the default fallback quotes.
+   */
+  isDefaultQuote(quote: Quote | null): boolean {
+    if (!quote) return false
+    return DEFAULT_QUOTES.some(
+      (dq) => dq.quote === quote.quote && dq.author === quote.author
+    )
   }
 
   /**
@@ -71,8 +106,13 @@ export class QuotesState {
   /**
    * Fetches quotes from the configured Supabase database.
    * If credentials are not configured or fetch fails, falls back gracefully to default quotes.
+   * Updates cache in background and only swaps currentQuote if it was a default quote or deleted from DB.
    */
   async fetchQuotes(): Promise<void> {
+    if (!this.hasLoaded) {
+      await this.init()
+    }
+
     const client = getSupabaseClient()
     if (!client) {
       this.logger.log('Supabase client is not configured, using default quotes')
@@ -99,7 +139,27 @@ export class QuotesState {
           link: item.link,
         }))
         this.quotes = parsedQuotes
-        this.currentQuote = this.selectRandomQuote(parsedQuotes)
+        await this.cache.set(QUOTES_STORAGE_KEY, parsedQuotes)
+
+        const isCurrentQuoteInPool = parsedQuotes.some(
+          (q) =>
+            q.quote === this.currentQuote.quote &&
+            q.author === this.currentQuote.author
+        )
+
+        // Only swap currentQuote if:
+        // 1. We didn't have custom cached quotes (showing default quotes), OR
+        // 2. The active quote is a default quote, OR
+        // 3. The active quote is no longer in the pool (e.g. deleted from DB)
+        if (
+          !this.hasCustomQuotes ||
+          this.isDefaultQuote(this.currentQuote) ||
+          !isCurrentQuoteInPool
+        ) {
+          this.currentQuote = this.selectRandomQuote(parsedQuotes)
+        }
+
+        this.hasCustomQuotes = true
       } else {
         this.logger.log('Supabase returned 0 quotes, keeping fallback quotes')
       }
@@ -110,6 +170,16 @@ export class QuotesState {
     } finally {
       this.loading = false
     }
+  }
+
+  /**
+   * Clears cached quotes and resets state to default fallback quotes.
+   */
+  async clearCache(): Promise<void> {
+    await this.cache.delete(QUOTES_STORAGE_KEY)
+    this.hasCustomQuotes = false
+    this.quotes = [...DEFAULT_QUOTES]
+    this.currentQuote = this.selectRandomQuote(this.quotes)
   }
 }
 

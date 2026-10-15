@@ -18,6 +18,7 @@ vi.mock('@/db/supabase', () => ({
 
 describe('QuotesState', () => {
   beforeEach(() => {
+    localStorage.clear()
     mockSelect.mockReset()
     mockFrom.mockClear().mockReturnValue({
       select: mockSelect,
@@ -26,6 +27,7 @@ describe('QuotesState', () => {
   })
 
   afterEach(() => {
+    localStorage.clear()
     vi.restoreAllMocks()
   })
 
@@ -145,6 +147,78 @@ describe('QuotesState', () => {
       expect(state.quotes).toEqual(DEFAULT_QUOTES)
       expect(state.loading).toBe(false)
       expect(state.error).toBeNull()
+    })
+
+    it('caches fetched quotes and preserves currentQuote across subsequent fetches without flickering', async () => {
+      const dbQuotes: Quote[] = [
+        { quote: 'Cached Quote 1', author: 'Author 1' },
+        { quote: 'Cached Quote 2', author: 'Author 2' },
+      ]
+      mockSelect.mockResolvedValue({
+        data: dbQuotes,
+        error: null,
+      })
+
+      // Initial fetch populates cache
+      const state1 = new QuotesState()
+      await state1.fetchQuotes()
+      expect(state1.quotes).toEqual(dbQuotes)
+
+      // Subsequent initialization loads from cache
+      const state2 = new QuotesState()
+      await state2.init()
+      expect(state2.hasCustomQuotes).toBe(true)
+      expect(state2.quotes).toEqual(dbQuotes)
+      const initialQuote = state2.currentQuote
+      expect(dbQuotes).toContainEqual(initialQuote)
+
+      // Background fetch does not change currentQuote if it still exists in the pool
+      await state2.fetchQuotes()
+      expect(state2.currentQuote).toEqual(initialQuote)
+    })
+
+    it('updates currentQuote if previously active quote was removed from database', async () => {
+      const initialQuotes: Quote[] = [
+        { quote: 'Old Quote', author: 'Old Author' },
+      ]
+      mockSelect.mockResolvedValueOnce({
+        data: initialQuotes,
+        error: null,
+      })
+
+      const state = new QuotesState()
+      await state.fetchQuotes()
+      expect(state.currentQuote).toEqual(initialQuotes[0])
+
+      // Database updates with new quotes where the old quote is absent
+      const updatedQuotes: Quote[] = [
+        { quote: 'New Quote', author: 'New Author' },
+      ]
+      mockSelect.mockResolvedValueOnce({
+        data: updatedQuotes,
+        error: null,
+      })
+
+      await state.fetchQuotes()
+      expect(state.quotes).toEqual(updatedQuotes)
+      expect(state.currentQuote).toEqual(updatedQuotes[0])
+    })
+
+    it('clearCache removes cached quotes and resets to defaults', async () => {
+      const dbQuotes: Quote[] = [{ quote: 'Quote A', author: 'Author A' }]
+      mockSelect.mockResolvedValueOnce({
+        data: dbQuotes,
+        error: null,
+      })
+
+      const state = new QuotesState()
+      await state.fetchQuotes()
+      expect(state.quotes).toEqual(dbQuotes)
+
+      await state.clearCache()
+      expect(state.hasCustomQuotes).toBe(false)
+      expect(state.quotes).toEqual(DEFAULT_QUOTES)
+      expect(DEFAULT_QUOTES).toContainEqual(state.currentQuote)
     })
   })
 })
