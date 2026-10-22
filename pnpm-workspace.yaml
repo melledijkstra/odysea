@@ -57,10 +57,10 @@ catalog:
   '@types/webextension-polyfill': ^0.12.6
 
   # Storybook
-  storybook: ^10.6.1
+  storybook: ^10.6.2
   '@storybook/addon-svelte-csf': ^5.1.5
-  '@storybook/svelte': ^10.6.1
-  '@storybook/svelte-vite': ^10.6.1
+  '@storybook/svelte': ^10.6.2
+  '@storybook/svelte-vite': ^10.6.2
 
   # Vite Plugins
   '@sveltejs/vite-plugin-svelte': ^7.3.1
