@@ -13,7 +13,7 @@
 
 {#snippet trackItem(track: Track)}
   <button
-    class="flex flex-row w-full text-left items-center p-2 hover:bg-neutral-400 cursor-pointer rounded-sm transition text-white"
+    class="flex flex-row w-full text-left items-center p-2 hover:bg-neutral-400 cursor-pointer rounded-sm transition text-white focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
     onclick={() => onTrackSelected(track)}
   >
     <img

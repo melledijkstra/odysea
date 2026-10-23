@@ -130,7 +130,7 @@
     <div class="flex flex-col gap-3">
       <div class="flex flex-row gap-3 items-center">
         <button
-          class="cursor-pointer"
+          class="cursor-pointer focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm"
           onclick={() => {
             onToggleShuffle?.(!isShuffling)
           }}
@@ -143,7 +143,7 @@
           />
         </button>
         <button
-          class="cursor-pointer"
+          class="cursor-pointer focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm"
           onclick={() => onPreviousTrack?.()}
           aria-label="Previous track"
           title="Previous track"
@@ -151,7 +151,7 @@
           <Icon class="size-6" path={mdiSkipPrevious} />
         </button>
         <button
-          class="cursor-pointer p-1 rounded-full bg-white text-black"
+          class="cursor-pointer p-1 rounded-full bg-white text-black focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
           onclick={() => onPlayPause?.()}
           aria-label={state?.isPlaying ? 'Pause' : 'Play'}
           title={state?.isPlaying ? 'Pause' : 'Play'}
@@ -159,7 +159,7 @@
           <Icon class="size-6" path={state?.isPlaying ? mdiPause : mdiPlay} />
         </button>
         <button
-          class="cursor-pointer"
+          class="cursor-pointer focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm"
           onclick={() => onNextTrack?.()}
           aria-label="Next track"
           title="Next track"
@@ -167,7 +167,7 @@
           <Icon class="size-6" path={mdiSkipNext} />
         </button>
         <button
-          class="cursor-pointer disabled:text-gray-500 disabled:cursor-not-allowed"
+          class="cursor-pointer disabled:text-gray-500 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden rounded-sm"
           onclick={() =>
             onSwitchRepeatMode?.(repeatMode === 2 ? 0 : repeatMode + 1)}
           aria-label="Toggle repeat mode"
