@@ -1,0 +1,73 @@
+name: Release Extension
+
+env:
+  CI: true
+
+on:
+  push:
+    tags:
+      - 'extension-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Publish Extension Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Validate tag matches package version
+        id: version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#extension-v}"
+          PKG_VERSION="$(node -p "require('./apps/extension/package.json').version")"
+
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "::error::Tag version ($TAG_VERSION) does not match apps/extension/package.json version ($PKG_VERSION)"
+            exit 1
+          fi
+
+          echo "version=$TAG_VERSION" >> "$GITHUB_OUTPUT"
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86
+        with:
+          cache: true
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Build & Validate Extension
+        run: pnpm turbo run build lint typecheck --filter=@odysea/extension
+
+      - name: Verify Built Manifest & Package Zip
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          MANIFEST_VERSION="$(node -p "require('./apps/extension/dist/manifest.json').version")"
+
+          if [ "$MANIFEST_VERSION" != "$VERSION" ]; then
+            echo "::error::Built manifest version ($MANIFEST_VERSION) does not match expected version ($VERSION)"
+            exit 1
+          fi
+
+          ZIP_NAME="mizu-extension-v${VERSION}.zip"
+          (cd apps/extension/dist && zip -r "$GITHUB_WORKSPACE/$ZIP_NAME" .)
+          echo "zip_name=$ZIP_NAME" >> "$GITHUB_OUTPUT"
+        id: package
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${{ steps.version.outputs.version }}"
+          ZIP_NAME="${{ steps.package.outputs.zip_name }}"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ZIP_NAME" --clobber
+          else
+            gh release create "$TAG" "$ZIP_NAME" \
+              --title "Mizu Extension v${VERSION}" \
+              --generate-notes
+          fi

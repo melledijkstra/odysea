@@ -1,6 +1,6 @@
 {
   "name": "@odysea/extension",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Productivity homepage with productivity tools integrated",
   "type": "module",
   "private": true,

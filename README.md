@@ -8,7 +8,7 @@ The codebase is organized into two main directories: `apps/` for deployable appl
 
 ### Apps (`apps/`)
 
-- **`extension`** – Svelte 5 browser extension providing a customizable new‑tab page with optional modules such as Unsplash backgrounds, Google Tasks integration, and more.
+- **`extension`** – Svelte 5 browser extension providing a customizable new‑tab page with optional modules such as Unsplash backgrounds, Google Tasks integration, and more. Download the latest build from [GitHub Releases](https://github.com/melledijkstra/odysea/releases/latest) or see [`apps/extension/README.md`](./apps/extension/README.md) for installation instructions.
 - **`serverless`** – Deno serverless functions (Hono) used for proxying API calls that require secrets (e.g., Unsplash image requests).
 - **`server`** – Raspberry Pi Node.js + Express backend that connects to a local SQLite database via Knex.js for persistent data storage.
 - **`cli`** – Command-line interface utilities for the ecosystem.
