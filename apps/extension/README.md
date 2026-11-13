@@ -26,6 +26,17 @@ Mizu is a personal homepage extension that enhances your new tab page with a var
 
 ## Installation
 
+### Download Latest Release (Recommended)
+
+1. Download the latest `mizu-extension-vX.Y.Z.zip` archive from the [GitHub Releases](https://github.com/melledijkstra/odysea/releases/latest) page.
+2. Unzip the downloaded archive to a folder on your computer.
+3. Load the extension in a Chromium-based browser (Chrome, Brave, Edge, Arc, etc.):
+   - Open `chrome://extensions`.
+   - Enable **Developer mode** using the toggle in the top-right corner.
+   - Click **Load unpacked** and select the unzipped folder (the directory containing `manifest.json`).
+
+### Build from Source
+
 1. Clone the repository:
 
 ```bash
@@ -35,11 +46,25 @@ git clone https://github.com/melledijkstra/odysea.git
 2. Install and build:
 
 ```bash
-pnpm install && pnpm build
+pnpm install && pnpm turbo run build --filter=@odysea/extension
 ```
 
 3. Load the extension in your browser:
 
 - Open the Extension Management page by navigating to `chrome://extensions`.
 - Enable Developer Mode by clicking the toggle switch next to Developer mode.
-- Click the Load unpacked button and select the `dist` directory of the cloned repository.
+- Click the Load unpacked button and select the `apps/extension/dist` directory of the cloned repository.
+
+## Releasing
+
+Extension releases are published automatically by `.github/workflows/release-extension.yml` when an `extension-vX.Y.Z` tag is pushed:
+
+1. Update `"version"` in `apps/extension/package.json` to `X.Y.Z` and commit it to `main`.
+2. Tag and push:
+
+```bash
+git tag extension-vX.Y.Z
+git push origin extension-vX.Y.Z
+```
+
+The workflow verifies that the tag matches `apps/extension/package.json`, builds and validates `@odysea/extension`, packages `apps/extension/dist` into `mizu-extension-vX.Y.Z.zip`, and publishes the GitHub Release.

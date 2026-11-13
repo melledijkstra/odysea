@@ -20,6 +20,7 @@
     "@melledijkstra/config": "workspace:*",
     "@types/node": "catalog:",
     "eslint": "catalog:",
-    "tsx": "catalog:"
+    "tsx": "catalog:",
+    "typescript": "catalog:"
   }
 }

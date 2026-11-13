@@ -21,6 +21,7 @@
     "@types/node": "catalog:",
     "@types/turndown": "^5.0.6",
     "eslint": "catalog:",
-    "tsx": "catalog:"
+    "tsx": "catalog:",
+    "typescript": "catalog:"
   }
 }
