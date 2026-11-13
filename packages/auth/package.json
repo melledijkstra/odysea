@@ -31,6 +31,7 @@
   "devDependencies": {
     "@melledijkstra/config": "workspace:*",
     "eslint": "catalog:",
-    "octokit": "^5.0.5"
+    "octokit": "^5.0.5",
+    "typescript": "catalog:"
   }
 }

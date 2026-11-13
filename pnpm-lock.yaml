@@ -165,6 +165,9 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.23.15
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   apps/extension:
     dependencies:
@@ -384,6 +387,9 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.23.15
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   apps/server:
     dependencies:
@@ -421,6 +427,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.11.0(jiti@2.7.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   apps/serverless:
     dependencies:
@@ -453,6 +462,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.11.0(jiti@2.7.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   packages/auth:
     dependencies:
@@ -475,6 +487,9 @@ importers:
       octokit:
         specifier: ^5.0.5
         version: 5.0.5
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   packages/config:
     devDependencies:
@@ -551,6 +566,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.11.0(jiti@2.7.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
       webextension-polyfill:
         specifier: 'catalog:'
         version: 0.12.0
@@ -570,6 +588,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.11.0(jiti@2.7.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   packages/toolbox:
     devDependencies:
@@ -582,6 +603,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.11.0(jiti@2.7.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   packages/ui:
     dependencies:

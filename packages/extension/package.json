@@ -26,6 +26,7 @@
     "@types/chrome": "catalog:",
     "@types/webextension-polyfill": "catalog:",
     "eslint": "catalog:",
+    "typescript": "catalog:",
     "webextension-polyfill": "catalog:"
   },
   "dependencies": {
