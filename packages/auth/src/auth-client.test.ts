@@ -245,6 +245,39 @@ describe('AuthClient', () => {
       expect(client.validate).toHaveBeenCalledWith('mockcode', 'mockstate')
       expect(token).toBe('new-access-token')
     })
+
+    it('should cache only the granted subset of scopes returned by the token response', async () => {
+      vi.spyOn(client, 'getTokenFromStoreOrRefreshToken').mockResolvedValue(
+        undefined
+      )
+
+      const mockTokens: OAuth2Token = {
+        accessToken: 'partial-grant-token',
+        refreshToken: 'refresh-token',
+        expiresAt: Date.now() + 3600000,
+        scope: ['profile', 'tasks'],
+      }
+
+      vi.spyOn(client, 'validate').mockResolvedValue(mockTokens)
+      const cacheSpy = vi.spyOn(client, 'cacheAuthToken')
+      vi.mocked(handler.open).mockResolvedValue(
+        new URL('http://localhost:3000/callback?code=mockcode&state=mockstate')
+      )
+
+      const token = await client.getAuthToken(true, [
+        'tasks',
+        'gmail',
+        'calendar',
+      ])
+
+      expect(token).toBe('partial-grant-token')
+      expect(cacheSpy).toHaveBeenCalledWith(
+        'partial-grant-token',
+        'refresh-token',
+        mockTokens.expiresAt,
+        ['profile', 'tasks']
+      )
+    })
   })
 
   describe('createAuthUrl and state handling', () => {

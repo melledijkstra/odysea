@@ -47,3 +47,9 @@ export const scopeRegistry: ScopeRegistry = {
       'This is purely to show you how many unread messages you have in your Gmail inbox.',
   },
 }
+
+export function getAllGoogleServiceScopes(): string[] {
+  return Array.from(
+    new Set(Object.values(scopeRegistry).flatMap((entry) => entry.scopes))
+  )
+}
