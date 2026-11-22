@@ -52,6 +52,7 @@ export class AuthState {
           ],
           extraParams: {
             include_granted_scopes: 'true',
+            enable_granular_consent: 'true',
           },
           skipServerRevoke: true,
         },

@@ -7,7 +7,10 @@
   import type { AuthClient } from '@melledijkstra/auth'
   import { authState, type OAuthProvider } from '@/oauth2/auth.state.svelte'
   import Card from '@melledijkstra/ui/svelte/Card.svelte'
-  import { scopeRegistry } from '@/oauth2/scope-registry'
+  import {
+    getAllGoogleServiceScopes,
+    scopeRegistry,
+  } from '@/oauth2/scope-registry'
   import Toggle from '@melledijkstra/ui/svelte/Toggle.svelte'
   import { clearAccountCache } from '@/queries/account'
   import { queryClient } from '@/queryClient'
@@ -25,7 +28,12 @@
     logger.log('Authenticating with', provider)
     isAuthenticating = true
     try {
-      const authToken = await clients[provider].getAuthToken(true)
+      const requestedScopes =
+        provider === 'google' ? getAllGoogleServiceScopes() : undefined
+      const authToken = await clients[provider].getAuthToken(
+        true,
+        requestedScopes
+      )
       const scopes = await clients[provider].getGrantedScopes()
       logger.log(
         `Authenticated with ${provider}, token: ${authToken}, scopes: ${scopes}`
