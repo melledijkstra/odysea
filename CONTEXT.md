@@ -12,7 +12,7 @@ The codebase is organized into two main directories: `apps/` for deployable appl
 - **`serverless`**: Serverless functions running on Deno using the Hono framework. Used to proxy API calls that require sensitive secrets (e.g., Unsplash API keys).
 - **`server`**: A Node.js + Express backend designed to run on a Raspberry Pi. It connects to a local SQLite database using Knex.js for persistent data storage.
 - **`cli`**: Command-line interface utilities for the ecosystem.
-- **`looper`**: A Node.js app which runs persistently in the background using pm2. It runs workflows on a schedule.
+- **`looper`**: A Node.js app which runs persistently in the background via native user services (`launchd` on macOS, `systemd --user` on Linux). It runs workflows on a schedule using XDG config/data directories (`~/.config/looper`, `~/.local/share/looper`).
 
 ### Packages (`packages/`)
 

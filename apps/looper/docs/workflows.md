@@ -27,17 +27,17 @@ This document explains how to author, configure, and manage automation workflows
 
 ## Overview
 
-Looper executes declarative workflows defined in YAML files located in the `apps/looper/workflows/` directory.
+Looper executes declarative workflows defined in YAML files located in `~/.config/looper/workflows/` by default (configurable via `LOOPER_WORKFLOWS_DIR` or `~/.config/looper/config.yaml`; local `pnpm dev` uses the example workflows in `apps/looper/workflows/`).
 
-- **Dynamic Loading & Hot Reloading**: The workflow scheduler uses [Chokidar](https://github.com/paulmillr/chokidar) to watch the `workflows/` directory. Creating, modifying, or removing `.yaml` / `.yml` files automatically registers, updates, or unregisters workflows in real time without restarting the application.
-- **Persistent Execution State**: Execution history (timestamps, status, names) is tracked in SQLite (`state.db`) via `better-sqlite3`.
+- **Dynamic Loading & Hot Reloading**: The workflow scheduler uses [Chokidar](https://github.com/paulmillr/chokidar) to watch the configured workflows directory. Creating, modifying, or removing `.yaml` / `.yml` files automatically registers, updates, or unregisters workflows in real time without restarting the application.
+- **Persistent Execution State**: Execution history (timestamps, status, names) is tracked in SQLite (`~/.local/share/looper/state.db`) via `better-sqlite3`.
 - **Clock Drift & Sleep Detection**: Looper monitors system sleep/wake events. If the system wakes up and scheduled runs were missed during sleep, Looper automatically triggers catch-up executions.
 
 ---
 
 ## Workflow File Structure
 
-Workflows are authored as YAML files placed in `apps/looper/workflows/`.
+Workflows are authored as YAML files placed in `~/.config/looper/workflows/` (see `apps/looper/workflows/` for reference examples).
 
 ```yaml
 id: simple-reminder
@@ -395,6 +395,7 @@ curl -X POST http://localhost:5050/webhook \
 
 If your workflows use Google actions (`google.getUserInfo`, `google.sendEmail`):
 
-1. Open `http://localhost:5050/auth/google` in your browser.
-2. Complete the OAuth consent flow.
-3. Looper stores the refresh and access tokens locally in `.tokens.json`.
+1. Provide `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `~/.config/odysea/secrets.env` (shared dotfiles secrets), `~/.config/looper/.env`, or environment variables.
+2. Open `http://localhost:5050/auth/google` in your browser.
+3. Complete the OAuth consent flow.
+4. Looper stores the refresh and access tokens locally in `~/.local/share/looper/.tokens.json`.

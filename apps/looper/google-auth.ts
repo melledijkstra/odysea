@@ -1,29 +1,33 @@
+import fs from 'node:fs'
+import path from 'node:path'
 import { GoogleAuthClient } from '@melledijkstra/auth'
 import { FileStorage } from '@melledijkstra/storage'
-import path from 'path'
-import dotenv from 'dotenv'
+import { config, type LooperConfig } from './config.js'
 
-// Load environment variables
-dotenv.config()
-
-const storagePath = path.resolve('.tokens.json')
-const storage = new FileStorage(storagePath)
-
-const redirectUri =
-  process.env['GOOGLE_REDIRECT_URI'] || 'http://localhost:5050/oauth/callback'
-
-const initialScope = process.env['GOOGLE_SCOPES']
-  ? process.env['GOOGLE_SCOPES'].split(' ')
-  : ['openid', 'profile']
-
-export const authClient = new GoogleAuthClient(
-  {
-    clientId: process.env['GOOGLE_CLIENT_ID'] ?? '',
-    clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
-    initialScope,
-  },
-  {
-    storage,
-    redirectUrl: redirectUri,
+export function createGoogleAuthClient(
+  appConfig: LooperConfig = config
+): GoogleAuthClient | null {
+  if (!appConfig.google.configured || !appConfig.google.clientId) {
+    return null
   }
-)
+
+  fs.mkdirSync(path.dirname(appConfig.paths.tokensPath), { recursive: true })
+  const storage = new FileStorage(appConfig.paths.tokensPath)
+
+  return new GoogleAuthClient(
+    {
+      clientId: appConfig.google.clientId,
+      ...(appConfig.google.clientSecret !== undefined && {
+        clientSecret: appConfig.google.clientSecret,
+      }),
+      initialScope: appConfig.google.scopes,
+    },
+    {
+      storage,
+      redirectUrl: appConfig.google.redirectUri,
+    }
+  )
+}
+
+export const authClient: GoogleAuthClient | null =
+  createGoogleAuthClient(config)
