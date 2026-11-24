@@ -8,6 +8,7 @@ Looper runs persistently in the background using your OS's native user service m
 - **`pnpm`** (enabled automatically via `corepack` if available)
 - **Native build tools** (for compiling `better-sqlite3`): Xcode Command Line Tools (`xcode-select --install`) on macOS, or `build-essential` + `python3` on Linux
 - **Linux desktop notifications (optional)**: `notify-send` (`libnotify-bin` on Debian/Ubuntu, `libnotify` on Arch/Fedora)
+- **Linux `active_time` triggers (optional)**: `gdbus` (`libglib2.0-bin` / `glib2`) for GNOME, KDE Plasma, Xfce, or Cinnamon sessions, or `xprintidle` as an X11 fallback (headless / `wlroots` compositors without these interfaces are not supported)
 
 ## Quick Install (from cloned `odysea` repo)
 
@@ -21,7 +22,7 @@ pnpm --filter looper service:install
 
 What `service.sh install` does:
 
-1. Verifies Node.js `>=20` and `pnpm` (and warns non-fatally if `notify-send` is missing on Linux).
+1. Verifies Node.js `>=20` and `pnpm` (and warns non-fatally if `notify-send`, or both `gdbus` and `xprintidle`, are missing on Linux).
 2. Runs `pnpm install --filter looper... --filter . --frozen-lockfile` and `pnpm --filter looper... --if-present build`.
 3. Ensures `~/.local/share/looper/logs` exists without writing `config.yaml` or touching `~/.config/looper/workflows` (so dotfiles symlinks never conflict).
 4. Installs and starts the native user service:

@@ -1,9 +1,245 @@
 import { Logger } from '@melledijkstra/toolbox'
-import { execSync } from 'node:child_process'
+import { execFileSync } from 'node:child_process'
 import type { TriggerManager } from './scheduler.js'
 import type { Workflow } from './types/workflow.js'
 
 const logger = new Logger('ActiveTimeTriggerManager')
+
+const COMMAND_TIMEOUT_MS = 2000
+const INHIBITION_CHECK_THRESHOLD_SEC = 10
+
+const BINARIES = {
+  ioreg: '/usr/sbin/ioreg',
+  pmset: '/usr/bin/pmset',
+  gdbus: '/usr/bin/gdbus',
+  systemdInhibit: '/usr/bin/systemd-inhibit',
+  xprintidle: '/usr/bin/xprintidle',
+} as const
+
+const EXEC_OPTIONS = {
+  encoding: 'utf8' as const,
+  timeout: COMMAND_TIMEOUT_MS,
+  stdio: ['ignore', 'pipe', 'pipe'] as ['ignore', 'pipe', 'pipe'],
+}
+
+export interface IdleTimeProvider {
+  readonly name: string
+  getIdleSeconds(): number
+}
+
+interface LinuxIdleBackend {
+  readonly name: string
+  readIdleSeconds(): number
+}
+
+function callSessionDBus(
+  dest: string,
+  objectPath: string,
+  method: string,
+  extraArgs: readonly string[] = []
+): string {
+  return execFileSync(
+    BINARIES.gdbus,
+    [
+      'call',
+      '--session',
+      '--dest',
+      dest,
+      '--object-path',
+      objectPath,
+      '--method',
+      method,
+      ...extraArgs,
+    ],
+    EXEC_OPTIONS
+  )
+}
+
+export function parseMacOSIdleSeconds(output: string): number {
+  const match = /"HIDIdleTime"\s*=\s*(\d+)/.exec(output)
+  if (!match?.[1]) {
+    return 0
+  }
+  const ns = Number.parseInt(match[1], 10)
+  return Math.floor(ns / 1_000_000_000)
+}
+
+export function parseDBusIdleSeconds(output: string): number {
+  const match = /\(\s*(?:uint(?:32|64)\s+)?(\d+)\s*,?\s*\)/.exec(output)
+  if (!match?.[1]) {
+    throw new Error(`Unexpected D-Bus idle time output: ${output.trim()}`)
+  }
+  const ms = Number.parseInt(match[1], 10)
+  return Math.floor(ms / 1000)
+}
+
+export function parseXprintidleSeconds(output: string): number {
+  const trimmed = output.trim()
+  if (!/^\d+$/.test(trimmed)) {
+    throw new Error(`Unexpected xprintidle output: ${trimmed}`)
+  }
+  const ms = Number.parseInt(trimmed, 10)
+  return Math.floor(ms / 1000)
+}
+
+export function isSystemdIdleInhibited(output: string): boolean {
+  for (const rawLine of output.split(/\r?\n/)) {
+    const line = rawLine.trim()
+    if (!line) continue
+    // Format: WHO  UID  USER  PID  COMM  WHAT  WHY  MODE
+    const match = /\b\d+\s+\S+\s+\d+\s+\S+\s+(\S+)\s+.*\bblock\s*$/.exec(line)
+    if (!match?.[1]) continue
+    const whatCapabilities = match[1].split(':')
+    if (whatCapabilities.includes('idle')) {
+      return true
+    }
+  }
+  return false
+}
+
+function isLinuxIdleInhibited(): boolean {
+  try {
+    const gnomeOutput = callSessionDBus(
+      'org.gnome.SessionManager',
+      '/org/gnome/SessionManager',
+      'org.gnome.SessionManager.IsInhibited',
+      ['8']
+    )
+    if (/\(\s*true\s*,?\s*\)/i.test(gnomeOutput)) {
+      return true
+    }
+  } catch {
+    // GNOME SessionManager may not be available on non-GNOME desktops
+  }
+
+  try {
+    const systemdOutput = execFileSync(
+      BINARIES.systemdInhibit,
+      ['--list', '--no-legend'],
+      EXEC_OPTIONS
+    )
+    if (isSystemdIdleInhibited(systemdOutput)) {
+      return true
+    }
+  } catch {
+    // systemd-inhibit may not be available
+  }
+
+  return false
+}
+
+export class MacOSIdleTimeProvider implements IdleTimeProvider {
+  readonly name = 'macOS (ioreg + pmset)'
+
+  getIdleSeconds(): number {
+    const output = execFileSync(
+      BINARIES.ioreg,
+      ['-c', 'IOHIDSystem'],
+      EXEC_OPTIONS
+    )
+    let idleSec = parseMacOSIdleSeconds(output)
+
+    // If physically idle, check if there's a software assertion keeping the display awake (e.g. video playback, video call)
+    if (idleSec >= INHIBITION_CHECK_THRESHOLD_SEC) {
+      const pmsetOutput = execFileSync(
+        BINARIES.pmset,
+        ['-g', 'assertions'],
+        EXEC_OPTIONS
+      )
+      if (/PreventUserIdleDisplaySleep\s+1/.test(pmsetOutput)) {
+        // Treat as fully active
+        idleSec = 0
+      }
+    }
+
+    return idleSec
+  }
+}
+
+const LINUX_BACKENDS: readonly LinuxIdleBackend[] = [
+  {
+    name: 'GNOME Mutter D-Bus',
+    readIdleSeconds: () =>
+      parseDBusIdleSeconds(
+        callSessionDBus(
+          'org.gnome.Mutter.IdleMonitor',
+          '/org/gnome/Mutter/IdleMonitor/Core',
+          'org.gnome.Mutter.IdleMonitor.GetIdletime'
+        )
+      ),
+  },
+  {
+    name: 'Freedesktop ScreenSaver D-Bus',
+    readIdleSeconds: () =>
+      parseDBusIdleSeconds(
+        callSessionDBus(
+          'org.freedesktop.ScreenSaver',
+          '/org/freedesktop/ScreenSaver',
+          'org.freedesktop.ScreenSaver.GetSessionIdleTime'
+        )
+      ),
+  },
+  {
+    name: 'xprintidle (X11)',
+    readIdleSeconds: () =>
+      parseXprintidleSeconds(
+        execFileSync(BINARIES.xprintidle, [], EXEC_OPTIONS)
+      ),
+  },
+]
+
+export class LinuxIdleTimeProvider implements IdleTimeProvider {
+  readonly name: string
+  private readonly backend: LinuxIdleBackend
+
+  constructor(backend: LinuxIdleBackend) {
+    this.backend = backend
+    this.name = `Linux (${backend.name})`
+  }
+
+  static probe(): LinuxIdleTimeProvider | null {
+    for (const backend of LINUX_BACKENDS) {
+      try {
+        backend.readIdleSeconds()
+        logger.log(`Detected Linux idle time backend: ${backend.name}`)
+        return new LinuxIdleTimeProvider(backend)
+      } catch {
+        // Backend unavailable or failed; try next candidate
+      }
+    }
+
+    logger.warn(
+      'No supported Linux idle-time backend available (tried GNOME Mutter D-Bus, Freedesktop ScreenSaver D-Bus, and xprintidle). Ensure a graphical desktop session with gdbus or xprintidle is available. Active time triggers will not poll.'
+    )
+    return null
+  }
+
+  getIdleSeconds(): number {
+    let idleSec = this.backend.readIdleSeconds()
+
+    if (idleSec >= INHIBITION_CHECK_THRESHOLD_SEC && isLinuxIdleInhibited()) {
+      idleSec = 0
+    }
+
+    return idleSec
+  }
+}
+
+export function createIdleTimeProvider(
+  platform: NodeJS.Platform = process.platform
+): IdleTimeProvider | null {
+  if (platform === 'darwin') {
+    return new MacOSIdleTimeProvider()
+  }
+  if (platform === 'linux') {
+    return LinuxIdleTimeProvider.probe()
+  }
+
+  logger.warn(
+    `ActiveTimeTriggerManager is not supported on platform "${platform}".`
+  )
+  return null
+}
 
 export class ActiveTimeTriggerManager implements TriggerManager {
   private readonly workflows = new Map<
@@ -16,6 +252,7 @@ export class ActiveTimeTriggerManager implements TriggerManager {
   >()
 
   private intervalHandle: ReturnType<typeof setInterval> | null = null
+  private idleProvider: IdleTimeProvider | null | undefined = undefined
   private readonly POLL_INTERVAL_MS = 5000
 
   register(workflow: Workflow, onTick: (w: Workflow) => Promise<void>): void {
@@ -50,6 +287,7 @@ export class ActiveTimeTriggerManager implements TriggerManager {
       this.intervalHandle = null
     }
     this.workflows.clear()
+    this.idleProvider = undefined
   }
 
   getTriggerState(workflowId: string): Record<string, unknown> | null {
@@ -68,36 +306,26 @@ export class ActiveTimeTriggerManager implements TriggerManager {
 
   private startPollingIfNeeded(): void {
     if (this.intervalHandle) return
-    if (process.platform !== 'darwin') {
-      logger.error('ActiveTimeTriggerManager is only supported on macOS.')
+
+    if (this.idleProvider === undefined) {
+      this.idleProvider = createIdleTimeProvider()
+    }
+    if (!this.idleProvider) {
       return
     }
 
     logger.log(
-      `Starting idle time polling loop (every ${this.POLL_INTERVAL_MS / 1000}s).`
+      `Starting idle time polling loop using ${this.idleProvider.name} (every ${this.POLL_INTERVAL_MS / 1000}s).`
     )
     this.intervalHandle = setInterval(() => this.poll(), this.POLL_INTERVAL_MS)
   }
 
   private poll(): void {
+    if (!this.idleProvider) return
+
     let idleSec = 0
     try {
-      const output = execSync(
-        "ioreg -c IOHIDSystem | awk '/HIDIdleTime/ {print int($NF/1000000000)}'",
-        { encoding: 'utf8' }
-      )
-      idleSec = parseInt(output.trim(), 10) || 0
-
-      // If physically idle, check if there's a software assertion keeping the display awake (e.g. video playback, video call)
-      if (idleSec >= 10) {
-        const pmsetOutput = execSync('pmset -g assertions', {
-          encoding: 'utf8',
-        })
-        if (/PreventUserIdleDisplaySleep\s+1/.test(pmsetOutput)) {
-          // Treat as fully active
-          idleSec = 0
-        }
-      }
+      idleSec = this.idleProvider.getIdleSeconds()
     } catch (err) {
       logger.error('Error fetching idle time/assertions:', err)
       return
