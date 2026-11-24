@@ -22,6 +22,11 @@ export interface TriggerManager {
 
 export class CronTriggerManager implements TriggerManager {
   private readonly cronHandles = new Map<string, CronTask>()
+  private readonly timezone: string | undefined
+
+  constructor(timezone?: string) {
+    this.timezone = timezone ?? process.env['TZ']
+  }
 
   register(workflow: Workflow, onTick: (w: Workflow) => Promise<void>): void {
     if (workflow.trigger.type !== 'cron') return
@@ -34,7 +39,7 @@ export class CronTriggerManager implements TriggerManager {
     const handle = cron.schedule(
       workflow.trigger.expression,
       () => onTick(workflow),
-      process.env['TZ'] ? { timezone: process.env['TZ'] } : undefined
+      this.timezone ? { timezone: this.timezone } : undefined
     )
     this.cronHandles.set(workflow.id, handle)
   }
@@ -63,7 +68,7 @@ export class CronTriggerManager implements TriggerManager {
 
       const interval = CronExpressionParser.parse(
         workflow.trigger.expression,
-        process.env['TZ'] ? { tz: process.env['TZ'] } : undefined
+        this.timezone ? { tz: this.timezone } : undefined
       )
 
       const expectedPrevRun = interval.prev().toDate().getTime()

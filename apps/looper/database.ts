@@ -1,7 +1,10 @@
 import Database from 'better-sqlite3'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
+import { config } from './config.js'
 
-const dbPath = path.resolve('state.db')
+const dbPath = config.paths.dbPath
+fs.mkdirSync(path.dirname(dbPath), { recursive: true })
 const db = new Database(dbPath)
 
 // Enable WAL mode for performance

@@ -1,32 +1,30 @@
 import express from 'express'
 import { Logger } from '@melledijkstra/toolbox'
+import { toHuman } from 'cron-translate'
+import { config } from './config.js'
 import { authClient } from './google-auth.js'
-import { WorkflowScheduler } from './scheduler.js'
+import { CronTriggerManager, WorkflowScheduler } from './scheduler.js'
 import { WorkflowEngine } from './engine.js'
 import { getLastExecutedTimestamp } from './database.js'
-import { toHuman } from 'cron-translate'
-import path from 'node:path'
-import { CronTriggerManager } from './scheduler.js'
 import { ActiveTimeTriggerManager } from './active-time-trigger.js'
+
+if (config.timezone && !process.env['TZ']) {
+  process.env['TZ'] = config.timezone
+}
 
 const logger = new Logger('looper')
 
 const app = express()
-const cliPortIndex = process.argv.indexOf('--port')
-const PORT =
-  (cliPortIndex !== -1 ? process.argv[cliPortIndex + 1] : null) ??
-  process.env['PORT'] ??
-  5050
+const PORT = config.port
 
 app.use(express.json())
 
 // ---------------------------------------------------------------------------
 // Workflow registration
-// Workflows are loaded dynamically from the workflows/ directory.
+// Workflows are loaded dynamically from the configured workflows directory.
 // ---------------------------------------------------------------------------
-const workflowsDir = path.resolve('workflows')
-const scheduler = new WorkflowScheduler(workflowsDir)
-scheduler.addTriggerManager(new CronTriggerManager())
+const scheduler = new WorkflowScheduler(config.paths.workflowsDir)
+scheduler.addTriggerManager(new CronTriggerManager(config.timezone))
 scheduler.addTriggerManager(new ActiveTimeTriggerManager())
 
 // ---------------------------------------------------------------------------
@@ -35,6 +33,15 @@ scheduler.addTriggerManager(new ActiveTimeTriggerManager())
 
 /** Initiates the Google OAuth2 flow. */
 app.get('/auth/google', async (_req, res) => {
+  if (!authClient) {
+    res
+      .status(503)
+      .send(
+        `Google authentication is not configured. Provide GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in ${config.paths.sharedSecretsFile}, ${config.paths.appEnvFile}, or environment variables.`
+      )
+    return
+  }
+
   try {
     const authUrl = await authClient.createAuthUrl()
     if (!authUrl) {
@@ -50,6 +57,11 @@ app.get('/auth/google', async (_req, res) => {
 
 /** OAuth2 redirect callback. */
 app.get('/oauth/callback', async (req, res) => {
+  if (!authClient) {
+    res.status(503).send('Google authentication is not configured')
+    return
+  }
+
   const code = req.query['code'] as string
   const state = req.query['state'] as string
 
@@ -92,7 +104,7 @@ app.get('/oauth/callback', async (req, res) => {
  */
 app.post('/webhook', (req, res) => {
   logger.log('Webhook endpoint triggered.')
-  const { workflowId } = req.body
+  const { workflowId } = req.body as { workflowId?: string }
 
   if (!workflowId) {
     res.status(400).json({ success: false, message: 'workflowId is required' })
@@ -132,7 +144,8 @@ app.post('/webhook', (req, res) => {
  * GET /status
  */
 app.get('/status', async (_req, res) => {
-  const authenticated = await authClient.isAuthenticated()
+  const googleConfigured = authClient !== null
+  const authenticated = authClient ? await authClient.isAuthenticated() : false
   const now = Date.now()
 
   const workflowStatuses = scheduler.getWorkflows().map((workflow) => {
@@ -159,9 +172,16 @@ app.get('/status', async (_req, res) => {
 
   res.status(200).json({
     workflows: workflowStatuses,
+    paths: {
+      configDir: config.paths.configDir,
+      dataDir: config.paths.dataDir,
+      workflowsDir: config.paths.workflowsDir,
+    },
     googleAuth: {
+      configured: googleConfigured,
       authenticated,
-      authUrl: `http://localhost:${PORT}/auth/google`,
+      credentialsSource: config.google.credentialsSource,
+      authUrl: googleConfigured ? `http://localhost:${PORT}/auth/google` : null,
     },
   })
 })
@@ -170,7 +190,19 @@ app.get('/status', async (_req, res) => {
 // Server startup
 // ---------------------------------------------------------------------------
 app.listen(PORT, () => {
-  logger.log(`Webhook server listening on port ${PORT}`)
+  logger.log(`Looper server listening on port ${PORT}`)
+  logger.log(`Config dir: ${config.paths.configDir}`)
+  logger.log(`Data dir: ${config.paths.dataDir}`)
+  logger.log(`Workflows dir: ${config.paths.workflowsDir}`)
+  if (authClient) {
+    logger.log(
+      `Google auth configured (source: ${config.google.credentialsSource})`
+    )
+  } else {
+    logger.log(
+      `Google auth not configured (optional). Set GOOGLE_CLIENT_ID in ${config.paths.sharedSecretsFile} or ${config.paths.appEnvFile} to enable Google actions.`
+    )
+  }
   logger.log(`Open http://localhost:${PORT}/status to view workflows`)
   scheduler.start()
 })

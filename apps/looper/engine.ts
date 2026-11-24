@@ -3,6 +3,7 @@ import type { Workflow } from './types/workflow.js'
 import { actionRegistry } from './actions/registry.js'
 import type { ActionContext } from './types/actions.js'
 import { updateLastExecutedTimestamp } from './database.js'
+import { config } from './config.js'
 
 const logger = new Logger('WorkflowEngine')
 
@@ -53,7 +54,7 @@ export class WorkflowEngine {
       workflowName: workflow.name,
       workflowId: workflow.id,
       reason: triggerReason,
-      port: process.env['PORT'] || 5050,
+      port: config.port,
     }
 
     let status = 'SUCCESS'
