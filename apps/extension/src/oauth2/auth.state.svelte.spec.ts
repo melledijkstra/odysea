@@ -67,11 +67,11 @@ describe('AuthState', () => {
     expect(googleHealth.config.clientSecret).toBeUndefined()
   })
 
-  it('enables server-side revocation for both Google and Google Health clients', () => {
+  it('skips server-side revocation for both Google clients to avoid project-wide invalidation', () => {
     const { google, 'google-health': googleHealth } = state.clients
 
-    expect(google.config.skipServerRevoke).toBeFalsy()
-    expect(googleHealth.config.skipServerRevoke).toBeFalsy()
+    expect(google.config.skipServerRevoke).toBe(true)
+    expect(googleHealth.config.skipServerRevoke).toBe(true)
   })
 
   it('rebuilds clients with updated credentials when refreshClients is called', () => {

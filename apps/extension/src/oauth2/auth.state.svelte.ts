@@ -58,6 +58,10 @@ export class AuthState {
             include_granted_scopes: 'true',
             enable_granular_consent: 'true',
           },
+          // Google's /revoke endpoint revokes grants at the Cloud project / OAuth
+          // consent screen level, so revoking here would also invalidate google-health
+          // when both clients belong to the same Google Cloud project.
+          skipServerRevoke: true,
         },
         extensionAuth({ redirectPath: 'google' })
       ),
@@ -92,6 +96,9 @@ export class AuthState {
           extraParams: {
             include_granted_scopes: 'false',
           },
+          // Keep revocation local-only to avoid invalidating the main Google client
+          // when both OAuth clients share the same Google Cloud project.
+          skipServerRevoke: true,
         },
         extensionAuth({ redirectPath: 'google-health' })
       ),
