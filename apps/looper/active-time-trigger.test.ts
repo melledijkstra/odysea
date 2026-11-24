@@ -207,15 +207,15 @@ describe('ActiveTimeTriggerManager', () => {
 
     it('detects blocking idle inhibitors in systemd-inhibit output', () => {
       const nonIdleOutput = [
-        'GNOME Shell       1000 melle 3300  gnome-shell     sleep             GNOME… delay',
-        'melle             1000 melle 3473  gsd-power       handle-lid-switch Exte… block',
-        'vlc               1000 melle 5678  vlc             idle              Play… delay',
+        'GNOME Shell       1000 user  3300  gnome-shell     sleep             GNOME… delay',
+        'user              1000 user  3473  gsd-power       handle-lid-switch Exte… block',
+        'vlc               1000 user  5678  vlc             idle              Play… delay',
       ].join('\n')
       expect(isSystemdIdleInhibited(nonIdleOutput)).toBe(false)
 
       const blockingIdleOutput = [
-        'GNOME Shell       1000 melle 3300  gnome-shell     sleep             GNOME… delay',
-        'firefox           1000 melle 4437  firefox         idle:sleep        Video block',
+        'GNOME Shell       1000 user  3300  gnome-shell     sleep             GNOME… delay',
+        'firefox           1000 user  4437  firefox         idle:sleep        Video block',
       ].join('\n')
       expect(isSystemdIdleInhibited(blockingIdleOutput)).toBe(true)
     })
