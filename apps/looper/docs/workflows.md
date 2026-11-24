@@ -122,7 +122,7 @@ Tracks the user's active keyboard/mouse usage and triggers when accumulated scre
 >   1. **GNOME / Mutter** (Wayland & X11): `org.gnome.Mutter.IdleMonitor` via `gdbus`
 >   2. **Freedesktop ScreenSaver** (KDE Plasma, Xfce, Cinnamon, etc.): `org.freedesktop.ScreenSaver` via `gdbus`
 >   3. **X11 fallback**: `xprintidle`
->   When idle for >= 10s, Linux also checks `org.gnome.SessionManager.IsInhibited` and `systemd-inhibit --list` for blocking `idle` inhibitors (so video calls and media playback count as active).
+>      When idle for >= 10s, Linux also checks `org.gnome.SessionManager.IsInhibited` and `systemd-inhibit --list` for blocking `idle` inhibitors (so video calls and media playback count as active).
 > - **Known limitations**: Headless Linux environments and `wlroots`-based Wayland compositors (e.g. Sway, Hyprland) without `org.freedesktop.ScreenSaver` or `xprintidle` are not supported; Looper logs a single warning and skips `active_time` polling.
 
 ```yaml

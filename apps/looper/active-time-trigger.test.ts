@@ -3,14 +3,36 @@ import {
   ActiveTimeTriggerManager,
   isSystemdIdleInhibited,
   parseDBusIdleSeconds,
+  parseMacOSIdleSeconds,
   parseXprintidleSeconds,
 } from './active-time-trigger.js'
 import type { Workflow } from './types/workflow.js'
 import * as cp from 'node:child_process'
 
 vi.mock('node:child_process', () => ({
-  execSync: vi.fn(),
+  execFileSync: vi.fn(),
 }))
+
+function formatCommand(file: string, args?: readonly string[]): string {
+  return [file, ...(args ?? [])].join(' ')
+}
+
+function mockCommands(
+  responses: Record<string, string | Error>,
+  recordedCalls?: string[]
+): void {
+  vi.mocked(cp.execFileSync).mockImplementation((file, args) => {
+    const command = formatCommand(file.toString(), args as readonly string[])
+    recordedCalls?.push(command)
+    for (const [pattern, response] of Object.entries(responses)) {
+      if (command.includes(pattern)) {
+        if (response instanceof Error) throw response
+        return response
+      }
+    }
+    throw new Error(`Unexpected command: ${command}`)
+  })
+}
 
 describe('ActiveTimeTriggerManager', () => {
   let manager: ActiveTimeTriggerManager
@@ -33,14 +55,11 @@ describe('ActiveTimeTriggerManager', () => {
   })
 
   const mockExecSync = (idleSeconds: number, hasAssertion = false) => {
-    vi.mocked(cp.execSync).mockImplementation((cmd) => {
-      const command = cmd.toString()
-      if (command.includes('ioreg')) return `${idleSeconds}\n`
-      if (command.includes('pmset'))
-        return hasAssertion
-          ? 'PreventUserIdleDisplaySleep    1\n'
-          : 'PreventUserIdleDisplaySleep    0\n'
-      return ''
+    mockCommands({
+      ioreg: `    | |   "HIDIdleTime" = ${idleSeconds * 1_000_000_000}\n`,
+      pmset: hasAssertion
+        ? 'PreventUserIdleDisplaySleep    1\n'
+        : 'PreventUserIdleDisplaySleep    0\n',
     })
   }
 
@@ -171,7 +190,12 @@ describe('ActiveTimeTriggerManager', () => {
       Object.defineProperty(process, 'platform', { value: 'linux' })
     })
 
-    it('parses D-Bus uint64, uint32, and xprintidle outputs into integer seconds', () => {
+    it('parses macOS ioreg, D-Bus uint64/uint32, and xprintidle outputs into integer seconds', () => {
+      expect(
+        parseMacOSIdleSeconds('    | |   "HIDIdleTime" = 12345000000\n')
+      ).toBe(12)
+      expect(parseMacOSIdleSeconds('no match')).toBe(0)
+
       expect(parseDBusIdleSeconds('(uint64 15432,)\n')).toBe(15)
       expect(parseDBusIdleSeconds('(uint32 60000,)')).toBe(60)
       expect(parseDBusIdleSeconds('(0,)')).toBe(0)
@@ -198,14 +222,7 @@ describe('ActiveTimeTriggerManager', () => {
 
     it('probes GNOME Mutter D-Bus first and caches it across polls', () => {
       const calls: string[] = []
-      vi.mocked(cp.execSync).mockImplementation((cmd) => {
-        const command = cmd.toString()
-        calls.push(command)
-        if (command.includes('org.gnome.Mutter.IdleMonitor')) {
-          return '(uint64 0,)\n'
-        }
-        throw new Error('Unexpected command')
-      })
+      mockCommands({ 'org.gnome.Mutter.IdleMonitor': '(uint64 0,)\n' }, calls)
 
       const onTick = vi.fn().mockResolvedValue(undefined)
       manager.register(createWorkflow(10), onTick)
@@ -224,15 +241,9 @@ describe('ActiveTimeTriggerManager', () => {
     })
 
     it('falls back from GNOME Mutter to Freedesktop ScreenSaver D-Bus', () => {
-      vi.mocked(cp.execSync).mockImplementation((cmd) => {
-        const command = cmd.toString()
-        if (command.includes('org.gnome.Mutter.IdleMonitor')) {
-          throw new Error('org.gnome.Mutter.IdleMonitor not available')
-        }
-        if (command.includes('org.freedesktop.ScreenSaver')) {
-          return '(uint32 2500,)\n'
-        }
-        throw new Error('Unexpected command')
+      mockCommands({
+        'org.gnome.Mutter.IdleMonitor': new Error('not available'),
+        'org.freedesktop.ScreenSaver': '(uint32 2500,)\n',
       })
 
       const onTick = vi.fn().mockResolvedValue(undefined)
@@ -244,15 +255,9 @@ describe('ActiveTimeTriggerManager', () => {
     })
 
     it('falls back to xprintidle when both D-Bus backends fail', () => {
-      vi.mocked(cp.execSync).mockImplementation((cmd) => {
-        const command = cmd.toString()
-        if (command.includes('gdbus')) {
-          throw new Error('gdbus not available')
-        }
-        if (command.includes('xprintidle')) {
-          return '3000\n'
-        }
-        throw new Error('Unexpected command')
+      mockCommands({
+        gdbus: new Error('gdbus not available'),
+        xprintidle: '3000\n',
       })
 
       const onTick = vi.fn().mockResolvedValue(undefined)
@@ -264,15 +269,9 @@ describe('ActiveTimeTriggerManager', () => {
     })
 
     it('treats user as active on Linux when org.gnome.SessionManager.IsInhibited returns true', () => {
-      vi.mocked(cp.execSync).mockImplementation((cmd) => {
-        const command = cmd.toString()
-        if (command.includes('org.gnome.Mutter.IdleMonitor')) {
-          return '(uint64 120000,)\n'
-        }
-        if (command.includes('org.gnome.SessionManager.IsInhibited')) {
-          return '(true,)\n'
-        }
-        return ''
+      mockCommands({
+        'org.gnome.Mutter.IdleMonitor': '(uint64 120000,)\n',
+        'org.gnome.SessionManager.IsInhibited': '(true,)\n',
       })
 
       const onTick = vi.fn().mockResolvedValue(undefined)
@@ -283,21 +282,11 @@ describe('ActiveTimeTriggerManager', () => {
     })
 
     it('treats user as active on Linux when systemd-inhibit reports a blocking idle inhibitor', () => {
-      vi.mocked(cp.execSync).mockImplementation((cmd) => {
-        const command = cmd.toString()
-        if (command.includes('org.gnome.Mutter.IdleMonitor')) {
-          throw new Error('no mutter')
-        }
-        if (command.includes('org.freedesktop.ScreenSaver')) {
-          return '(uint32 120000,)\n'
-        }
-        if (command.includes('org.gnome.SessionManager.IsInhibited')) {
-          throw new Error('no gnome session manager')
-        }
-        if (command.includes('systemd-inhibit')) {
-          return 'vlc 1000 user 999 vlc idle Watching video block\n'
-        }
-        return ''
+      mockCommands({
+        'org.gnome.Mutter.IdleMonitor': new Error('no mutter'),
+        'org.freedesktop.ScreenSaver': '(uint32 120000,)\n',
+        'org.gnome.SessionManager.IsInhibited': new Error('no gnome'),
+        'systemd-inhibit': 'vlc 1000 user 999 vlc idle Watching video block\n',
       })
 
       const onTick = vi.fn().mockResolvedValue(undefined)
@@ -309,13 +298,12 @@ describe('ActiveTimeTriggerManager', () => {
 
     it('skips polling and does not re-probe when no Linux backend is available', () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
-      vi.mocked(cp.execSync).mockImplementation(() => {
-        throw new Error('command not found')
-      })
+      mockCommands({})
 
       const onTick = vi.fn()
       manager.register(createWorkflow(60), onTick)
-      const callsAfterFirstRegister = vi.mocked(cp.execSync).mock.calls.length
+      const callsAfterFirstRegister = vi.mocked(cp.execFileSync).mock.calls
+        .length
 
       expect(vi.getTimerCount()).toBe(0)
       expect(callsAfterFirstRegister).toBe(3)
@@ -323,7 +311,7 @@ describe('ActiveTimeTriggerManager', () => {
       // Registering another workflow should not re-probe or start timers
       manager.register({ ...createWorkflow(30), id: 'test-wf-2' }, vi.fn())
       expect(vi.getTimerCount()).toBe(0)
-      expect(vi.mocked(cp.execSync).mock.calls.length).toBe(
+      expect(vi.mocked(cp.execFileSync).mock.calls.length).toBe(
         callsAfterFirstRegister
       )
 

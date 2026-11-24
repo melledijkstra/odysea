@@ -1,5 +1,5 @@
 import { Logger } from '@melledijkstra/toolbox'
-import { execSync } from 'node:child_process'
+import { execFileSync } from 'node:child_process'
 import type { TriggerManager } from './scheduler.js'
 import type { Workflow } from './types/workflow.js'
 
@@ -7,6 +7,14 @@ const logger = new Logger('ActiveTimeTriggerManager')
 
 const COMMAND_TIMEOUT_MS = 2000
 const INHIBITION_CHECK_THRESHOLD_SEC = 10
+
+const BINARIES = {
+  ioreg: '/usr/sbin/ioreg',
+  pmset: '/usr/bin/pmset',
+  gdbus: '/usr/bin/gdbus',
+  systemdInhibit: '/usr/bin/systemd-inhibit',
+  xprintidle: '/usr/bin/xprintidle',
+} as const
 
 const EXEC_OPTIONS = {
   encoding: 'utf8' as const,
@@ -22,6 +30,38 @@ export interface IdleTimeProvider {
 interface LinuxIdleBackend {
   readonly name: string
   readIdleSeconds(): number
+}
+
+function callSessionDBus(
+  dest: string,
+  objectPath: string,
+  method: string,
+  extraArgs: readonly string[] = []
+): string {
+  return execFileSync(
+    BINARIES.gdbus,
+    [
+      'call',
+      '--session',
+      '--dest',
+      dest,
+      '--object-path',
+      objectPath,
+      '--method',
+      method,
+      ...extraArgs,
+    ],
+    EXEC_OPTIONS
+  )
+}
+
+export function parseMacOSIdleSeconds(output: string): number {
+  const match = /"HIDIdleTime"\s*=\s*(\d+)/.exec(output)
+  if (!match?.[1]) {
+    return 0
+  }
+  const ns = Number.parseInt(match[1], 10)
+  return Math.floor(ns / 1_000_000_000)
 }
 
 export function parseDBusIdleSeconds(output: string): number {
@@ -59,9 +99,11 @@ export function isSystemdIdleInhibited(output: string): boolean {
 
 function isLinuxIdleInhibited(): boolean {
   try {
-    const gnomeOutput = execSync(
-      'gdbus call --session --dest org.gnome.SessionManager --object-path /org/gnome/SessionManager --method org.gnome.SessionManager.IsInhibited 8',
-      EXEC_OPTIONS
+    const gnomeOutput = callSessionDBus(
+      'org.gnome.SessionManager',
+      '/org/gnome/SessionManager',
+      'org.gnome.SessionManager.IsInhibited',
+      ['8']
     )
     if (/\(\s*true\s*,?\s*\)/i.test(gnomeOutput)) {
       return true
@@ -71,8 +113,9 @@ function isLinuxIdleInhibited(): boolean {
   }
 
   try {
-    const systemdOutput = execSync(
-      'systemd-inhibit --list --no-legend',
+    const systemdOutput = execFileSync(
+      BINARIES.systemdInhibit,
+      ['--list', '--no-legend'],
       EXEC_OPTIONS
     )
     if (isSystemdIdleInhibited(systemdOutput)) {
@@ -89,15 +132,20 @@ export class MacOSIdleTimeProvider implements IdleTimeProvider {
   readonly name = 'macOS (ioreg + pmset)'
 
   getIdleSeconds(): number {
-    const output = execSync(
-      "ioreg -c IOHIDSystem | awk '/HIDIdleTime/ {print int($NF/1000000000)}'",
+    const output = execFileSync(
+      BINARIES.ioreg,
+      ['-c', 'IOHIDSystem'],
       EXEC_OPTIONS
     )
-    let idleSec = Number.parseInt(output.trim(), 10) || 0
+    let idleSec = parseMacOSIdleSeconds(output)
 
     // If physically idle, check if there's a software assertion keeping the display awake (e.g. video playback, video call)
     if (idleSec >= INHIBITION_CHECK_THRESHOLD_SEC) {
-      const pmsetOutput = execSync('pmset -g assertions', EXEC_OPTIONS)
+      const pmsetOutput = execFileSync(
+        BINARIES.pmset,
+        ['-g', 'assertions'],
+        EXEC_OPTIONS
+      )
       if (/PreventUserIdleDisplaySleep\s+1/.test(pmsetOutput)) {
         // Treat as fully active
         idleSec = 0
@@ -111,30 +159,32 @@ export class MacOSIdleTimeProvider implements IdleTimeProvider {
 const LINUX_BACKENDS: readonly LinuxIdleBackend[] = [
   {
     name: 'GNOME Mutter D-Bus',
-    readIdleSeconds: () => {
-      const output = execSync(
-        'gdbus call --session --dest org.gnome.Mutter.IdleMonitor --object-path /org/gnome/Mutter/IdleMonitor/Core --method org.gnome.Mutter.IdleMonitor.GetIdletime',
-        EXEC_OPTIONS
-      )
-      return parseDBusIdleSeconds(output)
-    },
+    readIdleSeconds: () =>
+      parseDBusIdleSeconds(
+        callSessionDBus(
+          'org.gnome.Mutter.IdleMonitor',
+          '/org/gnome/Mutter/IdleMonitor/Core',
+          'org.gnome.Mutter.IdleMonitor.GetIdletime'
+        )
+      ),
   },
   {
     name: 'Freedesktop ScreenSaver D-Bus',
-    readIdleSeconds: () => {
-      const output = execSync(
-        'gdbus call --session --dest org.freedesktop.ScreenSaver --object-path /org/freedesktop/ScreenSaver --method org.freedesktop.ScreenSaver.GetSessionIdleTime',
-        EXEC_OPTIONS
-      )
-      return parseDBusIdleSeconds(output)
-    },
+    readIdleSeconds: () =>
+      parseDBusIdleSeconds(
+        callSessionDBus(
+          'org.freedesktop.ScreenSaver',
+          '/org/freedesktop/ScreenSaver',
+          'org.freedesktop.ScreenSaver.GetSessionIdleTime'
+        )
+      ),
   },
   {
     name: 'xprintidle (X11)',
-    readIdleSeconds: () => {
-      const output = execSync('xprintidle', EXEC_OPTIONS)
-      return parseXprintidleSeconds(output)
-    },
+    readIdleSeconds: () =>
+      parseXprintidleSeconds(
+        execFileSync(BINARIES.xprintidle, [], EXEC_OPTIONS)
+      ),
   },
 ]
 
