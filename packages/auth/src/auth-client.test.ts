@@ -353,4 +353,81 @@ describe('AuthClient', () => {
       )
     })
   })
+
+  describe('revokeToken', () => {
+    it('should revoke refresh_token on server when present', async () => {
+      const mockStore: OAuth2Token = {
+        accessToken: 'expired-access-token',
+        refreshToken: 'valid-refresh-token',
+        expiresAt: Date.now() - 1000,
+      }
+      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce(
+        mockStore
+      )
+      const oauth2Client = (
+        client as unknown as {
+          _oauth2Client: { revoke: ReturnType<typeof vi.fn> }
+        }
+      )._oauth2Client
+
+      await client.revokeToken()
+
+      expect(storage.delete).toHaveBeenCalledWith(client.storageKey)
+      expect(oauth2Client.revoke).toHaveBeenCalledWith(
+        mockStore,
+        'refresh_token'
+      )
+    })
+
+    it('should fall back to access_token when refreshToken is absent', async () => {
+      const mockStore: OAuth2Token = {
+        accessToken: 'access-token-only',
+        refreshToken: null,
+        expiresAt: Date.now() + 65000,
+      }
+      vi.spyOn(client, 'getAuthTokenFromStorage').mockResolvedValueOnce(
+        mockStore
+      )
+      const oauth2Client = (
+        client as unknown as {
+          _oauth2Client: { revoke: ReturnType<typeof vi.fn> }
+        }
+      )._oauth2Client
+
+      await client.revokeToken()
+
+      expect(storage.delete).toHaveBeenCalledWith(client.storageKey)
+      expect(oauth2Client.revoke).toHaveBeenCalledWith(
+        mockStore,
+        'access_token'
+      )
+    })
+
+    it('should skip server revocation when skipServerRevoke is true', async () => {
+      const localOnlyClient = new AuthClient(
+        'google',
+        { ...config, skipServerRevoke: true },
+        { storage, handler, redirectUrl: 'http://localhost/callback' }
+      )
+      const mockStore: OAuth2Token = {
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token',
+        expiresAt: Date.now() + 65000,
+      }
+      vi.spyOn(
+        localOnlyClient,
+        'getAuthTokenFromStorage'
+      ).mockResolvedValueOnce(mockStore)
+      const oauth2Client = (
+        localOnlyClient as unknown as {
+          _oauth2Client: { revoke: ReturnType<typeof vi.fn> }
+        }
+      )._oauth2Client
+
+      await localOnlyClient.revokeToken()
+
+      expect(storage.delete).toHaveBeenCalledWith(localOnlyClient.storageKey)
+      expect(oauth2Client.revoke).not.toHaveBeenCalled()
+    })
+  })
 })

@@ -37,6 +37,10 @@ export class AuthState {
     return this._clients
   }
 
+  refreshClients() {
+    return this.setupClients()
+  }
+
   private setupClients() {
     logger.debug('Setting up auth clients')
     this._clients = {
@@ -54,7 +58,6 @@ export class AuthState {
             include_granted_scopes: 'true',
             enable_granular_consent: 'true',
           },
-          skipServerRevoke: true,
         },
         extensionAuth({ redirectPath: 'google' })
       ),
@@ -81,17 +84,16 @@ export class AuthState {
       ),
       'google-health': new GoogleHealthAuthClient(
         {
-          clientId: settingsStore.apiKeys.google_client_id ?? '',
-          clientSecret: settingsStore.apiKeys.google_client_secret,
+          clientId: settingsStore.apiKeys.google_health_client_id ?? '',
+          clientSecret: settingsStore.apiKeys.google_health_client_secret,
           initialScope: [
             'https://www.googleapis.com/auth/googlehealth.sleep.readonly',
           ],
           extraParams: {
             include_granted_scopes: 'false',
           },
-          skipServerRevoke: true,
         },
-        extensionAuth({ redirectPath: 'google' })
+        extensionAuth({ redirectPath: 'google-health' })
       ),
     }
     return this._clients

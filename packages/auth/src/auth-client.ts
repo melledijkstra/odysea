@@ -120,7 +120,10 @@ export class AuthClient {
     }
 
     try {
-      await this._oauth2Client.revoke(tokenStore)
+      const tokenTypeHint = tokenStore.refreshToken
+        ? 'refresh_token'
+        : 'access_token'
+      await this._oauth2Client.revoke(tokenStore, tokenTypeHint)
       this._logger.log('Server side revoke completed')
     } catch (e) {
       this._logger.error('Unknown error while revoking token on server', { e })
