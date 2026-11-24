@@ -112,6 +112,9 @@ check_prerequisites() {
     if ! command -v notify-send >/dev/null 2>&1; then
       warn "'notify-send' not found. Desktop notifications (system.notify) require libnotify (e.g. 'sudo apt install libnotify-bin' or 'sudo pacman -S libnotify')."
     fi
+    if ! command -v gdbus >/dev/null 2>&1 && ! command -v xprintidle >/dev/null 2>&1; then
+      warn "Neither 'gdbus' nor 'xprintidle' was found. 'active_time' workflow triggers require a desktop session with gdbus (glib2) or xprintidle (X11)."
+    fi
   fi
 }
 
