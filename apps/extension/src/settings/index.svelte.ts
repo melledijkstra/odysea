@@ -33,6 +33,8 @@ export type SettingsState = {
     weather?: string
     google_client_id?: string
     google_client_secret?: string
+    google_health_client_id?: string
+    google_health_client_secret?: string
     spotify?: string
     github_client_id?: string
     github_client_secret?: string

@@ -4,7 +4,6 @@
   import Input from '@melledijkstra/ui/svelte/Input.svelte'
   import Spinner from '@melledijkstra/ui/svelte/Spinner.svelte'
   import { Logger } from '@/logger'
-  import type { AuthClient } from '@melledijkstra/auth'
   import { authState, type OAuthProvider } from '@/oauth2/auth.state.svelte'
   import Card from '@melledijkstra/ui/svelte/Card.svelte'
   import {
@@ -20,21 +19,22 @@
 
   const logger = new Logger('AuthenticationTab')
 
-  const clients: Record<OAuthProvider, AuthClient> = authState.clients
-
   const loadAuthState = authState.initialize()
+
+  async function saveApiKeys() {
+    await settings.saveSettingsToStorage()
+    authState.refreshClients()
+  }
 
   async function authenticate(provider: OAuthProvider) {
     logger.log('Authenticating with', provider)
     isAuthenticating = true
     try {
+      const client = authState.clients[provider]
       const requestedScopes =
         provider === 'google' ? getAllGoogleServiceScopes() : undefined
-      const authToken = await clients[provider].getAuthToken(
-        true,
-        requestedScopes
-      )
-      const scopes = await clients[provider].getGrantedScopes()
+      const authToken = await client.getAuthToken(true, requestedScopes)
+      const scopes = await client.getGrantedScopes()
       logger.log(
         `Authenticated with ${provider}, token: ${authToken}, scopes: ${scopes}`
       )
@@ -48,7 +48,7 @@
 
   async function deauthenticate(provider: OAuthProvider) {
     logger.log('Deauthenticating from', provider)
-    await clients[provider].revokeToken()
+    await authState.clients[provider].revokeToken()
     authState.deauthenticated(provider)
     if (provider === 'google') {
       await clearAccountCache()
@@ -79,33 +79,44 @@
   <Input
     label="OpenWeather API Key"
     bind:value={settingsStore.apiKeys.weather}
-    onchange={() => settings.saveSettingsToStorage()}
+    onchange={saveApiKeys}
   />
   <Input
     label="Google Client ID"
     bind:value={settingsStore.apiKeys.google_client_id}
-    onchange={() => settings.saveSettingsToStorage()}
+    onchange={saveApiKeys}
   />
   <Input
     label="Google Client Secret"
     bind:value={settingsStore.apiKeys.google_client_secret}
-    onchange={() => settings.saveSettingsToStorage()}
+    onchange={saveApiKeys}
+  />
+  <Input
+    label="Google Health Client ID"
+    bind:value={settingsStore.apiKeys.google_health_client_id}
+    onchange={saveApiKeys}
+  />
+  <Input
+    type="password"
+    label="Google Health Client Secret"
+    bind:value={settingsStore.apiKeys.google_health_client_secret}
+    onchange={saveApiKeys}
   />
   <Input
     label="Spotify Client ID"
     bind:value={settingsStore.apiKeys.spotify}
-    onchange={() => settings.saveSettingsToStorage()}
+    onchange={saveApiKeys}
   />
   <Input
     label="GitHub Client ID"
     bind:value={settingsStore.apiKeys.github_client_id}
-    onchange={() => settings.saveSettingsToStorage()}
+    onchange={saveApiKeys}
   />
   <Input
     type="password"
     label="GitHub Client Secret"
     bind:value={settingsStore.apiKeys.github_client_secret}
-    onchange={() => settings.saveSettingsToStorage()}
+    onchange={saveApiKeys}
   />
 </div>
 
@@ -115,7 +126,7 @@
     <Spinner class="text-gray-400" />
   </div>
 {:then}
-  {#each Object.keys(clients) as key (key)}
+  {#each Object.keys(authState.providers) as key (key)}
     {@const provider = key as OAuthProvider}
     {@const providerState = authState.providers[provider]}
 

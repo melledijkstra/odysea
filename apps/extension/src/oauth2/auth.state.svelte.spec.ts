@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { extensionAuth } from '@melledijkstra/extension'
+import { settingsStore } from '@/settings/index.svelte'
 import { AuthState } from './auth.state.svelte'
 import {
   GMAIL_SCOPE,
@@ -12,6 +14,8 @@ describe('AuthState', () => {
   let state: AuthState
 
   beforeEach(() => {
+    vi.clearAllMocks()
+    settingsStore.apiKeys = {}
     state = new AuthState()
   })
 
@@ -32,6 +36,57 @@ describe('AuthState', () => {
     for (const serviceScope of getAllGoogleServiceScopes()) {
       expect(googleClient.initialScope).not.toContain(serviceScope)
     }
+  })
+
+  it('uses separate OAuth credentials and redirect paths for Google and Google Health', () => {
+    settingsStore.apiKeys.google_client_id = 'google-main-id'
+    settingsStore.apiKeys.google_client_secret = 'google-main-secret'
+    settingsStore.apiKeys.google_health_client_id = 'google-health-id'
+    settingsStore.apiKeys.google_health_client_secret = 'google-health-secret'
+
+    const { google, 'google-health': googleHealth } = state.clients
+
+    expect(google.config.clientId).toBe('google-main-id')
+    expect(google.config.clientSecret).toBe('google-main-secret')
+    expect(googleHealth.config.clientId).toBe('google-health-id')
+    expect(googleHealth.config.clientSecret).toBe('google-health-secret')
+
+    expect(extensionAuth).toHaveBeenCalledWith({ redirectPath: 'google' })
+    expect(extensionAuth).toHaveBeenCalledWith({
+      redirectPath: 'google-health',
+    })
+  })
+
+  it('does not fall back to main Google credentials when Google Health credentials are unset', () => {
+    settingsStore.apiKeys.google_client_id = 'google-main-id'
+    settingsStore.apiKeys.google_client_secret = 'google-main-secret'
+
+    const googleHealth = state.clients['google-health']
+
+    expect(googleHealth.config.clientId).toBe('')
+    expect(googleHealth.config.clientSecret).toBeUndefined()
+  })
+
+  it('skips server-side revocation for both Google clients to avoid project-wide invalidation', () => {
+    const { google, 'google-health': googleHealth } = state.clients
+
+    expect(google.config.skipServerRevoke).toBe(true)
+    expect(googleHealth.config.skipServerRevoke).toBe(true)
+  })
+
+  it('rebuilds clients with updated credentials when refreshClients is called', () => {
+    expect(state.clients['google-health'].config.clientId).toBe('')
+
+    settingsStore.apiKeys.google_health_client_id = 'updated-health-id'
+    settingsStore.apiKeys.google_health_client_secret = 'updated-health-secret'
+    state.refreshClients()
+
+    expect(state.clients['google-health'].config.clientId).toBe(
+      'updated-health-id'
+    )
+    expect(state.clients['google-health'].config.clientSecret).toBe(
+      'updated-health-secret'
+    )
   })
 
   it('tracks partial grants from granular consent accurately', () => {
