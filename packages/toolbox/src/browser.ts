@@ -2,7 +2,7 @@ export type VisibilityCallback = () => void
 
 export interface PageVisibleOptions {
   /** If true, fires the callback immediately upon setup if the page is currently visible */
-  immediate?: boolean | undefined
+  immediate?: boolean
 }
 
 /**

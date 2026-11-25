@@ -12,7 +12,16 @@ export interface ILogger {
 }
 
 export class Logger {
-  public static defaultDisabled?: boolean | undefined
+  private static defaultDisabledValue: boolean | undefined
+
+  public static get defaultDisabled(): boolean | undefined {
+    return Logger.defaultDisabledValue
+  }
+
+  public static set defaultDisabled(value: boolean | undefined) {
+    Logger.defaultDisabledValue = value
+  }
+
   public name: string
   public disabled = false
   private readonly printer: LoggerPrinter

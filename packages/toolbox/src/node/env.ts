@@ -8,8 +8,7 @@ const logger = new Logger('ToolboxEnv')
 
 const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype'])
 
-const ENV_LINE_REGEX =
-  /^[ \t]*(?:export[ \t]+)?([\w.-]+)[ \t]*=[ \t]*('[^']*'|"(?:\\[\s\S]|[^"\\])*"|`[^`]*`|[^#\r\n]*?)?[ \t]*(?:#[^\r\n]*)?$/gm
+const VALID_ENV_KEY_REGEX = /^[\w.-]+$/
 
 function unescapeDoubleQuoted(value: string): string {
   return value.replace(/\\([nrt"\\])/g, (_match, ch: string) => {
@@ -30,28 +29,126 @@ function unescapeDoubleQuoted(value: string): string {
   })
 }
 
+function findLineEnd(text: string, from: number): number {
+  const nl = text.indexOf('\n', from)
+  return nl === -1 ? text.length : nl
+}
+
+function skipHorizontalWhitespace(text: string, from: number): number {
+  let index = from
+  while (index < text.length && (text[index] === ' ' || text[index] === '\t')) {
+    index++
+  }
+  return index
+}
+
+function parseKey(rawHeader: string): string | undefined {
+  let key = rawHeader.trim()
+  if (key.startsWith('export') && (key[6] === ' ' || key[6] === '\t')) {
+    key = key.slice(6).trim()
+  }
+  if (!VALID_ENV_KEY_REGEX.test(key) || FORBIDDEN_KEYS.has(key)) {
+    return undefined
+  }
+  return key
+}
+
+function parseQuotedValue(
+  text: string,
+  quoteIndex: number
+): { value: string; nextIndex: number } | undefined {
+  const quote = text[quoteIndex]
+  let index = quoteIndex + 1
+
+  while (index < text.length) {
+    const ch = text[index]
+    if (quote === '"' && ch === '\\' && index + 1 < text.length) {
+      index += 2
+      continue
+    }
+    if (ch === quote) {
+      const lineEnd = findLineEnd(text, index + 1)
+      const trailing = text.slice(index + 1, lineEnd).trim()
+      if (trailing.length > 0 && !trailing.startsWith('#')) {
+        return undefined
+      }
+      const rawValue = text.slice(quoteIndex + 1, index)
+      const value = quote === '"' ? unescapeDoubleQuoted(rawValue) : rawValue
+      return { value, nextIndex: lineEnd + 1 }
+    }
+    index++
+  }
+
+  return undefined
+}
+
+function parseUnquotedValue(
+  text: string,
+  startIndex: number
+): { value: string; nextIndex: number } {
+  const lineEnd = findLineEnd(text, startIndex)
+  const rawLine = text.slice(startIndex, lineEnd)
+  const commentIndex = rawLine.indexOf('#')
+  const rawValue =
+    commentIndex === -1 ? rawLine : rawLine.slice(0, commentIndex)
+  return { value: rawValue.trim(), nextIndex: lineEnd + 1 }
+}
+
+const QUOTE_CHARS = new Set(['"', "'", '`'])
+
+function parseEnvEntry(
+  text: string,
+  startIndex: number,
+  lineEnd: number
+): { key: string | undefined; value: string; nextIndex: number } | undefined {
+  const eqIndex = text.indexOf('=', startIndex)
+  if (eqIndex === -1 || eqIndex > lineEnd) {
+    return undefined
+  }
+
+  const key = parseKey(text.slice(startIndex, eqIndex))
+  const valueStart = skipHorizontalWhitespace(text, eqIndex + 1)
+  const firstChar = text[valueStart]
+
+  const parsed =
+    firstChar !== undefined && QUOTE_CHARS.has(firstChar)
+      ? parseQuotedValue(text, valueStart)
+      : parseUnquotedValue(text, valueStart)
+
+  if (!parsed) {
+    return undefined
+  }
+
+  return { key, value: parsed.value, nextIndex: parsed.nextIndex }
+}
+
 export function parseEnvContent(content: string): Record<string, string> {
   const result: Record<string, string> = {}
-  const normalized = content.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n')
+  const withoutBom = content.startsWith('\uFEFF') ? content.slice(1) : content
+  const normalized = withoutBom.replaceAll('\r\n', '\n').replaceAll('\r', '\n')
 
-  for (const match of normalized.matchAll(ENV_LINE_REGEX)) {
-    const key = match[1]
-    if (!key || FORBIDDEN_KEYS.has(key)) continue
+  let index = 0
+  while (index < normalized.length) {
+    index = skipHorizontalWhitespace(normalized, index)
+    if (index >= normalized.length) break
 
-    let value = (match[2] ?? '').trim()
-    const quote = value[0]
-    if (
-      (quote === '"' || quote === "'" || quote === '`') &&
-      value.length >= 2 &&
-      value[value.length - 1] === quote
-    ) {
-      value = value.slice(1, -1)
-      if (quote === '"') {
-        value = unescapeDoubleQuoted(value)
-      }
+    const lineEnd = findLineEnd(normalized, index)
+    const ch = normalized[index]
+    if (ch === '\n' || ch === '#') {
+      index = lineEnd + 1
+      continue
     }
 
-    result[key] = value
+    const entry = parseEnvEntry(normalized, index, lineEnd)
+    if (!entry) {
+      index = lineEnd + 1
+      continue
+    }
+
+    if (entry.key !== undefined) {
+      result[entry.key] = entry.value
+    }
+    index = entry.nextIndex
   }
 
   return result

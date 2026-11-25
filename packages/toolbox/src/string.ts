@@ -6,7 +6,7 @@ export function slugify(input: string): string {
     return ''
   }
 
-  return input
+  const collapsed = input
     .toLowerCase()
     .trim()
     .normalize('NFD')
@@ -14,7 +14,10 @@ export function slugify(input: string): string {
     .replace(/[^a-z0-9\s-]/g, ' ')
     .trim()
     .replace(/[\s-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+
+  const start = collapsed.startsWith('-') ? 1 : 0
+  const end = collapsed.endsWith('-') ? collapsed.length - 1 : collapsed.length
+  return start < end ? collapsed.slice(start, end) : ''
 }
 
 /**
