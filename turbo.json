@@ -5,15 +5,7 @@
     "build": {
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "dependsOn": ["^build"],
-      "outputs": [
-        "dist/**",
-        ".dist/**",
-        "build/**",
-        ".next/**",
-        ".next/**",
-        "!.next/cache/**",
-        "!.next/dev/**"
-      ]
+      "outputs": ["dist/**", "build/**"]
     },
     "dev": {
       "persistent": true,

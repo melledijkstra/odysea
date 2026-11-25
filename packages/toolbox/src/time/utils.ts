@@ -116,3 +116,40 @@ export function getMomentOfDay(): 'morning' | 'afternoon' | 'evening' {
 
   return momentOfDay
 }
+
+export const seconds = (n: number): number => n * 1000
+export const minutes = (n: number): number => n * 60 * 1000
+export const hours = (n: number): number => n * 60 * 60 * 1000
+export const days = (n: number): number => n * 24 * 60 * 60 * 1000
+export const weeks = (n: number): number => n * 7 * 24 * 60 * 60 * 1000
+
+/**
+ * Formats a duration in minutes into a human-readable string (e.g. "45m", "1h", "1h 30m").
+ * Returns `fallback` (default: "No data") when input is undefined, negative, or non-finite.
+ */
+export function formatDurationMinutes(
+  totalMinutes?: number,
+  fallback: string = 'No data'
+): string {
+  if (
+    totalMinutes === undefined ||
+    !Number.isFinite(totalMinutes) ||
+    totalMinutes < 0
+  ) {
+    return fallback
+  }
+
+  const floored = Math.floor(totalMinutes)
+  const wholeHours = Math.floor(floored / 60)
+  const remainingMins = floored % 60
+
+  if (wholeHours === 0) {
+    return `${remainingMins}m`
+  }
+
+  if (remainingMins === 0) {
+    return `${wholeHours}h`
+  }
+
+  return `${wholeHours}h ${remainingMins}m`
+}

@@ -1,8 +1,6 @@
 import js from '@eslint/js'
 import { globalIgnores, defineConfig } from 'eslint/config'
 import ts from 'typescript-eslint'
-// import json from '@eslint/json'
-// import css from '@eslint/css'
 import turboPlugin from 'eslint-plugin-turbo'
 import eslintConfigPrettier from 'eslint-config-prettier'
 
@@ -13,7 +11,8 @@ export default defineConfig([
     '.turbo/**',
     '.next/**',
     'coverage/**',
-    'test_results/**',
+    'test-results/**',
+    'playwright-report/**',
     'storybook-static/**',
   ]),
   js.configs.recommended,
@@ -39,22 +38,4 @@ export default defineConfig([
       'turbo/no-undeclared-env-vars': 'warn',
     },
   },
-  // JSON and CSS configurations
-  // {
-  //   files: ['**/*.json'],
-  //   ignores: ['**/package.json', '**/tsconfig.json', '**/tsconfig.*.json'],
-  //   plugins: { json },
-  //   language: 'json/json',
-  // },
-  // {
-  //   files: ['**/*.jsonc', '**/tsconfig.json', '**/tsconfig.*.json'],
-  //   plugins: { json },
-  //   language: 'json/jsonc',
-  // },
-  // {
-  //   files: ['**/*.css'],
-  //   ignores: ['**/app.css'],
-  //   plugins: { css },
-  //   language: 'css/css',
-  // },
 ])

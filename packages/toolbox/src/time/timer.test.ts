@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { Timer } from './timer'
+import { Timer, type TimerTick } from './timer'
 
 describe('Timer', () => {
   beforeEach(() => {
@@ -38,6 +38,19 @@ describe('Timer', () => {
       })
 
       expect(timer).toBeDefined()
+    })
+
+    it('should accept a typed TimerTick callback in constructor options', () => {
+      const ticks: Array<{ remaining: number; count: number }> = []
+      const onTick: TimerTick = (remainingTime, tickCount) => {
+        ticks.push({ remaining: remainingTime, count: tickCount })
+      }
+      const timer = new Timer({ duration: 3000, interval: 1000, onTick })
+      timer.start()
+      vi.advanceTimersToNextTimer()
+      expect(ticks[0]).toEqual({ remaining: 3000, count: 1 })
+      expect(ticks[1].count).toBe(2)
+      timer.stop()
     })
   })
 
