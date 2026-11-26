@@ -13,6 +13,7 @@ For domain knowledge, architectural details, and coding conventions, agents MUST
 - **Coding Standards**: Follow formatting and linting standards dictated by Prettier and ESLint
 - Don't use `any`, instead try to actual type correctly the code, only in some special cases `unknown` can be used. If unsure, ask the user.
 - Don't silence eslint issues, instead try to tackle them and resolve the issue.
+- **Pure UI Components**: Keep UI components pure/presentational and decoupled from API clients, queries, or business logic. Pass plain props and callbacks from container components so UI components stay easy to test and render in Storybook.
 
 ## Agent skills
 

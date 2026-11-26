@@ -1,49 +1,110 @@
-type Weather = {
+export type OpenWeatherCondition = {
   id: number // 501
   main: string // 'Rain'
   description: string // 'moderate rain'
   icon: string // '10d'
 }
 
-export type WeatherResponse = {
-  coord: {
-    lon: number // 7.367
-    lat: number // 45.133
-  }
-  weather: Weather[]
-  base: string // 'stations'
-  main: {
-    temp: number // 284.2
-    feels_like: number // 282.93
-    temp_min: number // 283.06
-    temp_max: number // 286.82
-    pressure: number // 1021
-    humidity: number // 60
-    sea_level: number // 1021
-    grnd_level: number // 910
-  }
-  visibility: number // 10000
-  wind: {
-    speed: number // 4.09
-    deg: number // 121
-    gust?: number // 3.47
-  }
-  rain?: {
-    '1h': number // 2.73
-  }
-  clouds: {
-    all: number // 83
-  }
-  dt: number // 1726660758
-  sys: {
-    type: number // 1
-    id: number // 6736
-    country: string // 'IT'
-    sunrise: number // 1726636384
-    sunset: number // 1726680975
-  }
-  timezone: number // 7200
-  id: number // 3165523
-  name: string // 'Province of Turin'
-  cod: number // 200
+export type PrecipitationVolume = {
+  '1h': number // mm/h
+}
+
+export type OneCallCurrentRecord = {
+  dt: number
+  sunrise?: number
+  sunset?: number
+  temp: number
+  feels_like: number
+  pressure: number
+  humidity: number
+  dew_point: number
+  uvi: number
+  clouds: number
+  visibility: number
+  wind_speed: number
+  wind_gust?: number
+  wind_deg: number
+  rain?: PrecipitationVolume
+  snow?: PrecipitationVolume
+  weather: OpenWeatherCondition[]
+  alerts?: string[]
+}
+
+export type OneCallHourlyRecord = {
+  dt: number
+  temp: number
+  feels_like: number
+  pressure: number
+  humidity: number
+  dew_point: number
+  uvi: number
+  clouds: number
+  visibility: number
+  wind_speed: number
+  wind_gust?: number
+  wind_deg: number
+  pop: number
+  rain?: PrecipitationVolume
+  snow?: PrecipitationVolume
+  weather: OpenWeatherCondition[]
+  alerts?: string[]
+}
+
+export type OneCallDailyTemp = {
+  day: number
+  min: number
+  max: number
+  night: number
+  eve: number
+  morn: number
+}
+
+export type OneCallDailyFeelsLike = {
+  day: number
+  night: number
+  eve: number
+  morn: number
+}
+
+export type OneCallDailyRecord = {
+  dt: number
+  sunrise?: number
+  sunset?: number
+  moonrise?: number
+  moonset?: number
+  moon_phase?: number
+  temp: OneCallDailyTemp
+  feels_like: OneCallDailyFeelsLike
+  pressure: number
+  humidity: number
+  dew_point: number
+  wind_speed: number
+  wind_deg: number
+  wind_gust?: number
+  weather: OpenWeatherCondition[]
+  clouds: number
+  pop: number
+  uvi: number
+  rain?: number | PrecipitationVolume
+  snow?: number | PrecipitationVolume
+  alerts?: string[]
+}
+
+export type OneCallResponse<T> = {
+  lat: number
+  lon: number
+  timezone: string
+  timezone_offset: number
+  data: T[]
+  next?: string
+  prev?: string
+}
+
+export type ReverseGeocodingResult = {
+  name: string
+  local_names?: Record<string, string>
+  lat: number
+  lon: number
+  country: string
+  state?: string
 }

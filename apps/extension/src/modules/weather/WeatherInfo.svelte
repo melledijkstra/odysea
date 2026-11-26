@@ -5,14 +5,14 @@
 
   export type WeatherInfoProps = {
     iconId: string
-    location: string
+    location?: string
     temperatureKelvin: number
     displayUnit?: 'C' | 'F'
   }
 
   const {
     iconId,
-    location,
+    location = '',
     temperatureKelvin,
     displayUnit = 'C',
   }: WeatherInfoProps = $props()
@@ -35,9 +35,11 @@
     <Icon path={weatherToMdiIcon(iconId)} size={20} />
     <span class="text-base">{temperature}<sup>{temperatureSymbol}</sup></span>
   </div>
-  <span
-    title={location}
-    class="text-xs max-w-20 overflow-hidden text-ellipsis whitespace-nowrap"
-    >{location}</span
-  >
+  {#if location}
+    <span
+      title={location}
+      class="text-xs max-w-20 overflow-hidden text-ellipsis whitespace-nowrap"
+      >{location}</span
+    >
+  {/if}
 </div>

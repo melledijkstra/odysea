@@ -1,4 +1,4 @@
-import type { LocationInfo, WeatherInfo } from '@melledijkstra/api'
+import type { CurrentWeather, LocationInfo } from '@melledijkstra/api'
 
 const STORAGE_KEY = 'appMode'
 
@@ -13,7 +13,7 @@ export type User = {
 export type AppState = {
   mode: AppMode
   title: string
-  weather?: WeatherInfo
+  weather?: CurrentWeather
   geolocation?: LocationInfo
 }
 
