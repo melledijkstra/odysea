@@ -1,13 +1,19 @@
 import {
   calculateRemainingDays,
+  days,
+  formatDurationMinutes,
   formatSeconds,
   getBrowserLocale,
   getTime,
   getTimePercentage,
+  hours,
   millisecondsToTime,
+  minutes,
   playbackLoop,
   renderTimezone,
   repeatEvery,
+  seconds,
+  weeks,
 } from './utils'
 
 class FakeNavigator {
@@ -298,6 +304,74 @@ describe('Time Utilities', () => {
       expect(callback).toHaveBeenCalledWith(750)
 
       cleanup()
+    })
+  })
+
+  describe('time unit conversions', () => {
+    it('should convert seconds, minutes, hours, days, and weeks to milliseconds', () => {
+      expect(seconds(0)).toBe(0)
+      expect(seconds(1)).toBe(1_000)
+      expect(seconds(5)).toBe(5_000)
+      expect(seconds(0.5)).toBe(500)
+      expect(seconds(-2)).toBe(-2_000)
+
+      expect(minutes(0)).toBe(0)
+      expect(minutes(1)).toBe(60_000)
+      expect(minutes(0.5)).toBe(30_000)
+      expect(minutes(-3)).toBe(-180_000)
+
+      expect(hours(0)).toBe(0)
+      expect(hours(1)).toBe(3_600_000)
+      expect(hours(2.5)).toBe(9_000_000)
+      expect(hours(-1)).toBe(-3_600_000)
+
+      expect(days(0)).toBe(0)
+      expect(days(1)).toBe(86_400_000)
+      expect(days(7)).toBe(604_800_000)
+      expect(days(-1)).toBe(-86_400_000)
+
+      expect(weeks(0)).toBe(0)
+      expect(weeks(1)).toBe(604_800_000)
+      expect(weeks(2)).toBe(1_209_600_000)
+      expect(weeks(-1)).toBe(-604_800_000)
+    })
+  })
+
+  describe('formatDurationMinutes', () => {
+    it('should return fallback for undefined, negative, or non-finite values', () => {
+      expect(formatDurationMinutes()).toBe('No data')
+      expect(formatDurationMinutes(undefined)).toBe('No data')
+      expect(formatDurationMinutes(-1)).toBe('No data')
+      expect(formatDurationMinutes(-60)).toBe('No data')
+      expect(formatDurationMinutes(Number.NaN)).toBe('No data')
+      expect(formatDurationMinutes(Number.POSITIVE_INFINITY)).toBe('No data')
+      expect(formatDurationMinutes(Number.NEGATIVE_INFINITY)).toBe('No data')
+    })
+
+    it('should support a custom fallback string', () => {
+      expect(formatDurationMinutes(undefined, 'N/A')).toBe('N/A')
+      expect(formatDurationMinutes(-5, '—')).toBe('—')
+    })
+
+    it('should format durations under one hour in minutes', () => {
+      expect(formatDurationMinutes(0)).toBe('0m')
+      expect(formatDurationMinutes(0.9)).toBe('0m')
+      expect(formatDurationMinutes(1)).toBe('1m')
+      expect(formatDurationMinutes(45)).toBe('45m')
+      expect(formatDurationMinutes(59.9)).toBe('59m')
+    })
+
+    it('should format exact hours without trailing minutes', () => {
+      expect(formatDurationMinutes(60)).toBe('1h')
+      expect(formatDurationMinutes(120)).toBe('2h')
+      expect(formatDurationMinutes(480)).toBe('8h')
+    })
+
+    it('should format mixed hours and minutes and floor fractional inputs', () => {
+      expect(formatDurationMinutes(61)).toBe('1h 1m')
+      expect(formatDurationMinutes(90)).toBe('1h 30m')
+      expect(formatDurationMinutes(90.7)).toBe('1h 30m')
+      expect(formatDurationMinutes(495)).toBe('8h 15m')
     })
   })
 })

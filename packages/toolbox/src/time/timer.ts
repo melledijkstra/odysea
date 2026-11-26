@@ -4,7 +4,7 @@ export type TimerCallback = (remainingTime: number) => void
 
 export type TimerOptions = {
   duration: number // Duration of the timer in milliseconds
-  onTick?: TimerCallback // Callback for each tick
+  onTick?: TimerTick // Callback for each tick
   onStart?: TimerCallback
   onStop?: TimerCallback
   onComplete?: TimerCallback // Callback when the timer completes

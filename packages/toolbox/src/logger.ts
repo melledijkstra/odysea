@@ -7,7 +7,21 @@ export interface LoggerPrinter {
   timeEnd(label?: string): void
 }
 
+export interface ILogger {
+  logger: Logger
+}
+
 export class Logger {
+  private static defaultDisabledValue: boolean | undefined
+
+  public static get defaultDisabled(): boolean | undefined {
+    return Logger.defaultDisabledValue
+  }
+
+  public static set defaultDisabled(value: boolean | undefined) {
+    Logger.defaultDisabledValue = value
+  }
+
   public name: string
   public disabled = false
   private readonly printer: LoggerPrinter
@@ -19,16 +33,14 @@ export class Logger {
   ) {
     this.name = name
     this.printer = printer
-    if (disabled !== undefined) {
-      this.disabled = disabled
-    } else {
-      this.disabled = this.isDisabledByEnv()
-    }
+    this.disabled = disabled ?? Logger.defaultDisabled ?? this.isDisabledByEnv()
   }
 
   private isDisabledByEnv(): boolean {
-    const envVar = process.env.NODE_ENV
-    return envVar?.toLowerCase() === 'test'
+    if (typeof process === 'undefined' || !process.env) {
+      return false
+    }
+    return process.env.NODE_ENV?.toLowerCase() === 'test'
   }
 
   log(...data: unknown[]) {
