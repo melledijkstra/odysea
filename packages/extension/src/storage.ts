@@ -1,4 +1,4 @@
-import * as browser from 'webextension-polyfill'
+import browser from 'webextension-polyfill'
 import {
   BaseStorage,
   CacheItem,

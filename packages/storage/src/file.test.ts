@@ -97,7 +97,23 @@ describe('FileStorage', () => {
     )
 
     const tildeStorage = new FileStorage('~/test.json')
-    expect(tildeStorage['filePath']).toBe(path.join(os.homedir(), 'test.json'))
+    expect(tildeStorage['filePath']).toBe(
+      path.resolve(os.homedir(), 'test.json')
+    )
+
+    const bareTildeStorage = new FileStorage('~')
+    expect(bareTildeStorage['filePath']).toBe(path.resolve(os.homedir()))
+
+    const windowsTildeStorage = new FileStorage('~\\test.json')
+    expect(windowsTildeStorage['filePath']).toBe(
+      path.resolve(path.join(os.homedir(), 'test.json'))
+    )
+
+    // ~user paths must NOT be expanded to current user's homedir
+    const otherUserStorage = new FileStorage('~otheruser/test.json')
+    expect(otherUserStorage['filePath']).toBe(
+      path.resolve('~otheruser/test.json')
+    )
   })
 
   it('should set file permissions to 0600 on Unix systems', async () => {

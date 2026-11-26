@@ -1,6 +1,6 @@
 import * as readline from 'node:readline/promises'
 import { stdin as input, stdout as output } from 'node:process'
-import { FileStorage } from '@melledijkstra/storage'
+import { FileStorage } from '@melledijkstra/storage/node'
 import {
   AuthClient,
   CliAuthFlowHandler,

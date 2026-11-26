@@ -430,4 +430,57 @@ describe('AuthClient', () => {
       expect(oauth2Client.revoke).not.toHaveBeenCalled()
     })
   })
+
+  describe('exchangeCodeAndCache', () => {
+    it('should validate code/state, cache token with returned scopes, and return the token', async () => {
+      const mockTokens: OAuth2Token = {
+        accessToken: 'exchanged-access-token',
+        refreshToken: 'exchanged-refresh-token',
+        expiresAt: Date.now() + 3600000,
+        scope: ['profile', 'email'],
+      }
+      vi.spyOn(client, 'validate').mockResolvedValueOnce(mockTokens)
+      const cacheSpy = vi.spyOn(client, 'cacheAuthToken')
+
+      const result = await client.exchangeCodeAndCache(
+        'auth-code',
+        'auth-state',
+        ['tasks']
+      )
+
+      expect(client.validate).toHaveBeenCalledWith('auth-code', 'auth-state')
+      expect(cacheSpy).toHaveBeenCalledWith(
+        'exchanged-access-token',
+        'exchanged-refresh-token',
+        mockTokens.expiresAt,
+        ['profile', 'email']
+      )
+      expect(result).toEqual(mockTokens)
+    })
+
+    it('should union previously granted and requested scopes when token response omits scope', async () => {
+      const mockTokens: OAuth2Token = {
+        accessToken: 'exchanged-access-token',
+        refreshToken: null,
+        expiresAt: Date.now() + 3600000,
+      }
+      vi.spyOn(client, 'validate').mockResolvedValueOnce(mockTokens)
+      vi.spyOn(client, 'getGrantedScopes').mockResolvedValueOnce(['profile'])
+      const cacheSpy = vi.spyOn(client, 'cacheAuthToken')
+
+      const result = await client.exchangeCodeAndCache(
+        'auth-code',
+        'auth-state',
+        ['profile', 'tasks']
+      )
+
+      expect(cacheSpy).toHaveBeenCalledWith(
+        'exchanged-access-token',
+        null,
+        mockTokens.expiresAt,
+        ['profile', 'tasks']
+      )
+      expect(result).toEqual(mockTokens)
+    })
+  })
 })

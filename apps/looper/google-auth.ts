@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { GoogleAuthClient } from '@melledijkstra/auth'
-import { FileStorage } from '@melledijkstra/storage'
+import { FileStorage } from '@melledijkstra/storage/node'
 import { config, type LooperConfig } from './config.js'
 
 export function createGoogleAuthClient(

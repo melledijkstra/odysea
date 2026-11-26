@@ -1,5 +1,5 @@
 import { MemoryCache } from './memory'
-import { minutes } from './utils'
+import { minutes } from '@melledijkstra/toolbox'
 
 describe('MemoryCache', () => {
   beforeAll(() => {
@@ -35,5 +35,25 @@ describe('MemoryCache', () => {
     vi.advanceTimersByTime(minutes(5) / 2)
 
     expect(await cache.get('foo')).toBe('bar')
+  })
+
+  it('should filter out and clean up expired keys in keys()', async () => {
+    const cache = new MemoryCache()
+
+    await cache.set('persistent', 'a')
+    await cache.set('short-lived', 'b', minutes(1))
+    await cache.set('longer-lived', 'c', minutes(10))
+
+    expect(await cache.keys()).toEqual([
+      'persistent',
+      'short-lived',
+      'longer-lived',
+    ])
+
+    vi.advanceTimersByTime(minutes(2))
+
+    expect(await cache.keys()).toEqual(['persistent', 'longer-lived'])
+    expect(await cache.size()).toBe(2)
+    expect(await cache.has('short-lived')).toBe(false)
   })
 })

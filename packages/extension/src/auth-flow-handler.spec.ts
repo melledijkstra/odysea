@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { ExtensionAuthFlowHandler } from './auth-flow-handler'
-import * as browser from 'webextension-polyfill'
+import browser from 'webextension-polyfill'
 
 describe('Extension AuthFlowHandler', () => {
   it('should create an instance of ExtensionAuthFlowHandler and call webAuthFlow', async () => {

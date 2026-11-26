@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { extensionAuth } from './auth'
 import { ExtensionStorage } from './storage'
 import { ExtensionAuthFlowHandler } from './auth-flow-handler'
-import * as browser from 'webextension-polyfill'
+import browser from 'webextension-polyfill'
 
 describe('extensionAuth', () => {
   it('should return environment options with extension storage and flow handler', () => {

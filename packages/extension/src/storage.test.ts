@@ -9,8 +9,10 @@ const mockStorageLocal = vi.hoisted(() => ({
 }))
 
 vi.mock('webextension-polyfill', () => ({
-  storage: {
-    local: mockStorageLocal,
+  default: {
+    storage: {
+      local: mockStorageLocal,
+    },
   },
 }))
 
