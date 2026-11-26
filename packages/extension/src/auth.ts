@@ -1,4 +1,4 @@
-import * as browser from 'webextension-polyfill'
+import browser from 'webextension-polyfill'
 import type { AuthEnvironmentOptions } from '@melledijkstra/auth'
 import { ExtensionStorage } from './storage'
 import { ExtensionAuthFlowHandler } from './auth-flow-handler'

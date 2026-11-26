@@ -21,8 +21,9 @@ type CacheOptions = {
 }
 
 /**
- * Curried `withCache`: first call it with your options,
- * then call the returned function with your async function.
+ * Wraps an async function with an in-memory TTL cache.
+ * Caches the resolved value under `options.key` (or `originalFunc.name`)
+ * for `options.ttl` milliseconds (default: 5 minutes).
  */
 export function withCache<T, A extends unknown[]>(
   originalFunc: (...args: A) => Promise<T>,
@@ -85,7 +86,16 @@ export class MemoryCache extends BaseStorage {
   }
 
   async keys(): Promise<string[]> {
-    return Object.keys(this._cache)
+    const activeKeys: string[] = []
+    for (const key of Object.keys(this._cache)) {
+      const item = this._cache[key]
+      if (!item || isExpired(item)) {
+        delete this._cache[key]
+      } else {
+        activeKeys.push(key)
+      }
+    }
+    return activeKeys
   }
 }
 

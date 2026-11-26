@@ -541,16 +541,19 @@ importers:
       '@melledijkstra/auth':
         specifier: workspace:*
         version: link:../auth
-      '@melledijkstra/config':
-        specifier: workspace:*
-        version: link:../config
       '@melledijkstra/storage':
         specifier: workspace:*
         version: link:../storage
       '@melledijkstra/toolbox':
         specifier: workspace:*
         version: link:../toolbox
+      webextension-polyfill:
+        specifier: 'catalog:'
+        version: 0.12.0
     devDependencies:
+      '@melledijkstra/config':
+        specifier: workspace:*
+        version: link:../config
       '@types/chrome':
         specifier: 'catalog:'
         version: 0.2.9
@@ -563,9 +566,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
-      webextension-polyfill:
+      vitest:
         specifier: 'catalog:'
-        version: 0.12.0
+        version: 4.1.11(@types/node@26.6.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1)(vite@8.3.2(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
 
   packages/storage:
     dependencies:

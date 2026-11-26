@@ -1,6 +1,7 @@
 import { authState } from '@/oauth2/auth.state.svelte'
 import { GoogleAccountApiClient, type Account } from '@melledijkstra/api'
-import { WebLocalStorage, hours } from '@melledijkstra/storage'
+import { WebLocalStorage } from '@melledijkstra/storage'
+import { hours } from '@melledijkstra/toolbox'
 import { ACCOUNT_CACHE_KEY } from '@/constants'
 import { createQuery } from '@tanstack/svelte-query'
 

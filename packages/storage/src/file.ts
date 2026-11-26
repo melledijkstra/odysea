@@ -1,6 +1,7 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import * as os from 'node:os'
+import { expandHomePath } from '@melledijkstra/toolbox/node'
 import { CacheItem } from './types'
 import { isExpired } from './utils'
 
@@ -12,9 +13,7 @@ export class FileStorage extends BaseStorage {
   constructor(filePath?: string) {
     super()
     if (filePath) {
-      this.filePath = filePath.startsWith('~')
-        ? path.join(os.homedir(), filePath.slice(1))
-        : path.resolve(filePath)
+      this.filePath = path.resolve(expandHomePath(filePath))
     } else {
       this.filePath = path.join(os.homedir(), '.toolbox-storage.json')
     }

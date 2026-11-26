@@ -1,31 +1,11 @@
 import { vi } from 'vitest'
+import { createWebExtensionMock } from './src/testing'
 
-const identityMock = {
-  getRedirectURL: vi.fn(),
-  getAuthToken: vi.fn(),
-}
+const mockBrowser = createWebExtensionMock({ extensionId: 'some-test-id' })
 
-// without chrome.runtime.id webextension-polyfill won't work
-const chromeObject = {
-  runtime: { id: 'some-test-id' },
-  identity: identityMock,
-}
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-globalThis.chrome = chromeObject
-
-const storageMock = {
-  get: vi.fn(),
-  set: vi.fn(),
-  remove: vi.fn(),
-  clear: vi.fn(),
-}
+vi.stubGlobal('chrome', mockBrowser)
+vi.stubGlobal('browser', mockBrowser)
 
 vi.mock('webextension-polyfill', () => ({
-  runtime: chromeObject.runtime,
-  identity: chromeObject.identity,
-  storage: {
-    local: storageMock,
-    sync: storageMock,
-  },
+  default: (globalThis as Record<string, unknown>).browser,
 }))

@@ -1,5 +1,5 @@
 import { Logger } from '@melledijkstra/toolbox'
-import * as browser from 'webextension-polyfill'
+import browser from 'webextension-polyfill'
 
 const logger = new Logger('messaging')
 
@@ -29,22 +29,29 @@ export function createMessage<Request = void, Response = void>(
       logger.log(identifier, 'sender response:', response)
       return response
     },
-    on(callback: Handler<Request, Response>) {
-      browser.runtime.onMessage.addListener(
-        (message: unknown, sender: browser.Runtime.MessageSender) => {
-          if (isMessage(message) && message.identifier === identifier) {
-            logger.log(identifier, 'listener message received', {
-              message,
-              sender,
-            })
-            const promise = callback(message?.data as Request)
-            return Promise.resolve(promise).then((response) => {
-              logger.log(identifier, 'listener response:', response)
-              return response
-            })
-          }
+    on(callback: Handler<Request, Response>): () => void {
+      const listener = (
+        message: unknown,
+        sender: browser.Runtime.MessageSender
+      ) => {
+        if (isMessage(message) && message.identifier === identifier) {
+          logger.log(identifier, 'listener message received', {
+            message,
+            sender,
+          })
+          const promise = callback(message?.data as Request)
+          return Promise.resolve(promise).then((response) => {
+            logger.log(identifier, 'listener response:', response)
+            return response
+          })
         }
-      )
+      }
+
+      browser.runtime.onMessage.addListener(listener)
+
+      return () => {
+        browser.runtime.onMessage.removeListener(listener)
+      }
     },
   }
 }

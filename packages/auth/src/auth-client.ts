@@ -283,11 +283,6 @@ export class AuthClient {
       throw new Error('Code or state mismatch')
     }
 
-    this._logger.log({
-      code,
-      savedCode: savedCodeVerifier,
-    })
-
     const tokens = await this._oauth2Client.authorizationCode.getToken({
       code,
       redirectUri: this._redirectUrl,
@@ -296,6 +291,32 @@ export class AuthClient {
     })
 
     await this._storage.delete(this.authStateKey)
+
+    return tokens
+  }
+
+  async exchangeCodeAndCache(
+    code: string,
+    state: string,
+    requestedScopes: string[] = []
+  ): Promise<OAuth2Token> {
+    const tokens = await this.validate(code, state)
+    const refreshToken = tokens.refreshToken ?? null
+
+    // If token response returned scopes, use them; otherwise union granted + requested
+    const scopesToSave =
+      tokens.scope && tokens.scope.length > 0
+        ? tokens.scope
+        : Array.from(
+            new Set([...(await this.getGrantedScopes()), ...requestedScopes])
+          )
+
+    await this.cacheAuthToken(
+      tokens.accessToken,
+      refreshToken,
+      tokens.expiresAt,
+      scopesToSave
+    )
 
     return tokens
   }
@@ -372,23 +393,10 @@ export class AuthClient {
         return undefined
       }
 
-      const tokens = await this.validate(code, state)
-
-      const refreshToken = tokens.refreshToken ?? null
-
-      // If token response returned scopes, use them; otherwise union granted + requested
-      const scopesToSave =
-        tokens.scope && tokens.scope.length > 0
-          ? tokens.scope
-          : Array.from(
-              new Set([...(await this.getGrantedScopes()), ...requestedScopes])
-            )
-
-      await this.cacheAuthToken(
-        tokens.accessToken,
-        refreshToken,
-        tokens.expiresAt,
-        scopesToSave
+      const tokens = await this.exchangeCodeAndCache(
+        code,
+        state,
+        requestedScopes
       )
       return tokens.accessToken
     } catch (error) {

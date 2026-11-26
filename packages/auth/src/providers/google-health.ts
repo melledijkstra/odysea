@@ -4,17 +4,9 @@ import {
   type AuthConfig,
   type ProviderDefinition,
 } from '../config'
+import { GOOGLE_DEFAULTS } from './google'
 
-export const GOOGLE_HEALTH_DEFAULTS: ProviderDefinition = {
-  server: 'https://oauth2.googleapis.com/',
-  authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
-  tokenEndpoint: 'https://oauth2.googleapis.com/token',
-  revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
-  extraParams: {
-    access_type: 'offline',
-    prompt: 'consent',
-  },
-}
+export const GOOGLE_HEALTH_DEFAULTS: ProviderDefinition = GOOGLE_DEFAULTS
 
 export class GoogleHealthAuthClient extends AuthClient {
   constructor(config: AuthConfig, options: AuthEnvironmentOptions = {}) {

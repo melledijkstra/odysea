@@ -11,9 +11,24 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.mts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./testing": {
+      "import": {
+        "types": "./dist/testing.d.mts",
+        "default": "./dist/testing.mjs"
+      },
+      "require": {
+        "types": "./dist/testing.d.cts",
+        "default": "./dist/testing.cjs"
+      }
     }
   },
   "scripts": {
@@ -22,17 +37,26 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@melledijkstra/auth": "workspace:*",
+    "@melledijkstra/storage": "workspace:*",
+    "@melledijkstra/toolbox": "workspace:*",
+    "webextension-polyfill": "catalog:"
+  },
+  "peerDependencies": {
+    "vitest": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@melledijkstra/config": "workspace:*",
     "@types/chrome": "catalog:",
     "@types/webextension-polyfill": "catalog:",
     "eslint": "catalog:",
     "typescript": "catalog:",
-    "webextension-polyfill": "catalog:"
-  },
-  "dependencies": {
-    "@melledijkstra/auth": "workspace:*",
-    "@melledijkstra/config": "workspace:*",
-    "@melledijkstra/storage": "workspace:*",
-    "@melledijkstra/toolbox": "workspace:*"
+    "vitest": "catalog:"
   }
 }
