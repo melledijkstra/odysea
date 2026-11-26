@@ -8,7 +8,9 @@ const habitsModule: Module = {
   scene: HabitsScene,
   trigger: HabitsTrigger,
   init: () => {
-    habits.initialize()
+    habits.initialize().catch((error) => {
+      console.error('Failed to initialize habits:', error)
+    })
   },
 }
 

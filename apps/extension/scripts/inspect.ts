@@ -6,14 +6,25 @@ import {
 } from '@playwright/test'
 import * as path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+  unlinkSync,
+} from 'node:fs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const EXTENSION_PATH = path.resolve(__dirname, '../dist')
-const SESSION_FILE = path.resolve('/tmp/odysea-inspect-session.json')
-const USER_DATA_DIR = path.resolve('/tmp/odysea-inspect-profile')
-const LOGS_FILE = path.resolve('/tmp/odysea-inspect-logs.json')
+const INSPECT_DIR = path.resolve(__dirname, '../.inspect')
+const SESSION_FILE = path.join(INSPECT_DIR, 'session.json')
+const USER_DATA_DIR = path.join(INSPECT_DIR, 'profile')
+const LOGS_FILE = path.join(INSPECT_DIR, 'logs.json')
 const CDP_PORT = 9333
+
+function ensureInspectDir() {
+  mkdirSync(INSPECT_DIR, { recursive: true, mode: 0o700 })
+}
 
 interface SessionInfo {
   wsEndpoint: string
@@ -85,6 +96,7 @@ function appendLog(
     if (logs.console.length > 200) logs.console.shift()
   }
   try {
+    ensureInspectDir()
     writeFileSync(LOGS_FILE, JSON.stringify(logs, null, 2))
   } catch (err) {
     void err
@@ -141,6 +153,7 @@ async function getOrCreateContext(): Promise<{
   cleanStaleLocks(USER_DATA_DIR)
 
   // 3. Launch fresh persistent context
+  ensureInspectDir()
   const isHeadless = process.argv.includes('--headless')
   const context = await chromium.launchPersistentContext(USER_DATA_DIR, {
     headless: isHeadless,

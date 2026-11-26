@@ -15,3 +15,6 @@ coverage/
 # rollup visualizer file
 stats.html
 stats-*.html
+
+# extension inspect script state
+.inspect/

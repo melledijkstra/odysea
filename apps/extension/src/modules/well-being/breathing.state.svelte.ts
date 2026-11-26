@@ -150,7 +150,9 @@ export class BreathingState {
           ? browser.runtime.getURL('audio/happy-bell.wav')
           : '/audio/happy-bell.wav'
         const audio = new Audio(url)
-        audio.play()
+        audio.play().catch((error) => {
+          this.logger.warn('Audio playback error', error)
+        })
       }
     } catch (error) {
       this.logger.warn('Audio playback error', error)

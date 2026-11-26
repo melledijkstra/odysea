@@ -9,8 +9,6 @@ export async function dailyImageHandler(context: Context): Promise<Response> {
 
   const extensionId = context.req.header('x-extension-id') ?? ''
 
-  console.log('Extension ID:', extensionId)
-
   if (extensionId !== EXTENSION_ID) {
     return context.json(
       {

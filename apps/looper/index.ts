@@ -15,6 +15,7 @@ if (config.timezone && !process.env['TZ']) {
 const logger = new Logger('looper')
 
 const app = express()
+app.disable('x-powered-by')
 const PORT = config.port
 
 app.use(express.json())

@@ -32,8 +32,8 @@ browser.notifications.onClicked.addListener((notificationId) => {
   browser.tabs.create({ url: '/index.html' })
 })
 
-self.addEventListener('install', () => {
-  self.skipWaiting()
+self.addEventListener('install', (e) => {
+  e.waitUntil(self.skipWaiting())
 })
 
 self.addEventListener('activate', (e) => {
