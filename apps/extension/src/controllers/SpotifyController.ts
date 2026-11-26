@@ -104,7 +104,9 @@ export class SpotifyController extends BaseMusicController implements ILogger {
 
   private handlePlayerReady(deviceId: string) {
     spotifyState.deviceId = deviceId
-    this.retrieveDevices()
+    this.retrieveDevices().catch((err) => {
+      this.logger.error('Failed to retrieve Spotify devices:', err)
+    })
   }
 
   private handlePlayerNotReady() {
@@ -160,7 +162,7 @@ export class SpotifyController extends BaseMusicController implements ILogger {
     } else {
       await this.apiService.play()
     }
-    super.play()
+    await super.play()
   }
 
   async pause() {
@@ -170,7 +172,7 @@ export class SpotifyController extends BaseMusicController implements ILogger {
     } else {
       await this.apiService.pause()
     }
-    super.pause()
+    await super.pause()
   }
 
   async next() {
@@ -198,7 +200,7 @@ export class SpotifyController extends BaseMusicController implements ILogger {
     } else {
       await this.apiService.setVolume(volume)
     }
-    super.setVolume(volume)
+    await super.setVolume(volume)
   }
 
   async seek(position: number) {
@@ -211,11 +213,13 @@ export class SpotifyController extends BaseMusicController implements ILogger {
       this.state.playback.position_ms = position
       this.setupPlaybackLoop()
     }
-    super.seek(position)
+    await super.seek(position)
   }
 
   trackEnded(): void {
-    this.getPlaybackState()
+    this.getPlaybackState().catch((err) => {
+      this.logger.warn('Failed to retrieve playback state on track end:', err)
+    })
   }
 
   async getPlaybackState(): Promise<PlaybackState> {

@@ -33,12 +33,14 @@ export class Sleep extends Tracker implements SleepTracker {
     return authState.hasScopes('google-health', [SLEEP_SCOPE])
   }
 
-  async init() {
+  init() {
     this.effectCleanup = $effect.root(() => {
       $effect(() => {
         if (this.authenticated) {
           untrack(() => {
-            this.fetchData()
+            this.fetchData().catch((error) => {
+              console.error('Error fetching sleep data:', error)
+            })
           })
         } else {
           this.minutes = undefined
@@ -49,7 +51,9 @@ export class Sleep extends Tracker implements SleepTracker {
     this.cancelUpdater = repeatEvery(
       () => {
         if (this.authenticated) {
-          this.fetchData()
+          this.fetchData().catch((error) => {
+            console.error('Error fetching sleep data:', error)
+          })
         }
       },
       60 * 60 * 1000

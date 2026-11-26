@@ -53,7 +53,7 @@ export abstract class BaseMusicController
     this.stopPlaybackLoop()
   }
 
-  async setupPlaybackLoop(initialPos?: number) {
+  setupPlaybackLoop(initialPos?: number) {
     if (this.cancelPlaybackLoop) {
       this.logger.log('Playback loop already set up, cancelling previous loop')
       this.cancelPlaybackLoop()
@@ -111,7 +111,7 @@ export abstract class BaseMusicController
     this.state.playback.position_ms = position
   }
 
-  setVolume(volume: number): void {
+  setVolume(volume: number): Promise<void> | void {
     this.state.playback.volume = volume
   }
 }

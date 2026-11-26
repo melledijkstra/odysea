@@ -18,8 +18,7 @@ type LocationResponse = {
 
 export type LocationInfo = Omit<LocationResponse, 'status' | 'message'>
 
-// unfortunately ipapi.co does not support https for free accounts
-const LOCATION_API_URL = 'http://ipapi.co/json/'
+const LOCATION_API_URL = 'https://ipapi.co/json/'
 
 async function fetchGeolocation(): Promise<LocationResponse | undefined> {
   const response = await fetch(LOCATION_API_URL)

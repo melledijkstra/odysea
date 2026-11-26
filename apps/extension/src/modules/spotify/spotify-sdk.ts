@@ -76,7 +76,7 @@ export async function initializeSpotifyPlayer(
         const player = createPlayer(authClient, initialVolume)
         resolve(player)
       }
-      loadSpotifySDK()
+      loadSpotifySDK().catch(reject)
     } catch (error) {
       reject(error)
     }

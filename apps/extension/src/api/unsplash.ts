@@ -178,15 +178,20 @@ export class UnsplashClient extends BaseUnsplashClient {
       dailyImageInfo = cached
 
       // Ensure next image is pre-cached if not yet present or config mismatched
-      this.cache.getNextImageInfo().then((next) => {
-        if (
-          !next ||
-          next.date !== formatDate(addDays(new Date(), 1)) ||
-          !this.isConfigMatch(next.config)
-        ) {
-          this.scheduleRetrieveNextImage()
-        }
-      })
+      this.cache
+        .getNextImageInfo()
+        .then((next) => {
+          if (
+            !next ||
+            next.date !== formatDate(addDays(new Date(), 1)) ||
+            !this.isConfigMatch(next.config)
+          ) {
+            this.scheduleRetrieveNextImage()
+          }
+        })
+        .catch((error) => {
+          this.logger.error('Failed to check next image cache:', error)
+        })
     } else {
       const next = await this.cache.getNextImageInfo()
 

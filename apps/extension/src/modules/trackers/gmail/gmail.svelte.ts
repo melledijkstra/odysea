@@ -32,15 +32,17 @@ export class Gmail extends Tracker implements GmailTracker {
   }
 
   override onclick() {
-    window.open('https://mail.google.com/mail', '_blank')
+    window.open('https://mail.google.com/mail', '_blank', 'noopener,noreferrer')
   }
 
-  async init() {
+  init() {
     this.effectCleanup = $effect.root(() => {
       $effect(() => {
         if (this.authenticated) {
           untrack(() => {
-            this.fetchData()
+            this.fetchData().catch((error) => {
+              console.error('Error fetching Gmail data:', error)
+            })
           })
         } else {
           this.unread = undefined
@@ -50,7 +52,9 @@ export class Gmail extends Tracker implements GmailTracker {
 
     this.cancelUpdater = repeatEvery(() => {
       if (this.authenticated) {
-        this.fetchData()
+        this.fetchData().catch((error) => {
+          console.error('Error fetching Gmail data:', error)
+        })
       }
     }, 60 * 1000)
   }
