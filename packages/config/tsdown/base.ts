@@ -1,13 +1,13 @@
 import { defineConfig } from 'tsdown'
-import { visualizer } from 'rollup-plugin-visualizer'
+import { visualizer, type BundlerOutputOptions } from 'rollup-plugin-visualizer'
 
 const plugins = []
 
 if (process.env.ANALYZE === 'true') {
   plugins.push(
-    visualizer((outputOpts) => ({
+    visualizer((outputOpts: BundlerOutputOptions & { format?: string }) => ({
       open: true,
-      filename: `stats-${outputOpts.format}.html`,
+      filename: `stats-${outputOpts.format ?? 'bundle'}.html`,
     }))
   )
 }
