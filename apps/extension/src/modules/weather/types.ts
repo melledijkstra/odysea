@@ -1,4 +1,4 @@
-export type WeatherPanelCurrent = {
+export type WeatherDetails = {
   iconId: string
   temperatureC: number
   feelsLikeC: number
@@ -18,7 +18,7 @@ export type WeatherPanelCurrent = {
   pressureHpa: number
 }
 
-export type WeatherPanelHourlyItem = {
+export type HourlyWeather = {
   id: number
   label: string
   iconId: string
@@ -26,7 +26,7 @@ export type WeatherPanelHourlyItem = {
   precipChance: number
 }
 
-export type WeatherPanelDailyItem = {
+export type DailyWeather = {
   id: number
   label: string
   iconId: string
@@ -36,4 +36,4 @@ export type WeatherPanelDailyItem = {
   precipChance: number
 }
 
-export type WeatherPanelTab = 'today' | 'forecast'
+export type WeatherTab = 'today' | 'forecast'

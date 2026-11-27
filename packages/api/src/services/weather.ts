@@ -1,4 +1,3 @@
-import { Logger } from '@melledijkstra/toolbox'
 import { getCurrentPosition } from './geolocation'
 import type {
   OneCallCurrentRecord,
@@ -63,8 +62,6 @@ export type GeoPosition = {
   lon: number
 }
 
-const logger = new Logger('weather')
-
 const BASE_URL = 'https://api.openweathermap.org'
 
 export class WeatherClient extends ApiKeyBaseClient {
@@ -101,7 +98,6 @@ export class WeatherClient extends ApiKeyBaseClient {
     const current = response?.data?.[0]
     if (!response || !current) return undefined
 
-    logger.log('retrieved current weather data from One Call 4.0 API')
     const condition = current.weather[0]
     return {
       dt: current.dt,
@@ -136,7 +132,6 @@ export class WeatherClient extends ApiKeyBaseClient {
 
     if (!response?.data) return undefined
 
-    logger.log('retrieved hourly forecast from One Call 4.0 API')
     return response.data.map((item) => {
       const condition = item.weather[0]
       return {
@@ -161,7 +156,6 @@ export class WeatherClient extends ApiKeyBaseClient {
 
     if (!response?.data) return undefined
 
-    logger.log('retrieved daily forecast from One Call 4.0 API')
     return response.data.map((item) => {
       const condition = item.weather[0]
       return {

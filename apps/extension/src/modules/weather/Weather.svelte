@@ -14,9 +14,9 @@
   import WeatherPanel from './WeatherPanel.svelte'
   import {
     formatRelativeUpdatedAt,
-    mapCurrentWeatherToPanel,
-    mapDailyToPanel,
-    mapHourlyToPanel,
+    mapCurrentWeather,
+    mapDailyWeather,
+    mapHourlyWeather,
   } from './utils'
 
   let isOpen = $state(false)
@@ -35,38 +35,32 @@
 
   const locationName = $derived(locationQuery.data ?? '')
 
-  const panelCurrent = $derived(
-    weatherQuery.data
-      ? mapCurrentWeatherToPanel(weatherQuery.data, dailyQuery.data?.[0])
-      : undefined
-  )
-
-  const panelHourly = $derived(
-    weatherQuery.data && hourlyQuery.data
-      ? mapHourlyToPanel(hourlyQuery.data, weatherQuery.data.timezoneOffset)
-      : []
-  )
-
-  const panelDaily = $derived(
-    weatherQuery.data && dailyQuery.data
-      ? mapDailyToPanel(dailyQuery.data, weatherQuery.data.timezoneOffset)
-      : []
-  )
-
   const updatedLabel = $derived(
     formatRelativeUpdatedAt(weatherQuery.dataUpdatedAt || undefined)
   )
 
   function handleRefresh() {
-    void weatherQuery.refetch()
+    weatherQuery.refetch()
     if (isOpen) {
-      void hourlyQuery.refetch()
-      void dailyQuery.refetch()
+      hourlyQuery.refetch()
+      dailyQuery.refetch()
     }
   }
 </script>
 
-{#if weatherQuery?.data && panelCurrent}
+{#if weatherQuery.data}
+  {@const currentWeather = mapCurrentWeather(
+    weatherQuery.data,
+    dailyQuery.data?.[0]
+  )}
+  {@const hourlyWeather = mapHourlyWeather(
+    hourlyQuery.data ?? [],
+    weatherQuery.data.timezoneOffset
+  )}
+  {@const dailyWeather = mapDailyWeather(
+    dailyQuery.data ?? [],
+    weatherQuery.data.timezoneOffset
+  )}
   <Popover.Root bind:open={isOpen}>
     <Popover.Trigger
       class="cursor-pointer rounded-md px-1.5 py-0.5 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden transition-colors"
@@ -82,9 +76,9 @@
     </Popover.Trigger>
     <WeatherPanel
       location={locationName}
-      current={panelCurrent}
-      hourly={panelHourly}
-      daily={panelDaily}
+      current={currentWeather}
+      hourly={hourlyWeather}
+      daily={dailyWeather}
       isHourlyLoading={hourlyQuery.isPending}
       isDailyLoading={dailyQuery.isPending}
       hourlyError={hourlyQuery.isError}
@@ -92,8 +86,8 @@
       {isRefreshing}
       {updatedLabel}
       onRefresh={handleRefresh}
-      onRetryHourly={() => void hourlyQuery.refetch()}
-      onRetryDaily={() => void dailyQuery.refetch()}
+      onRetryHourly={() => hourlyQuery.refetch()}
+      onRetryDaily={() => dailyQuery.refetch()}
     />
   </Popover.Root>
 {:else if isPending}

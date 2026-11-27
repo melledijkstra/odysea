@@ -22,11 +22,7 @@ import {
   uvIndexLevel,
   windDegToCompass,
 } from '@melledijkstra/toolbox'
-import type {
-  WeatherPanelCurrent,
-  WeatherPanelDailyItem,
-  WeatherPanelHourlyItem,
-} from './types'
+import type { DailyWeather, HourlyWeather, WeatherDetails } from './types'
 
 export function weatherToMdiIcon(icon?: string) {
   switch (icon) {
@@ -145,10 +141,10 @@ export function computeTempMarkerPercent(
   return Math.max(0, Math.min(100, ((value - overallMin) / span) * 100))
 }
 
-export function mapCurrentWeatherToPanel(
+export function mapCurrentWeather(
   current: CurrentWeather,
   todayDaily?: DailyForecastItem
-): WeatherPanelCurrent {
+): WeatherDetails {
   const offset = current.timezoneOffset
   return {
     iconId: current.icon,
@@ -178,10 +174,10 @@ export function mapCurrentWeatherToPanel(
   }
 }
 
-export function mapHourlyToPanel(
+export function mapHourlyWeather(
   items: HourlyForecastItem[],
   timezoneOffsetSeconds: number
-): WeatherPanelHourlyItem[] {
+): HourlyWeather[] {
   return items.map((item, idx) => ({
     id: item.dt,
     label: idx === 0 ? 'Now' : formatHour(item.dt, timezoneOffsetSeconds),
@@ -191,10 +187,10 @@ export function mapHourlyToPanel(
   }))
 }
 
-export function mapDailyToPanel(
+export function mapDailyWeather(
   items: DailyForecastItem[],
   timezoneOffsetSeconds: number
-): WeatherPanelDailyItem[] {
+): DailyWeather[] {
   return items.map((item, idx) => ({
     id: item.dt,
     label: formatDayName(item.dt, timezoneOffsetSeconds, idx),
