@@ -26,15 +26,6 @@ Domain documentation uses a single-context layout (`CONTEXT.md`). See `docs/agen
 
 ### Extension Inspection & Testing
 
-- **Built-in IDE Browser (Preferred)**: If the Antigravity IDE built-in browser is available, ALWAYS prioritize using it for interactive testing, debugging, and visual inspection of extension pages (e.g., `chrome-extension://...`) and web apps/Storybook. It is more reliable than the CLI script, natively renders extension and local pages, and keeps session state visible in the IDE.
-- **Interactive Playwright CLI (Fallback / Headless)**: If the IDE browser is not available, use `pnpm inspect` (or `pnpm --filter @odysea/extension inspect <command>`). It launches and maintains a live Playwright Chromium session with `--load-extension` and exposes fast CLI commands:
-  - `pnpm inspect open [home|popup|options|debug|<url>]`: Open/navigate to an extension page.
-  - `pnpm inspect snapshot`: Output visible text and DOM state from the active page.
-  - `pnpm inspect network`: Print recent network requests (status, size, duration, headers).
-  - `pnpm inspect console`: Print recent console logs, warnings, and errors.
-  - `pnpm inspect eval "<js code>"`: Evaluate JavaScript in the active extension tab context.
-  - `pnpm inspect click "<selector>"` / `pnpm inspect fill "<selector>" "<text>"`: Interact with elements.
-  - `pnpm inspect screenshot [path]`: Capture full-page screenshot.
-  - `pnpm inspect close`: Close the live browser session.
+- **Built-in IDE Browser / Chrome DevTools (Preferred)**: Use the Antigravity IDE built-in browser or Chrome DevTools for interactive testing, debugging, and visual inspection of extension pages (e.g., `chrome-extension://...`) and web apps/Storybook.
 - **Automated Verification**: For formal test validation, run Playwright E2E tests (`pnpm --filter @odysea/extension test:e2e`).
 - **Storybook UI Inspection**: For isolated component styling and layout changes, run and inspect Storybook on port 6006 (`pnpm --filter @odysea/extension storybook`).
