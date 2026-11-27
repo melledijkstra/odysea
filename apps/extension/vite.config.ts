@@ -75,6 +75,7 @@ const viteConfig = defineConfig(({ mode }) => ({
   ...defineProject({
     test: {
       environment: 'jsdom',
+      pool: 'vmThreads',
       setupFiles: ['./test-setup.ts'],
       exclude: ['**/node_modules/**', '**/dist/**', '**/tests/e2e/**'],
     },
